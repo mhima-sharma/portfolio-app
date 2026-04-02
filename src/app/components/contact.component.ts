@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { EMAILJS_CONFIG, isEmailJsConfigured } from '../config/email.config';
 import { PortfolioService } from '../services/portfolio.service';
 
 @Component({
@@ -30,6 +31,18 @@ import { PortfolioService } from '../services/portfolio.service';
                   </a>
                 </div>
               </div>
+
+              <a
+                [href]="directEmailLink()"
+                class="inline-flex items-center gap-2 rounded-lg border border-primary-200 bg-primary-50 px-4 py-3 font-medium text-primary-700 transition-colors hover:bg-primary-100 dark:border-primary-500/30 dark:bg-primary-500/10 dark:text-primary-300 dark:hover:bg-primary-500/20"
+              >
+                <span>Send email directly</span>
+                <span>↗</span>
+              </a>
+
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                Visitors can email you directly, and the form below can send messages straight to your inbox.
+              </p>
               }
 
               @if (contact().phone) {
@@ -80,6 +93,12 @@ import { PortfolioService } from '../services/portfolio.service';
 
           <div class="card p-8">
             <form (ngSubmit)="submitForm()" class="space-y-4">
+              @if (contact().email) {
+              <div class="rounded-lg border border-primary-200 bg-primary-50 px-4 py-3 text-sm text-primary-700 dark:border-primary-500/30 dark:bg-primary-500/10 dark:text-primary-300">
+                Messages from this form will be sent to {{ contact().email }}.
+              </div>
+              }
+
               <div>
                 <label for="name" class="block text-sm font-medium text-dark-900 dark:text-white mb-2">Name</label>
                 <input
@@ -119,14 +138,28 @@ import { PortfolioService } from '../services/portfolio.service';
                 ></textarea>
               </div>
 
-              <button type="submit" class="w-full btn-primary" [disabled]="!canSendMessage()">
-                <span>{{ canSendMessage() ? 'Send Message' : 'Email Not Available' }}</span>
+              <button type="submit" class="w-full btn-primary" [disabled]="!canSendMessage() || isSending()">
+                <span>
+                  {{
+                    !canSendMessage()
+                      ? 'Email Not Available'
+                      : isSending()
+                        ? 'Sending...'
+                        : 'Send Message'
+                  }}
+                </span>
                 <span>✈️</span>
               </button>
 
               @if (submitted()) {
               <div class="mt-4 p-3 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-lg">
-                Mail draft opened successfully.
+                Message sent successfully.
+              </div>
+              }
+
+              @if (errorMessage()) {
+              <div class="mt-4 p-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg">
+                {{ errorMessage() }}
               </div>
               }
             </form>
@@ -148,26 +181,70 @@ export class ContactComponent {
   };
 
   submitted = signal(false);
+  isSending = signal(false);
+  errorMessage = signal('');
   contact = this.portfolioService.contact;
-  canSendMessage = computed(() => Boolean(this.contact().email));
+  canSendMessage = computed(() => Boolean(this.contact().email) && isEmailJsConfigured());
+  directEmailLink = computed(() =>
+    this.contact().email
+      ? `mailto:${this.contact().email}?subject=${encodeURIComponent('Portfolio enquiry')}`
+      : '#contact'
+  );
 
-  submitForm() {
+  async submitForm() {
     const email = this.contact().email;
 
+    this.errorMessage.set('');
+
     if (!email) {
+      this.errorMessage.set('Contact email is not available right now.');
       return;
     }
 
-    const subject = encodeURIComponent(`Portfolio enquiry from ${this.formData.name || 'Website visitor'}`);
-    const body = encodeURIComponent(
-      [`Name: ${this.formData.name}`, `Email: ${this.formData.email}`, '', this.formData.message].join('\n')
-    );
+    if (!isEmailJsConfigured()) {
+      this.errorMessage.set('Email sending is not configured yet. Add your EmailJS keys to continue.');
+      return;
+    }
 
-    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
-    this.submitted.set(true);
+    this.isSending.set(true);
+    this.submitted.set(false);
+
+    try {
+      const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          service_id: EMAILJS_CONFIG.serviceId,
+          template_id: EMAILJS_CONFIG.templateId,
+          user_id: EMAILJS_CONFIG.publicKey,
+          template_params: {
+            to_email: EMAILJS_CONFIG.recipientEmail,
+            to_name: 'Madhav',
+            from_name: this.formData.name,
+            from_email: this.formData.email,
+            reply_to: this.formData.email,
+            subject: `Portfolio enquiry from ${this.formData.name || 'Website visitor'}`,
+            message: this.formData.message,
+          },
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Unable to send message right now.');
+      }
+
+      this.submitted.set(true);
+      this.formData = { name: '', email: '', message: '' };
+    } catch (error) {
+      console.error('Email send failed:', error);
+      this.errorMessage.set('Message send nahi hua. Please try again in a moment.');
+    } finally {
+      this.isSending.set(false);
+    }
 
     setTimeout(() => {
-      this.formData = { name: '', email: '', message: '' };
       this.submitted.set(false);
     }, 3000);
   }

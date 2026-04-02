@@ -3,6 +3,20 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Skill, Project, Experience, AboutData, ContactData } from '../models/portfolio.model';
 import { API_BASE_URL, HEALTH_URL } from '../config/api.config';
 
+const DEFAULT_CONTACT: ContactData = {
+  email: 'dev.nest.ms@gmail.com',
+  phone: '',
+  location: '',
+  github: '',
+  linkedin: '',
+  medium: '',
+  tableau: '',
+  leetcode: '',
+  instagram: '',
+  youtube: '',
+  portfolio: '',
+};
+
 @Injectable({ providedIn: 'root' })
 export class PortfolioService {
   private http = inject(HttpClient);
@@ -17,19 +31,7 @@ export class PortfolioService {
     yearsExperience: 0,
   });
 
-  contact = signal<ContactData>({
-    email: '',
-    phone: '',
-    location: '',
-    github: '',
-    linkedin: '',
-    medium: '',
-    tableau: '',
-    leetcode: '',
-    instagram: '',
-    youtube: '',
-    portfolio: '',
-  });
+  contact = signal<ContactData>({ ...DEFAULT_CONTACT });
 
   isLoading = signal(false);
   error = signal<string | null>(null);
@@ -63,17 +65,17 @@ export class PortfolioService {
           });
 
           this.contact.set({
-            email: data?.contact?.email ?? '',
-            phone: data?.contact?.phone ?? '',
-            location: data?.contact?.location ?? '',
-            github: data?.contact?.github ?? '',
-            linkedin: data?.contact?.linkedin ?? '',
-            medium: data?.contact?.medium ?? '',
-            tableau: data?.contact?.tableau ?? '',
-            leetcode: data?.contact?.leetcode ?? '',
-            instagram: data?.contact?.instagram ?? '',
-            youtube: data?.contact?.youtube ?? '',
-            portfolio: data?.contact?.portfolio ?? '',
+            email: data?.contact?.email ?? DEFAULT_CONTACT.email,
+            phone: data?.contact?.phone ?? DEFAULT_CONTACT.phone,
+            location: data?.contact?.location ?? DEFAULT_CONTACT.location,
+            github: data?.contact?.github ?? DEFAULT_CONTACT.github,
+            linkedin: data?.contact?.linkedin ?? DEFAULT_CONTACT.linkedin,
+            medium: data?.contact?.medium ?? DEFAULT_CONTACT.medium,
+            tableau: data?.contact?.tableau ?? DEFAULT_CONTACT.tableau,
+            leetcode: data?.contact?.leetcode ?? DEFAULT_CONTACT.leetcode,
+            instagram: data?.contact?.instagram ?? DEFAULT_CONTACT.instagram,
+            youtube: data?.contact?.youtube ?? DEFAULT_CONTACT.youtube,
+            portfolio: data?.contact?.portfolio ?? DEFAULT_CONTACT.portfolio,
           });
 
           this.skillsData.set(
@@ -88,7 +90,9 @@ export class PortfolioService {
 
           this.experienceData.set(
             Array.isArray(data?.experience)
-              ? data.experience.map((experience: any) => this.mapExperience(experience))
+              ? this.sortExperience(
+                  data.experience.map((experience: any) => this.mapExperience(experience))
+                )
               : []
           );
 
@@ -101,19 +105,7 @@ export class PortfolioService {
           this.projectsData.set([]);
           this.experienceData.set([]);
           this.about.set({ bio: '', description: '', yearsExperience: 0 });
-          this.contact.set({
-            email: '',
-            phone: '',
-            location: '',
-            github: '',
-            linkedin: '',
-            medium: '',
-            tableau: '',
-            leetcode: '',
-            instagram: '',
-            youtube: '',
-            portfolio: '',
-          });
+          this.contact.set({ ...DEFAULT_CONTACT });
           this.isLoading.set(false);
         },
       });
@@ -140,17 +132,17 @@ export class PortfolioService {
 
     if (response?.data) {
       this.contact.set({
-        email: response.data.email ?? '',
-        phone: response.data.phone ?? '',
-        location: response.data.location ?? '',
-        github: response.data.github ?? '',
-        linkedin: response.data.linkedin ?? '',
-        medium: response.data.medium ?? '',
-        tableau: response.data.tableau ?? '',
-        leetcode: response.data.leetcode ?? '',
-        instagram: response.data.instagram ?? '',
-        youtube: response.data.youtube ?? '',
-        portfolio: response.data.portfolio ?? '',
+        email: response.data.email ?? DEFAULT_CONTACT.email,
+        phone: response.data.phone ?? DEFAULT_CONTACT.phone,
+        location: response.data.location ?? DEFAULT_CONTACT.location,
+        github: response.data.github ?? DEFAULT_CONTACT.github,
+        linkedin: response.data.linkedin ?? DEFAULT_CONTACT.linkedin,
+        medium: response.data.medium ?? DEFAULT_CONTACT.medium,
+        tableau: response.data.tableau ?? DEFAULT_CONTACT.tableau,
+        leetcode: response.data.leetcode ?? DEFAULT_CONTACT.leetcode,
+        instagram: response.data.instagram ?? DEFAULT_CONTACT.instagram,
+        youtube: response.data.youtube ?? DEFAULT_CONTACT.youtube,
+        portfolio: response.data.portfolio ?? DEFAULT_CONTACT.portfolio,
       });
     }
   }
@@ -219,7 +211,9 @@ export class PortfolioService {
       .toPromise();
 
     if (response?.data) {
-      this.experienceData.update((items) => [...items, this.mapExperience(response.data)]);
+      this.experienceData.update((items) =>
+        this.sortExperience([...items, this.mapExperience(response.data)])
+      );
     }
   }
 
@@ -232,7 +226,9 @@ export class PortfolioService {
 
     if (response?.data) {
       this.experienceData.update((items) =>
-        items.map((item) => (item.id === id ? this.mapExperience(response.data) : item))
+        this.sortExperience(
+          items.map((item) => (item.id === id ? this.mapExperience(response.data) : item))
+        )
       );
     }
   }
@@ -332,6 +328,38 @@ export class PortfolioService {
       startDate: experience.startDate ?? '',
       endDate: experience.endDate ?? '',
     };
+  }
+
+  private sortExperience(items: Experience[]): Experience[] {
+    return [...items].sort((a, b) => {
+      const aIsCurrent = this.isCurrentExperience(a);
+      const bIsCurrent = this.isCurrentExperience(b);
+
+      if (aIsCurrent !== bIsCurrent) {
+        return aIsCurrent ? -1 : 1;
+      }
+
+      const endDateDiff = this.toTimestamp(b.endDate) - this.toTimestamp(a.endDate);
+      if (endDateDiff !== 0) {
+        return endDateDiff;
+      }
+
+      return this.toTimestamp(b.startDate) - this.toTimestamp(a.startDate);
+    });
+  }
+
+  private isCurrentExperience(item: Experience): boolean {
+    const duration = item.duration.trim().toLowerCase();
+    return !item.endDate || duration.includes('present') || duration.includes('current');
+  }
+
+  private toTimestamp(value: string): number {
+    if (!value) {
+      return 0;
+    }
+
+    const timestamp = new Date(value).getTime();
+    return Number.isNaN(timestamp) ? 0 : timestamp;
   }
 
   private normalizeCategory(category: string): Skill['category'] {
