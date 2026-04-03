@@ -70,6 +70,37 @@ type ValidationErrors = Record<string, string>;
           </div>
         </section>
 
+        <section class="admin-panel p-6 md:p-7">
+          <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+            <div>
+              <p class="admin-panel__eyebrow">Public Portfolio</p>
+              <h2 class="admin-panel__title">Your Live URL</h2>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                Isi link ko share karke koi bhi aapka portfolio dekh sakta hai.
+              </p>
+            </div>
+
+            @if (profileSlug()) {
+            <div class="flex flex-wrap items-center gap-3">
+              <button class="btn-secondary" (click)="openPortfolio()" [disabled]="!publicPortfolioUrl()">Open Portfolio</button>
+              <button class="btn-primary" (click)="copyPortfolioUrl()" [disabled]="!publicPortfolioUrl()">Copy Link</button>
+            </div>
+            }
+          </div>
+
+          <div class="mt-5 rounded-2xl border border-dashed border-primary-200 dark:border-primary-500/30 bg-primary-50/70 dark:bg-primary-500/10 px-4 py-4">
+            <p class="text-xs uppercase tracking-[0.22em] text-primary-700 dark:text-primary-300">Public URL</p>
+            <p class="mt-2 text-base md:text-lg font-semibold text-dark-900 dark:text-white break-all">
+              {{ publicPortfolioUrl() || 'Portfolio URL will appear after profile slug is available.' }}
+            </p>
+            @if (profileSlug()) {
+              <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                Slug: <span class="font-semibold text-dark-900 dark:text-white">{{ profileSlug() }}</span>
+              </p>
+            }
+          </div>
+        </section>
+
         <section class="grid lg:grid-cols-2 gap-6">
           <div class="admin-panel p-6 md:p-7">
             <div class="admin-panel__header">
@@ -611,8 +642,27 @@ export class AdminDashboardComponent {
   skills = this.portfolioService.getSkills;
   projects = this.portfolioService.getProjects;
   experience = this.portfolioService.getExperience;
+  profileSlug = signal('');
+  publicPortfolioUrl = signal('');
 
   constructor() {
+    effect(() => {
+      this.portfolioService.loadPortfolio(this.authService.admin()?.profile?.slug);
+    });
+
+    effect(() => {
+      const slug = this.authService.admin()?.profile?.slug?.trim() || '';
+
+      this.profileSlug.set(slug);
+
+      if (typeof window === 'undefined') {
+        this.publicPortfolioUrl.set(slug ? `/${slug}` : '');
+        return;
+      }
+
+      this.publicPortfolioUrl.set(slug ? `${window.location.origin}/${slug}` : '');
+    });
+
     effect(() => {
       this.aboutForm = { ...this.portfolioService.about() };
       this.contactForm = { ...this.portfolioService.contact() };
@@ -620,9 +670,29 @@ export class AdminDashboardComponent {
   }
 
   refresh() {
-    this.portfolioService.loadPortfolio();
+    this.portfolioService.loadPortfolio(this.authService.admin()?.profile?.slug);
     this.hydrateForms();
     this.setStatus('Portfolio refreshed.');
+  }
+
+  openPortfolio() {
+    const url = this.publicPortfolioUrl();
+    if (!url || typeof window === 'undefined') {
+      return;
+    }
+
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+
+  async copyPortfolioUrl() {
+    const url = this.publicPortfolioUrl();
+    if (!url || typeof navigator === 'undefined' || !navigator.clipboard) {
+      this.error.set('Unable to copy portfolio URL on this device.');
+      return;
+    }
+
+    await navigator.clipboard.writeText(url);
+    this.setStatus('Portfolio URL copied.');
   }
 
   async saveAbout() {

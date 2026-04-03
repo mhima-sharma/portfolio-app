@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { PortfolioService } from '../services/portfolio.service';
 
 @Component({
   selector: 'app-footer',
@@ -37,7 +38,13 @@ import { AuthService } from '../services/auth.service';
 })
 export class FooterComponent {
   private authService = inject(AuthService);
+  private portfolioService = inject(PortfolioService);
 
-  displayName = computed(() => this.authService.admin()?.name?.trim() || 'Portfolio Owner');
+  displayName = computed(
+    () =>
+      this.portfolioService.currentProfile().name?.trim() ||
+      this.authService.admin()?.name?.trim() ||
+      'Portfolio Owner'
+  );
   currentYear = computed(() => new Date().getFullYear());
 }

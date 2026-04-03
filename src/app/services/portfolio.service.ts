@@ -1,6 +1,13 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Skill, Project, Experience, AboutData, ContactData } from '../models/portfolio.model';
+import {
+  Skill,
+  Project,
+  Experience,
+  AboutData,
+  ContactData,
+  ProfileData,
+} from '../models/portfolio.model';
 import { API_BASE_URL, HEALTH_URL } from '../config/api.config';
 
 const DEFAULT_CONTACT: ContactData = {
@@ -17,6 +24,12 @@ const DEFAULT_CONTACT: ContactData = {
   portfolio: '',
 };
 
+const DEFAULT_PROFILE: ProfileData = {
+  slug: '',
+  name: '',
+  title: '',
+};
+
 @Injectable({ providedIn: 'root' })
 export class PortfolioService {
   private http = inject(HttpClient);
@@ -24,6 +37,7 @@ export class PortfolioService {
   private skillsData = signal<Skill[]>([]);
   private projectsData = signal<Project[]>([]);
   private experienceData = signal<Experience[]>([]);
+  currentProfile = signal<ProfileData>({ ...DEFAULT_PROFILE });
 
   about = signal<AboutData>({
     bio: '',
@@ -40,23 +54,32 @@ export class PortfolioService {
   getProjects = this.projectsData.asReadonly();
   getExperience = this.experienceData.asReadonly();
 
-  constructor() {
-    this.loadPortfolio();
-  }
+  constructor() {}
 
   checkHealth() {
     return this.http.get<{ success?: boolean; message?: string }>(HEALTH_URL);
   }
 
-  loadPortfolio() {
+  loadPortfolio(profileSlug?: string) {
     this.isLoading.set(true);
     this.error.set(null);
 
+    const normalizedSlug = this.normalizeSlug(profileSlug);
+    const endpoint = normalizedSlug
+      ? `${API_BASE_URL}/portfolio/${encodeURIComponent(normalizedSlug)}`
+      : `${API_BASE_URL}/portfolio`;
+
     this.http
-      .get<{ success: boolean; message: string; data: any }>(`${API_BASE_URL}/portfolio`)
+      .get<{ success: boolean; message: string; data: any }>(endpoint)
       .subscribe({
         next: (response) => {
           const data = response.data;
+
+          this.currentProfile.set({
+            slug: data?.profile?.slug ?? normalizedSlug,
+            name: data?.profile?.name ?? data?.about?.name ?? '',
+            title: data?.profile?.title ?? data?.about?.title ?? '',
+          });
 
           this.about.set({
             bio: data?.about?.bio ?? '',
@@ -101,6 +124,11 @@ export class PortfolioService {
         error: (error) => {
           console.error('Failed to load portfolio data:', error);
           this.error.set('Unable to load live portfolio data.');
+          this.currentProfile.set({
+            slug: normalizedSlug,
+            name: '',
+            title: '',
+          });
           this.skillsData.set([]);
           this.projectsData.set([]);
           this.experienceData.set([]);
@@ -386,5 +414,9 @@ export class PortfolioService {
       default:
         return 'tools';
     }
+  }
+
+  private normalizeSlug(profileSlug?: string): string {
+    return (profileSlug ?? '').trim().toLowerCase();
   }
 }

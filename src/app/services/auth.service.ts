@@ -3,16 +3,28 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { API_BASE_URL } from '../config/api.config';
 
-interface LoginResponse {
+interface AuthProfile {
+  id?: number;
+  name?: string;
+  slug?: string;
+  title?: string;
+}
+
+interface AuthAdmin {
+  id: number;
+  name: string;
+  email: string;
+  profileId?: number;
+  profile?: AuthProfile;
+}
+
+interface AuthResponse {
   success: boolean;
   message: string;
   data: {
     token: string;
-    admin: {
-      id: number;
-      name: string;
-      email: string;
-    };
+    admin: AuthAdmin;
+    profile?: AuthProfile;
   };
 }
 
@@ -20,12 +32,17 @@ interface MeResponse {
   success: boolean;
   message: string;
   data: {
-    admin: {
-      id: number;
-      name: string;
-      email: string;
-    };
+    admin: AuthAdmin;
+    profile?: AuthProfile;
   };
+}
+
+export interface SignupPayload {
+  name: string;
+  email: string;
+  password: string;
+  slug: string;
+  title: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -37,7 +54,7 @@ export class AuthService {
   private adminKey = 'portfolio_admin_user';
 
   token = signal<string | null>(this.readToken());
-  admin = signal<any>(this.readAdmin());
+  admin = signal<AuthAdmin | null>(this.readAdmin());
   isLoading = signal(false);
   error = signal<string | null>(null);
   isAuthenticated = computed(() => Boolean(this.token()));
@@ -54,20 +71,39 @@ export class AuthService {
 
     try {
       const response = await this.http
-        .post<LoginResponse>(`${API_BASE_URL}/auth/login`, { email, password })
+        .post<AuthResponse>(`${API_BASE_URL}/auth/login`, { email, password })
         .toPromise();
 
       if (!response?.success || !response.data?.token) {
         throw new Error(response?.message ?? 'Login failed');
       }
 
-      this.token.set(response.data.token);
-      this.admin.set(response.data.admin);
-
-      localStorage.setItem(this.tokenKey, response.data.token);
-      localStorage.setItem(this.adminKey, JSON.stringify(response.data.admin));
+      this.persistAuth(response.data.token, response.data.admin, response.data.profile);
     } catch (error: any) {
       const message = error?.error?.message ?? error?.message ?? 'Login failed';
+      this.error.set(message);
+      throw new Error(message);
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
+  async signup(payload: SignupPayload): Promise<void> {
+    this.isLoading.set(true);
+    this.error.set(null);
+
+    try {
+      const response = await this.http
+        .post<AuthResponse>(`${API_BASE_URL}/auth/signup`, payload)
+        .toPromise();
+
+      if (!response?.success || !response.data?.token) {
+        throw new Error(response?.message ?? 'Signup failed');
+      }
+
+      this.persistAuth(response.data.token, response.data.admin, response.data.profile);
+    } catch (error: any) {
+      const message = error?.error?.message ?? error?.message ?? 'Signup failed';
       this.error.set(message);
       throw new Error(message);
     } finally {
@@ -96,8 +132,8 @@ export class AuthService {
         throw new Error(response?.message ?? 'Unable to load admin profile');
       }
 
-      this.admin.set(response.data.admin);
-      localStorage.setItem(this.adminKey, JSON.stringify(response.data.admin));
+      this.admin.set(this.mergeAdminProfile(response.data.admin, response.data.profile));
+      localStorage.setItem(this.adminKey, JSON.stringify(this.admin()));
     } catch (error: any) {
       const message = error?.error?.message ?? error?.message ?? 'Unable to load admin profile';
       this.error.set(message);
@@ -142,5 +178,24 @@ export class AuthService {
 
     const raw = localStorage.getItem(this.adminKey);
     return raw ? JSON.parse(raw) : null;
+  }
+
+  private persistAuth(token: string, admin: AuthAdmin, profile?: AuthProfile) {
+    const mergedAdmin = this.mergeAdminProfile(admin, profile);
+    this.token.set(token);
+    this.admin.set(mergedAdmin);
+
+    localStorage.setItem(this.tokenKey, token);
+    localStorage.setItem(this.adminKey, JSON.stringify(mergedAdmin));
+  }
+
+  private mergeAdminProfile(admin: AuthAdmin, profile?: AuthProfile): AuthAdmin {
+    return {
+      ...admin,
+      profile: {
+        ...(profile ?? {}),
+        ...(admin.profile ?? {}),
+      },
+    };
   }
 }

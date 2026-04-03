@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-admin-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   template: `
     <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-white to-orange-50 dark:from-dark-900 dark:via-dark-800 dark:to-dark-900 px-4">
       <div class="w-full max-w-md card p-8 border border-gray-200/80 dark:border-dark-700">
@@ -22,7 +22,7 @@ import { AuthService } from '../services/auth.service';
         <div class="rounded-2xl border border-amber-200/80 dark:border-amber-500/20 bg-amber-50/80 dark:bg-amber-500/10 px-4 py-4 mb-6">
           <p class="text-sm font-semibold text-amber-800 dark:text-amber-200">Private administration area</p>
           <p class="text-sm text-amber-700 dark:text-amber-100/80 mt-1">
-            No public signup happens here. Only use this page if you are the verified site owner.
+            Existing account ho to login karo. Naya portfolio banana ho to signup page use karo.
           </p>
         </div>
 
@@ -81,6 +81,11 @@ import { AuthService } from '../services/auth.service';
         <p class="text-xs text-center text-gray-500 dark:text-gray-400 mt-6 leading-5">
           Protected admin route for portfolio management only. If you reached this page unintentionally,
           return to the public portfolio.
+        </p>
+
+        <p class="text-sm text-center text-gray-600 dark:text-gray-400 mt-4">
+          Need a new portfolio account?
+          <a routerLink="/admin/signup" class="font-semibold text-primary-600 dark:text-primary-400 hover:underline">Create one here</a>
         </p>
       </div>
     </div>

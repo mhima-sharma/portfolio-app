@@ -14,7 +14,7 @@ import { AuthService } from '../services/auth.service';
       <div class="max-w-6xl mx-auto px-4 sm:px-6 pb-6 print:hidden">
         <div class="flex flex-wrap gap-3 justify-between items-center">
           <div class="flex flex-wrap items-center gap-3">
-            <a routerLink="/" class="btn-secondary">Back to Portfolio</a>
+            <a [routerLink]="portfolioHomeLink()" class="btn-secondary">Back to Portfolio</a>
             <button class="btn-primary" (click)="downloadResume()">Download Resume</button>
           </div>
 
@@ -294,7 +294,12 @@ export class ResumeComponent {
   accentColor = signal('#1d4ed8');
   colorPresets = ['#1d4ed8', '#0f766e', '#b45309', '#9333ea', '#be123c'];
 
-  displayName = computed(() => this.authService.admin()?.name?.trim() || 'Your Name');
+  displayName = computed(
+    () =>
+      this.portfolioService.currentProfile().name?.trim() ||
+      this.authService.admin()?.name?.trim() ||
+      'Your Name'
+  );
   summaryText = computed(() => this.about().bio || this.about().description || '');
 
   roleLine = computed(() => {
@@ -326,6 +331,11 @@ export class ResumeComponent {
     }
 
     return window.location.origin;
+  });
+
+  portfolioHomeLink = computed(() => {
+    const slug = this.portfolioService.currentProfile().slug?.trim();
+    return slug ? `/${slug}` : '/';
   });
 
   educationTitle = computed(() => "Bachelor's Degree / Education Details");

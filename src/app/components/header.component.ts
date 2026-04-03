@@ -2,6 +2,7 @@ import { Component, signal, ChangeDetectionStrategy, effect, computed, inject } 
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { PortfolioService } from '../services/portfolio.service';
 
 @Component({
   selector: 'app-header',
@@ -64,10 +65,16 @@ import { AuthService } from '../services/auth.service';
 })
 export class HeaderComponent {
   private authService = inject(AuthService);
+  private portfolioService = inject(PortfolioService);
 
   isMobileMenuOpen = signal(false);
   isDark = signal(this.initializeDarkMode());
-  displayName = computed(() => this.authService.admin()?.name?.trim() || 'Portfolio');
+  displayName = computed(
+    () =>
+      this.portfolioService.currentProfile().name?.trim() ||
+      this.authService.admin()?.name?.trim() ||
+      'Portfolio'
+  );
   displayInitial = computed(() => this.displayName().charAt(0).toUpperCase() || 'P');
 
   constructor() {

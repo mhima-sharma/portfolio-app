@@ -51,3 +51,9 @@ export interface ContactData {
   youtube: string;
   portfolio: string;
 }
+
+export interface ProfileData {
+  slug: string;
+  name: string;
+  title: string;
+}

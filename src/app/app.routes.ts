@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { HomePageComponent } from './components/home-page.component';
 import { AdminLoginComponent } from './components/admin-login.component';
+import { AdminSignupComponent } from './components/admin-signup.component';
 import { AdminDashboardComponent } from './components/admin-dashboard.component';
 import { adminGuard } from './guards/admin.guard';
 import { ResumeComponent } from './components/resume.component';
@@ -15,6 +16,10 @@ export const routes: Routes = [
     component: AdminLoginComponent,
   },
   {
+    path: 'admin/signup',
+    component: AdminSignupComponent,
+  },
+  {
     path: 'admin/dashboard',
     component: AdminDashboardComponent,
     canActivate: [adminGuard],
@@ -22,6 +27,10 @@ export const routes: Routes = [
   {
     path: 'resume',
     component: ResumeComponent,
+  },
+  {
+    path: ':profileSlug',
+    component: HomePageComponent,
   },
   {
     path: '**',
