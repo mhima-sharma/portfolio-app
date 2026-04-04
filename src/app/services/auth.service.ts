@@ -25,6 +25,12 @@ interface AuthResponse {
     token: string;
     admin: AuthAdmin;
     profile?: AuthProfile;
+  } | {
+    data: {
+      token: string;
+      admin: AuthAdmin;
+      profile?: AuthProfile;
+    };
   };
 }
 
@@ -34,6 +40,11 @@ interface MeResponse {
   data: {
     admin: AuthAdmin;
     profile?: AuthProfile;
+  } | {
+    data: {
+      admin: AuthAdmin;
+      profile?: AuthProfile;
+    };
   };
 }
 
@@ -73,12 +84,13 @@ export class AuthService {
       const response = await this.http
         .post<AuthResponse>(`${API_BASE_URL}/auth/login`, { email, password })
         .toPromise();
+      const data = this.extractAuthPayload(response);
 
-      if (!response?.success || !response.data?.token) {
+      if (!response?.success || !data?.token || !data.admin) {
         throw new Error(response?.message ?? 'Login failed');
       }
 
-      this.persistAuth(response.data.token, response.data.admin, response.data.profile);
+      this.persistAuth(data.token, data.admin, data.profile);
     } catch (error: any) {
       const message = error?.error?.message ?? error?.message ?? 'Login failed';
       this.error.set(message);
@@ -96,12 +108,13 @@ export class AuthService {
       const response = await this.http
         .post<AuthResponse>(`${API_BASE_URL}/auth/signup`, payload)
         .toPromise();
+      const data = this.extractAuthPayload(response);
 
-      if (!response?.success || !response.data?.token) {
+      if (!response?.success || !data?.token || !data.admin) {
         throw new Error(response?.message ?? 'Signup failed');
       }
 
-      this.persistAuth(response.data.token, response.data.admin, response.data.profile);
+      this.persistAuth(data.token, data.admin, data.profile);
     } catch (error: any) {
       const message = error?.error?.message ?? error?.message ?? 'Signup failed';
       this.error.set(message);
@@ -127,12 +140,13 @@ export class AuthService {
           headers: this.authHeaders(),
         })
         .toPromise();
+      const data = this.extractMePayload(response);
 
-      if (!response?.success || !response.data?.admin) {
+      if (!response?.success || !data?.admin) {
         throw new Error(response?.message ?? 'Unable to load admin profile');
       }
 
-      this.admin.set(this.mergeAdminProfile(response.data.admin, response.data.profile));
+      this.admin.set(this.mergeAdminProfile(data.admin, data.profile));
       localStorage.setItem(this.adminKey, JSON.stringify(this.admin()));
     } catch (error: any) {
       const message = error?.error?.message ?? error?.message ?? 'Unable to load admin profile';
@@ -197,5 +211,31 @@ export class AuthService {
         ...(admin.profile ?? {}),
       },
     };
+  }
+
+  private extractAuthPayload(response?: AuthResponse | null) {
+    const data = response?.data as
+      | { token: string; admin: AuthAdmin; profile?: AuthProfile }
+      | { data?: { token: string; admin: AuthAdmin; profile?: AuthProfile } }
+      | undefined;
+
+    if (!data) {
+      return null;
+    }
+
+    return 'token' in data ? data : (data.data ?? null);
+  }
+
+  private extractMePayload(response?: MeResponse | null) {
+    const data = response?.data as
+      | { admin: AuthAdmin; profile?: AuthProfile }
+      | { data?: { admin: AuthAdmin; profile?: AuthProfile } }
+      | undefined;
+
+    if (!data) {
+      return null;
+    }
+
+    return 'admin' in data ? data : (data.data ?? null);
   }
 }
