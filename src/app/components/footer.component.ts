@@ -18,7 +18,7 @@ import { PortfolioService } from '../services/portfolio.service';
           </div>
 
           <div class="flex flex-col sm:flex-row gap-6 text-center md:text-right text-sm text-gray-400">
-            <a routerLink="/resume" class="hover:text-primary-400 transition-colors">Download Resume</a>
+            <a [routerLink]="resumeLink()" class="hover:text-primary-400 transition-colors">Download Resume</a>
             <a routerLink="/admin/login" class="hover:text-primary-400 transition-colors">Admin Login</a>
           </div>
         </div>
@@ -46,5 +46,13 @@ export class FooterComponent {
       this.authService.admin()?.name?.trim() ||
       'Portfolio Owner'
   );
+  resumeLink = computed(() => {
+    const slug =
+      this.portfolioService.currentProfile().slug?.trim() ||
+      this.authService.admin()?.profile?.slug?.trim() ||
+      '';
+
+    return slug ? `/${slug}/resume` : '/resume';
+  });
   currentYear = computed(() => new Date().getFullYear());
 }

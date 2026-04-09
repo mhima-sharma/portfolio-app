@@ -2,12 +2,14 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { API_BASE_URL } from '../config/api.config';
+import { firstValueFrom } from 'rxjs';
 
 interface AuthProfile {
   id?: number;
   name?: string;
   slug?: string;
   title?: string;
+  selected_theme?: string | null;
 }
 
 interface AuthAdmin {
@@ -21,31 +23,43 @@ interface AuthAdmin {
 interface AuthResponse {
   success: boolean;
   message: string;
-  data: {
-    token: string;
-    admin: AuthAdmin;
-    profile?: AuthProfile;
-  } | {
-    data: {
-      token: string;
-      admin: AuthAdmin;
-      profile?: AuthProfile;
-    };
-  };
+  data:
+    | ({
+        token: string;
+        profile?: AuthProfile;
+      } & AuthAdmin)
+    | {
+        token: string;
+        admin: AuthAdmin;
+        profile?: AuthProfile;
+      }
+    | {
+        data: {
+          token: string;
+          profile?: AuthProfile;
+        } & AuthAdmin;
+      }
+    | {
+        data: {
+          token: string;
+          admin: AuthAdmin;
+          profile?: AuthProfile;
+        };
+      };
 }
 
 interface MeResponse {
   success: boolean;
   message: string;
-  data: {
-    admin: AuthAdmin;
-    profile?: AuthProfile;
-  } | {
-    data: {
-      admin: AuthAdmin;
-      profile?: AuthProfile;
-    };
-  };
+  data:
+    | ({ profile?: AuthProfile } & AuthAdmin)
+    | {
+        admin: AuthAdmin;
+        profile?: AuthProfile;
+      }
+    | {
+        data: ({ profile?: AuthProfile } & AuthAdmin) | { admin: AuthAdmin; profile?: AuthProfile };
+      };
 }
 
 export interface SignupPayload {
@@ -63,9 +77,11 @@ export class AuthService {
 
   private tokenKey = 'portfolio_admin_token';
   private adminKey = 'portfolio_admin_user';
+  private userIdKey = 'portfolio_admin_user_id';
 
   token = signal<string | null>(this.readToken());
   admin = signal<AuthAdmin | null>(this.readAdmin());
+  userId = signal<number | null>(this.readUserId() ?? this.readAdmin()?.id ?? null);
   isLoading = signal(false);
   error = signal<string | null>(null);
   isAuthenticated = computed(() => Boolean(this.token()));
@@ -81,9 +97,9 @@ export class AuthService {
     this.error.set(null);
 
     try {
-      const response = await this.http
-        .post<AuthResponse>(`${API_BASE_URL}/auth/login`, { email, password })
-        .toPromise();
+      const response = await firstValueFrom(
+        this.http.post<AuthResponse>(`${API_BASE_URL}/auth/login`, { email, password })
+      );
       const data = this.extractAuthPayload(response);
 
       if (!response?.success || !data?.token || !data.admin) {
@@ -105,9 +121,9 @@ export class AuthService {
     this.error.set(null);
 
     try {
-      const response = await this.http
-        .post<AuthResponse>(`${API_BASE_URL}/auth/signup`, payload)
-        .toPromise();
+      const response = await firstValueFrom(
+        this.http.post<AuthResponse>(`${API_BASE_URL}/auth/signup`, payload)
+      );
       const data = this.extractAuthPayload(response);
 
       if (!response?.success || !data?.token || !data.admin) {
@@ -135,19 +151,22 @@ export class AuthService {
     this.error.set(null);
 
     try {
-      const response = await this.http
-        .get<MeResponse>(`${API_BASE_URL}/auth/me`, {
+      const response = await firstValueFrom(
+        this.http.get<MeResponse>(`${API_BASE_URL}/auth/me`, {
           headers: this.authHeaders(),
         })
-        .toPromise();
+      );
       const data = this.extractMePayload(response);
 
       if (!response?.success || !data?.admin) {
         throw new Error(response?.message ?? 'Unable to load admin profile');
       }
 
-      this.admin.set(this.mergeAdminProfile(data.admin, data.profile));
+      const mergedAdmin = this.mergeAdminProfile(data.admin, data.profile);
+      this.admin.set(mergedAdmin);
+      this.userId.set(mergedAdmin.id);
       localStorage.setItem(this.adminKey, JSON.stringify(this.admin()));
+      localStorage.setItem(this.userIdKey, String(mergedAdmin.id));
     } catch (error: any) {
       const message = error?.error?.message ?? error?.message ?? 'Unable to load admin profile';
       this.error.set(message);
@@ -165,8 +184,10 @@ export class AuthService {
   logout() {
     this.token.set(null);
     this.admin.set(null);
+    this.userId.set(null);
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.adminKey);
+    localStorage.removeItem(this.userIdKey);
     this.router.navigate(['/admin/login']);
   }
 
@@ -175,6 +196,14 @@ export class AuthService {
     return new HttpHeaders({
       Authorization: `Bearer ${token ?? ''}`,
     });
+  }
+
+  getCurrentUserId(): number | null {
+    return this.userId() ?? this.admin()?.id ?? null;
+  }
+
+  getCurrentSlug(): string {
+    return this.admin()?.profile?.slug?.trim() ?? '';
   }
 
   private readToken(): string | null {
@@ -194,13 +223,29 @@ export class AuthService {
     return raw ? JSON.parse(raw) : null;
   }
 
+  private readUserId(): number | null {
+    if (typeof localStorage === 'undefined') {
+      return null;
+    }
+
+    const raw = localStorage.getItem(this.userIdKey);
+    if (!raw) {
+      return null;
+    }
+
+    const value = Number(raw);
+    return Number.isNaN(value) ? null : value;
+  }
+
   private persistAuth(token: string, admin: AuthAdmin, profile?: AuthProfile) {
     const mergedAdmin = this.mergeAdminProfile(admin, profile);
     this.token.set(token);
     this.admin.set(mergedAdmin);
+    this.userId.set(mergedAdmin.id);
 
     localStorage.setItem(this.tokenKey, token);
     localStorage.setItem(this.adminKey, JSON.stringify(mergedAdmin));
+    localStorage.setItem(this.userIdKey, String(mergedAdmin.id));
   }
 
   private mergeAdminProfile(admin: AuthAdmin, profile?: AuthProfile): AuthAdmin {
@@ -215,27 +260,56 @@ export class AuthService {
 
   private extractAuthPayload(response?: AuthResponse | null) {
     const data = response?.data as
+      | ({ token: string; profile?: AuthProfile } & AuthAdmin)
       | { token: string; admin: AuthAdmin; profile?: AuthProfile }
-      | { data?: { token: string; admin: AuthAdmin; profile?: AuthProfile } }
+      | { data?: ({ token: string; profile?: AuthProfile } & AuthAdmin) | { token: string; admin: AuthAdmin; profile?: AuthProfile } }
       | undefined;
 
     if (!data) {
       return null;
     }
 
-    return 'token' in data ? data : (data.data ?? null);
+    const payload = 'token' in data ? data : (data.data ?? null);
+    if (!payload) {
+      return null;
+    }
+
+    if ('admin' in payload) {
+      return payload;
+    }
+
+    const { token, profile, ...admin } = payload;
+    return {
+      token,
+      admin: admin as AuthAdmin,
+      profile,
+    };
   }
 
   private extractMePayload(response?: MeResponse | null) {
     const data = response?.data as
+      | ({ profile?: AuthProfile } & AuthAdmin)
       | { admin: AuthAdmin; profile?: AuthProfile }
-      | { data?: { admin: AuthAdmin; profile?: AuthProfile } }
+      | { data?: ({ profile?: AuthProfile } & AuthAdmin) | { admin: AuthAdmin; profile?: AuthProfile } }
       | undefined;
 
     if (!data) {
       return null;
     }
 
-    return 'admin' in data ? data : (data.data ?? null);
+    const payload = 'admin' in data || 'id' in data ? data : (data.data ?? null);
+    if (!payload) {
+      return null;
+    }
+
+    if ('admin' in payload) {
+      return payload;
+    }
+
+    const { profile, ...admin } = payload;
+    return {
+      admin: admin as AuthAdmin,
+      profile,
+    };
   }
 }

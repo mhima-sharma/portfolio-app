@@ -7,8 +7,11 @@ import {
   AboutData,
   ContactData,
   ProfileData,
+  PortfolioData,
+  PortfolioTheme,
 } from '../models/portfolio.model';
 import { API_BASE_URL, HEALTH_URL } from '../config/api.config';
+import { firstValueFrom } from 'rxjs';
 
 const DEFAULT_CONTACT: ContactData = {
   email: 'dev.nest.ms@gmail.com',
@@ -28,16 +31,20 @@ const DEFAULT_PROFILE: ProfileData = {
   slug: '',
   name: '',
   title: '',
+  selectedTheme: 'modern-dark',
 };
 
 @Injectable({ providedIn: 'root' })
 export class PortfolioService {
   private http = inject(HttpClient);
+  private activeLoadRequestId = 0;
 
   private skillsData = signal<Skill[]>([]);
   private projectsData = signal<Project[]>([]);
   private experienceData = signal<Experience[]>([]);
   currentProfile = signal<ProfileData>({ ...DEFAULT_PROFILE });
+  selectedTheme = signal<PortfolioTheme>('modern-dark');
+  isUsingDefaultThemeFallback = signal(false);
 
   about = signal<AboutData>({
     bio: '',
@@ -60,83 +67,106 @@ export class PortfolioService {
     return this.http.get<{ success?: boolean; message?: string }>(HEALTH_URL);
   }
 
-  loadPortfolio(profileSlug?: string) {
-    this.isLoading.set(true);
-    this.error.set(null);
-
+  async getUserProfile(profileSlug?: string): Promise<PortfolioData> {
     const normalizedSlug = this.normalizeSlug(profileSlug);
     const endpoint = normalizedSlug
       ? `${API_BASE_URL}/portfolio/${encodeURIComponent(normalizedSlug)}`
       : `${API_BASE_URL}/portfolio`;
 
-    this.http
-      .get<{ success: boolean; message: string; data: any }>(endpoint)
-      .subscribe({
-        next: (response) => {
-          const data = response.data;
+    const response = await firstValueFrom(
+      this.http.get<{ success: boolean; message: string; data: any }>(endpoint)
+    );
 
-          this.currentProfile.set({
-            slug: data?.profile?.slug ?? normalizedSlug,
-            name: data?.profile?.name ?? data?.about?.name ?? '',
-            title: data?.profile?.title ?? data?.about?.title ?? '',
-          });
+    return this.mapPortfolioResponse(response?.data, normalizedSlug);
+  }
 
-          this.about.set({
-            bio: data?.about?.bio ?? '',
-            description: data?.about?.description ?? '',
-            yearsExperience: Number(data?.about?.yearsExperience ?? 0),
-          });
+  loadPortfolio(profileSlug?: string) {
+    const requestId = ++this.activeLoadRequestId;
+    this.isLoading.set(true);
+    this.error.set(null);
 
-          this.contact.set({
-            email: data?.contact?.email ?? DEFAULT_CONTACT.email,
-            phone: data?.contact?.phone ?? DEFAULT_CONTACT.phone,
-            location: data?.contact?.location ?? DEFAULT_CONTACT.location,
-            github: data?.contact?.github ?? DEFAULT_CONTACT.github,
-            linkedin: data?.contact?.linkedin ?? DEFAULT_CONTACT.linkedin,
-            medium: data?.contact?.medium ?? DEFAULT_CONTACT.medium,
-            tableau: data?.contact?.tableau ?? DEFAULT_CONTACT.tableau,
-            leetcode: data?.contact?.leetcode ?? DEFAULT_CONTACT.leetcode,
-            instagram: data?.contact?.instagram ?? DEFAULT_CONTACT.instagram,
-            youtube: data?.contact?.youtube ?? DEFAULT_CONTACT.youtube,
-            portfolio: data?.contact?.portfolio ?? DEFAULT_CONTACT.portfolio,
-          });
+    this.getUserProfile(profileSlug)
+      .then((portfolio) => {
+          if (requestId !== this.activeLoadRequestId) {
+            return;
+          }
 
-          this.skillsData.set(
-            Array.isArray(data?.skills) ? data.skills.map((skill: any) => this.mapSkill(skill)) : []
-          );
-
-          this.projectsData.set(
-            Array.isArray(data?.projects)
-              ? data.projects.map((project: any) => this.mapProject(project))
-              : []
-          );
-
-          this.experienceData.set(
-            Array.isArray(data?.experience)
-              ? this.sortExperience(
-                  data.experience.map((experience: any) => this.mapExperience(experience))
-                )
-              : []
-          );
-
+          this.applyPortfolioData(portfolio);
           this.isLoading.set(false);
-        },
-        error: (error) => {
+        })
+      .catch((error) => {
+          if (requestId !== this.activeLoadRequestId) {
+            return;
+          }
+
+          const normalizedSlug = this.normalizeSlug(profileSlug);
           console.error('Failed to load portfolio data:', error);
           this.error.set('Unable to load live portfolio data.');
           this.currentProfile.set({
             slug: normalizedSlug,
             name: '',
             title: '',
+            selectedTheme: 'modern-dark',
           });
+          this.selectedTheme.set('modern-dark');
+          this.isUsingDefaultThemeFallback.set(true);
           this.skillsData.set([]);
           this.projectsData.set([]);
           this.experienceData.set([]);
           this.about.set({ bio: '', description: '', yearsExperience: 0 });
           this.contact.set({ ...DEFAULT_CONTACT });
           this.isLoading.set(false);
-        },
       });
+  }
+
+  async getLoggedInUserTheme(userId: number, headers: HttpHeaders): Promise<PortfolioTheme> {
+    const response = await firstValueFrom(
+      this.http.get<{ success: boolean; message?: string; data: any }>(`${API_BASE_URL}/user/${userId}`, {
+        headers,
+      })
+    );
+
+    const rawTheme = response?.data?.profile?.selected_theme;
+    const theme = this.normalizeTheme(rawTheme);
+    this.isUsingDefaultThemeFallback.set(!this.hasSavedThemeValue(rawTheme));
+    this.selectedTheme.set(theme);
+    this.currentProfile.update((profile) => ({
+      ...profile,
+      selectedTheme: theme,
+      slug: response?.data?.profile?.slug ?? profile.slug,
+      title: response?.data?.profile?.title ?? profile.title,
+      name: response?.data?.name ?? profile.name,
+    }));
+
+    return theme;
+  }
+
+  async updateTheme(slug: string, selectedTheme: PortfolioTheme, headers: HttpHeaders): Promise<PortfolioTheme> {
+    const response = await firstValueFrom(
+      this.http.put<{ success: boolean; message?: string; data: any }>(
+        `${API_BASE_URL}/user/theme`,
+        { slug, selectedTheme },
+        { headers }
+      )
+    );
+
+    const theme = this.normalizeTheme(
+      response?.data?.selectedTheme ??
+        response?.data?.selected_theme ??
+        response?.data?.profile?.selectedTheme ??
+        response?.data?.profile?.selected_theme ??
+        selectedTheme
+    );
+
+    this.selectedTheme.set(theme);
+    this.isUsingDefaultThemeFallback.set(false);
+    this.currentProfile.update((profile) => ({
+      ...profile,
+      selectedTheme: theme,
+      slug: response?.data?.profile?.slug ?? profile.slug,
+    }));
+
+    return theme;
   }
 
   async updateAbout(payload: AboutData, headers: HttpHeaders): Promise<void> {
@@ -418,5 +448,76 @@ export class PortfolioService {
 
   private normalizeSlug(profileSlug?: string): string {
     return (profileSlug ?? '').trim().toLowerCase();
+  }
+
+  private mapPortfolioResponse(data: any, normalizedSlug: string): PortfolioData {
+    const profile: ProfileData = {
+      slug: data?.profile?.slug ?? normalizedSlug,
+      name: data?.profile?.name ?? data?.about?.name ?? '',
+      title: data?.profile?.title ?? data?.about?.title ?? '',
+      selectedTheme: this.normalizeTheme(
+        data?.profile?.selectedTheme ??
+          data?.profile?.selected_theme ??
+          data?.selectedTheme ??
+          data?.selected_theme
+      ),
+    };
+
+    return {
+      profile,
+      about: {
+        bio: data?.about?.bio ?? '',
+        description: data?.about?.description ?? '',
+        yearsExperience: Number(data?.about?.yearsExperience ?? 0),
+      },
+      contact: {
+        email: data?.contact?.email ?? DEFAULT_CONTACT.email,
+        phone: data?.contact?.phone ?? DEFAULT_CONTACT.phone,
+        location: data?.contact?.location ?? DEFAULT_CONTACT.location,
+        github: data?.contact?.github ?? DEFAULT_CONTACT.github,
+        linkedin: data?.contact?.linkedin ?? DEFAULT_CONTACT.linkedin,
+        medium: data?.contact?.medium ?? DEFAULT_CONTACT.medium,
+        tableau: data?.contact?.tableau ?? DEFAULT_CONTACT.tableau,
+        leetcode: data?.contact?.leetcode ?? DEFAULT_CONTACT.leetcode,
+        instagram: data?.contact?.instagram ?? DEFAULT_CONTACT.instagram,
+        youtube: data?.contact?.youtube ?? DEFAULT_CONTACT.youtube,
+        portfolio: data?.contact?.portfolio ?? DEFAULT_CONTACT.portfolio,
+      },
+      skills: Array.isArray(data?.skills) ? data.skills.map((skill: any) => this.mapSkill(skill)) : [],
+      projects: Array.isArray(data?.projects)
+        ? data.projects.map((project: any) => this.mapProject(project))
+        : [],
+      experience: Array.isArray(data?.experience)
+        ? this.sortExperience(
+            data.experience.map((experience: any) => this.mapExperience(experience))
+          )
+        : [],
+    };
+  }
+
+  private applyPortfolioData(portfolio: PortfolioData) {
+    this.currentProfile.set(portfolio.profile);
+    this.selectedTheme.set(portfolio.profile.selectedTheme);
+    this.about.set(portfolio.about);
+    this.contact.set(portfolio.contact);
+    this.skillsData.set(portfolio.skills);
+    this.projectsData.set(portfolio.projects);
+    this.experienceData.set(portfolio.experience);
+  }
+
+  private normalizeTheme(theme?: string): PortfolioTheme {
+    switch ((theme ?? '').trim().toLowerCase()) {
+      case 'minimal-light':
+        return 'minimal-light';
+      case 'corporate-resume':
+        return 'corporate-resume';
+      case 'modern-dark':
+      default:
+        return 'modern-dark';
+    }
+  }
+
+  private hasSavedThemeValue(theme?: string | null): boolean {
+    return Boolean((theme ?? '').trim());
   }
 }

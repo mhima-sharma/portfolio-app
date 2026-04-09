@@ -1,7 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs/operators';
 import { PortfolioService } from '../services/portfolio.service';
 import { AuthService } from '../services/auth.service';
 
@@ -282,8 +284,14 @@ import { AuthService } from '../services/auth.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ResumeComponent {
+  private route = inject(ActivatedRoute);
   private portfolioService = inject(PortfolioService);
   private authService = inject(AuthService);
+
+  private profileSlug = toSignal(
+    this.route.paramMap.pipe(map((params) => params.get('profileSlug') ?? '')),
+    { initialValue: this.route.snapshot.paramMap.get('profileSlug') ?? '' }
+  );
 
   about = this.portfolioService.about;
   contact = this.portfolioService.contact;
@@ -334,12 +342,18 @@ export class ResumeComponent {
   });
 
   portfolioHomeLink = computed(() => {
-    const slug = this.portfolioService.currentProfile().slug?.trim();
+    const slug = this.portfolioService.currentProfile().slug?.trim() || this.profileSlug().trim();
     return slug ? `/${slug}` : '/';
   });
 
   educationTitle = computed(() => "Bachelor's Degree / Education Details");
   educationSubtitle = computed(() => this.contact().location || 'Add education details from your profile');
+
+  constructor() {
+    effect(() => {
+      this.portfolioService.loadPortfolio(this.profileSlug());
+    });
+  }
 
   downloadResume() {
     window.print();

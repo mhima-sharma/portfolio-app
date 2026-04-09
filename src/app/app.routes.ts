@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { HomePageComponent } from './components/home-page.component';
+import { GuestLandingComponent } from './components/guest-landing.component';
 import { AdminLoginComponent } from './components/admin-login.component';
 import { AdminSignupComponent } from './components/admin-signup.component';
 import { AdminDashboardComponent } from './components/admin-dashboard.component';
@@ -9,7 +10,7 @@ import { ResumeComponent } from './components/resume.component';
 export const routes: Routes = [
   {
     path: '',
-    component: HomePageComponent,
+    component: GuestLandingComponent,
   },
   {
     path: 'admin/login',
@@ -26,6 +27,10 @@ export const routes: Routes = [
   },
   {
     path: 'resume',
+    component: ResumeComponent,
+  },
+  {
+    path: ':profileSlug/resume',
     component: ResumeComponent,
   },
   {

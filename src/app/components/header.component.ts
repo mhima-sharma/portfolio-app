@@ -1,6 +1,6 @@
 import { Component, signal, ChangeDetectionStrategy, effect, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { PortfolioService } from '../services/portfolio.service';
 
@@ -20,11 +20,11 @@ import { PortfolioService } from '../services/portfolio.service';
 
         <!-- Desktop Navigation -->
         <div class="hidden md:flex items-center gap-8">
-          <a href="#about" class="text-dark-700 dark:text-gray-300 hover:text-primary-500 transition-colors">About</a>
-          <a href="#skills" class="text-dark-700 dark:text-gray-300 hover:text-primary-500 transition-colors">Skills</a>
-          <a href="#projects" class="text-dark-700 dark:text-gray-300 hover:text-primary-500 transition-colors">Projects</a>
-          <a href="#experience" class="text-dark-700 dark:text-gray-300 hover:text-primary-500 transition-colors">Experience</a>
-          <a href="#contact" class="text-dark-700 dark:text-gray-300 hover:text-primary-500 transition-colors">Contact</a>
+          <a [href]="sectionLink('about')" class="text-dark-700 dark:text-gray-300 hover:text-primary-500 transition-colors">About</a>
+          <a [href]="sectionLink('skills')" class="text-dark-700 dark:text-gray-300 hover:text-primary-500 transition-colors">Skills</a>
+          <a [href]="sectionLink('projects')" class="text-dark-700 dark:text-gray-300 hover:text-primary-500 transition-colors">Projects</a>
+          <a [href]="sectionLink('experience')" class="text-dark-700 dark:text-gray-300 hover:text-primary-500 transition-colors">Experience</a>
+          <a [href]="sectionLink('contact')" class="text-dark-700 dark:text-gray-300 hover:text-primary-500 transition-colors">Contact</a>
         </div>
 
         <!-- Theme Toggle & Mobile Menu -->
@@ -51,11 +51,11 @@ import { PortfolioService } from '../services/portfolio.service';
       <!-- Mobile Navigation -->
       <div *ngIf="isMobileMenuOpen()" class="md:hidden border-t border-gray-200 dark:border-dark-700 py-4">
         <div class="flex flex-col gap-3 px-4">
-          <a href="#about" (click)="toggleMobileMenu()" class="text-dark-700 dark:text-gray-300 hover:text-primary-500 py-2">About</a>
-          <a href="#skills" (click)="toggleMobileMenu()" class="text-dark-700 dark:text-gray-300 hover:text-primary-500 py-2">Skills</a>
-          <a href="#projects" (click)="toggleMobileMenu()" class="text-dark-700 dark:text-gray-300 hover:text-primary-500 py-2">Projects</a>
-          <a href="#experience" (click)="toggleMobileMenu()" class="text-dark-700 dark:text-gray-300 hover:text-primary-500 py-2">Experience</a>
-          <a href="#contact" (click)="toggleMobileMenu()" class="text-dark-700 dark:text-gray-300 hover:text-primary-500 py-2">Contact</a>
+          <a [href]="sectionLink('about')" (click)="toggleMobileMenu()" class="text-dark-700 dark:text-gray-300 hover:text-primary-500 py-2">About</a>
+          <a [href]="sectionLink('skills')" (click)="toggleMobileMenu()" class="text-dark-700 dark:text-gray-300 hover:text-primary-500 py-2">Skills</a>
+          <a [href]="sectionLink('projects')" (click)="toggleMobileMenu()" class="text-dark-700 dark:text-gray-300 hover:text-primary-500 py-2">Projects</a>
+          <a [href]="sectionLink('experience')" (click)="toggleMobileMenu()" class="text-dark-700 dark:text-gray-300 hover:text-primary-500 py-2">Experience</a>
+          <a [href]="sectionLink('contact')" (click)="toggleMobileMenu()" class="text-dark-700 dark:text-gray-300 hover:text-primary-500 py-2">Contact</a>
         </div>
       </div>
     </header>
@@ -66,6 +66,7 @@ import { PortfolioService } from '../services/portfolio.service';
 export class HeaderComponent {
   private authService = inject(AuthService);
   private portfolioService = inject(PortfolioService);
+  private router = inject(Router);
 
   isMobileMenuOpen = signal(false);
   isDark = signal(this.initializeDarkMode());
@@ -108,5 +109,10 @@ export class HeaderComponent {
 
   toggleTheme() {
     this.isDark.update((v) => !v);
+  }
+
+  sectionLink(fragment: string): string {
+    const currentPath = this.router.url.split('#')[0].split('?')[0] || '/';
+    return `${currentPath}#${fragment}`;
   }
 }

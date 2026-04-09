@@ -56,4 +56,16 @@ export interface ProfileData {
   slug: string;
   name: string;
   title: string;
+  selectedTheme: PortfolioTheme;
+}
+
+export type PortfolioTheme = 'modern-dark' | 'minimal-light' | 'corporate-resume';
+
+export interface PortfolioData {
+  profile: ProfileData;
+  about: AboutData;
+  contact: ContactData;
+  skills: Skill[];
+  projects: Project[];
+  experience: Experience[];
 }

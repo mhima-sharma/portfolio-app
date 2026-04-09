@@ -3,14 +3,15 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PortfolioService } from '../services/portfolio.service';
 import { AuthService } from '../services/auth.service';
-import { AboutData, ContactData, Experience, Project, Skill } from '../models/portfolio.model';
+import { AboutData, ContactData, Experience, PortfolioTheme, Project, Skill } from '../models/portfolio.model';
+import { ThemeSelectorComponent } from './theme-selector/theme-selector.component';
 
 type ValidationErrors = Record<string, string>;
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ThemeSelectorComponent],
   template: `
     <div class="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(249,115,22,0.10),_transparent_26%),linear-gradient(180deg,#fff7ed_0%,#ffffff_38%,#f8fafc_100%)] dark:bg-[radial-gradient(circle_at_top_left,_rgba(249,115,22,0.16),_transparent_24%),linear-gradient(180deg,#171717_0%,#111827_42%,#0f172a_100%)]">
       <header class="sticky top-0 z-40 border-b border-white/50 dark:border-white/10 bg-white/80 dark:bg-slate-950/70 backdrop-blur-xl shadow-[0_12px_36px_rgba(15,23,42,0.06)]">
@@ -64,9 +65,9 @@ type ValidationErrors = Record<string, string>;
             <p class="dashboard-stat__hint">Career items currently visible to visitors</p>
           </div>
           <div class="dashboard-stat">
-            <p class="dashboard-stat__label">Identity</p>
-            <p class="dashboard-stat__value truncate">{{ authService.admin()?.name || 'Admin' }}</p>
-            <p class="dashboard-stat__hint">Active profile currently controlling this dashboard</p>
+            <p class="dashboard-stat__label">Theme</p>
+            <p class="dashboard-stat__value truncate">{{ selectedTheme() }}</p>
+            <p class="dashboard-stat__hint">Current public portfolio theme state</p>
           </div>
         </section>
 
@@ -99,6 +100,21 @@ type ValidationErrors = Record<string, string>;
               </p>
             }
           </div>
+        </section>
+
+        <section class="space-y-4">
+          <app-theme-selector
+            [activeTheme]="selectedTheme()"
+            [isSaving]="themeSaving()"
+            (themeSelected)="saveTheme($event)"
+          ></app-theme-selector>
+
+          @if (isUsingDefaultThemeFallback()) {
+            <div class="rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 px-4 py-3 text-sm text-amber-700 dark:text-amber-200">
+              No saved theme was found for this account, so the default <span class="font-semibold">modern-dark</span> theme is currently active.
+              Select a theme once and it will be saved permanently.
+            </div>
+          }
         </section>
 
         <section class="grid lg:grid-cols-2 gap-6">
@@ -642,8 +658,11 @@ export class AdminDashboardComponent {
   skills = this.portfolioService.getSkills;
   projects = this.portfolioService.getProjects;
   experience = this.portfolioService.getExperience;
+  selectedTheme = this.portfolioService.selectedTheme.asReadonly();
+  isUsingDefaultThemeFallback = this.portfolioService.isUsingDefaultThemeFallback.asReadonly();
   profileSlug = signal('');
   publicPortfolioUrl = signal('');
+  themeSaving = signal(false);
 
   constructor() {
     effect(() => {
@@ -717,6 +736,30 @@ export class AdminDashboardComponent {
       await this.portfolioService.updateContact(this.contactForm, this.authService.authHeaders());
       this.setStatus('Contact section updated.');
     });
+  }
+
+  async saveTheme(theme: PortfolioTheme) {
+    if (theme === this.selectedTheme()) {
+      this.setStatus('Theme already active.');
+      return;
+    }
+
+    const slug = this.authService.getCurrentSlug();
+    if (!slug) {
+      this.error.set('Logged-in profile slug not available.');
+      return;
+    }
+
+    this.themeSaving.set(true);
+    try {
+      this.error.set(null);
+      await this.portfolioService.updateTheme(slug, theme, this.authService.authHeaders());
+      this.setStatus(`Theme updated to ${theme}.`);
+    } catch (error: any) {
+      this.error.set(error.message ?? 'Unable to update theme.');
+    } finally {
+      this.themeSaving.set(false);
+    }
   }
 
   editSkill(skill: Skill) {
