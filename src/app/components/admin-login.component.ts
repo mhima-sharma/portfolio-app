@@ -21,15 +21,15 @@ import { AuthService } from '../services/auth.service';
 
               <div class="mt-8 max-w-md">
                 <p class="text-sm font-semibold uppercase tracking-[0.3em] text-[#db7a28]">Welcome back</p>
-                <h1 class="mt-4 text-4xl font-black tracking-tight text-[#182218] sm:text-5xl">Sign in to your dashboard</h1>
+                <h1 class="mt-4 text-4xl font-black tracking-tight text-[#182218] sm:text-5xl">Sign in and continue building your portfolio</h1>
                 <p class="mt-4 text-base leading-7 text-[#72604f]">
-                  Clean, calm workspace for managing your portfolio content, projects, and public profile.
+                  A clean and welcoming workspace for updating your portfolio, profile sections, and live public page.
                 </p>
               </div>
 
               <div class="mt-8 flex flex-wrap gap-3 text-sm text-[#72604f]">
-                <div class="rounded-full border border-[#f6dac5] bg-[#fff6ee] px-4 py-2">Secure owner access</div>
-                <div class="rounded-full border border-[#f6dac5] bg-[#fff6ee] px-4 py-2">Guest theme inspired</div>
+                <div class="rounded-full border border-[#f6dac5] bg-[#fff6ee] px-4 py-2">Secure access</div>
+                <div class="rounded-full border border-[#f6dac5] bg-[#fff6ee] px-4 py-2">Built for every profile</div>
               </div>
 
               <form (ngSubmit)="submit()" class="mt-8 space-y-5" novalidate autocomplete="on">
@@ -105,8 +105,8 @@ import { AuthService } from '../services/auth.service';
               </div>
 
               <p class="mt-8 text-sm text-[#72604f]">
-                Need a new portfolio account?
-                <a routerLink="/admin/signup" class="font-semibold text-[#c96b1a] underline decoration-[#f2b071] underline-offset-4">Create one here</a>
+                New here and ready to create your portfolio?
+                <a routerLink="/admin/signup" class="font-semibold text-[#c96b1a] underline decoration-[#f2b071] underline-offset-4">Create your account</a>
               </p>
             </div>
           </section>
@@ -118,8 +118,8 @@ import { AuthService } from '../services/auth.service';
             <div class="relative flex h-full flex-col justify-between rounded-[1.8rem] border border-[#f3dcc6] bg-[linear-gradient(180deg,rgba(255,255,255,0.84)_0%,rgba(255,246,235,0.96)_100%)] p-8">
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-xs font-semibold uppercase tracking-[0.28em] text-[#db7a28]">Guest Theme</p>
-                  <h2 class="mt-3 text-2xl font-bold text-[#1f2b1f]">Professional and calm workspace</h2>
+                  <p class="text-xs font-semibold uppercase tracking-[0.28em] text-[#db7a28]">Portfolio Workspace</p>
+                  <h2 class="mt-3 text-2xl font-bold text-[#1f2b1f]">Professional, simple, and open to everyone</h2>
                 </div>
                 <div class="rounded-full border border-[#f2dcc6] bg-white px-4 py-2 text-xs font-semibold text-[#c87424]">Live Preview</div>
               </div>
@@ -132,7 +132,7 @@ import { AuthService } from '../services/auth.service';
                   <div class="flex items-center justify-between">
                     <div>
                       <p class="text-lg font-bold text-[#1c281c]">Portfolio Flow</p>
-                      <p class="text-sm text-[#8b6b52]">Content organized, updates simplified</p>
+                      <p class="text-sm text-[#8b6b52]">Organize your story and keep updates simple</p>
                     </div>
                     <div class="flex h-12 w-12 items-center justify-center rounded-full border-4 border-[#f1bf89] text-sm font-bold text-[#c87424]">84%</div>
                   </div>
@@ -150,10 +150,10 @@ import { AuthService } from '../services/auth.service';
 
               <div class="rounded-[1.5rem] border border-[#f3dcc6] bg-white/80 p-5">
                 <p class="text-center text-2xl font-bold leading-snug text-[#1d291d]">
-                  Make your portfolio work feel easier and more organized
+                  Build and manage your portfolio in a way that feels easy and approachable
                 </p>
                 <p class="mt-3 text-center text-sm leading-7 text-[#8a6a51]">
-                  Existing account ho to login karo. Naya setup chahiye to signup se apna personalized portfolio create karo.
+                  Existing account ho to login karo. Naya setup chahiye to signup karke apna portfolio start karo.
                 </p>
               </div>
             </div>

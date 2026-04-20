@@ -20,18 +20,18 @@ type ThemePreview = {
     <section class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-slate-950/70">
       <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
-          <p class="text-xs font-semibold uppercase tracking-[0.32em] text-orange-500">Theme Studio</p>
-          <h2 class="mt-2 text-2xl font-bold text-slate-900 dark:text-white">Choose your live portfolio theme</h2>
+          <p class="text-xs font-semibold uppercase tracking-[0.32em] text-orange-500">Layout Studio</p>
+          <h2 class="mt-2 text-2xl font-bold text-slate-900 dark:text-white">Choose your public page layout</h2>
           <p class="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-300">
-            Jo theme yahan select hoga, wahi public portfolio page par render hoga.
+            Jo layout yahan select hoga, wahi aapke public page par render hoga.
           </p>
         </div>
         <div class="rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 dark:border-white/10 dark:text-slate-300">
-          Active theme: <span class="text-slate-950 dark:text-white">{{ activeTheme() }}</span>
+          Active layout: <span class="text-slate-950 dark:text-white">{{ activeTheme() }}</span>
         </div>
       </div>
 
-      <div class="mt-6 grid gap-5 lg:grid-cols-3">
+      <div class="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         @for (theme of previews; track theme.id) {
           <article
             class="rounded-[1.75rem] border p-4 transition-all duration-200"
@@ -69,7 +69,7 @@ type ThemePreview = {
               [disabled]="isSaving()"
               (click)="themeSelected.emit(theme.id)"
             >
-              {{ activeTheme() === theme.id ? 'Current theme' : 'Use this theme' }}
+              {{ activeTheme() === theme.id ? 'Current layout' : 'Use this layout' }}
             </button>
           </article>
         }
@@ -88,7 +88,7 @@ export class ThemeSelectorComponent {
       id: 'modern-dark',
       name: 'Modern Dark',
       badge: 'MD',
-      summary: 'Minimal developer layout with a sharp dark shell and clean hierarchy.',
+      summary: 'Minimal dark presentation with a sharp shell and clean hierarchy.',
       accent: '#f97316',
       surface: 'linear-gradient(135deg, #0f172a, #111827)',
       previewClasses: ['h-3 w-24', 'h-14 w-full rounded-3xl', 'h-3 w-36', 'h-3 w-28'],
@@ -110,6 +110,24 @@ export class ThemeSelectorComponent {
       accent: '#0f766e',
       surface: 'linear-gradient(135deg, #ecfeff, #f0fdf4)',
       previewClasses: ['h-4 w-40', 'h-3 w-24', 'h-10 w-full rounded-xl', 'h-10 w-full rounded-xl'],
+    },
+    {
+      id: 'creator-orange',
+      name: 'Creator Orange',
+      badge: 'CO',
+      summary: 'Bold visual layout with dark gradients, spotlight stats, and direct contact CTA.',
+      accent: '#f97316',
+      surface: 'linear-gradient(135deg, #1e293b, #0f172a)',
+      previewClasses: ['h-3 w-20', 'h-16 w-full rounded-[1.5rem]', 'h-10 w-10 rounded-2xl', 'h-3 w-32'],
+    },
+    {
+      id: 'theme-5',
+      name: 'Theme 5',
+      badge: 'T5',
+      summary: 'Editorial presentation style with a cream canvas, bold typography, and an illustrated hero.',
+      accent: '#111111',
+      surface: 'linear-gradient(135deg, #f8f4ec, #efe6d5)',
+      previewClasses: ['h-4 w-28', 'h-20 w-full rounded-[1.5rem]', 'h-24 w-16 rounded-[1.25rem]', 'h-3 w-24'],
     },
   ];
 }

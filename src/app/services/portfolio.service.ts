@@ -511,6 +511,10 @@ export class PortfolioService {
         return 'minimal-light';
       case 'corporate-resume':
         return 'corporate-resume';
+      case 'creator-orange':
+        return 'creator-orange';
+      case 'theme-5':
+        return 'theme-5';
       case 'modern-dark':
       default:
         return 'modern-dark';

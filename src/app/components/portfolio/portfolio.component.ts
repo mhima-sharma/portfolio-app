@@ -5,11 +5,13 @@ import { PortfolioData } from '../../models/portfolio.model';
 import { Theme1Component } from '../themes/theme1.component';
 import { Theme2Component } from '../themes/theme2.component';
 import { Theme3Component } from '../themes/theme3.component';
+import { Theme4Component } from '../themes/theme4.component';
+import { Theme5Component } from '../themes/theme5.component';
 
 @Component({
   selector: 'app-portfolio',
   standalone: true,
-  imports: [CommonModule, Theme1Component, Theme2Component, Theme3Component],
+  imports: [CommonModule, Theme1Component, Theme2Component, Theme3Component, Theme4Component, Theme5Component],
   template: `
     @if (isLoading()) {
       <div class="flex min-h-screen items-center justify-center bg-slate-950 px-4 text-white">
@@ -31,6 +33,8 @@ import { Theme3Component } from '../themes/theme3.component';
         <app-theme1 *ngSwitchCase="'modern-dark'" [data]="portfolio"></app-theme1>
         <app-theme2 *ngSwitchCase="'minimal-light'" [data]="portfolio"></app-theme2>
         <app-theme3 *ngSwitchCase="'corporate-resume'" [data]="portfolio"></app-theme3>
+        <app-theme4 *ngSwitchCase="'creator-orange'" [data]="portfolio"></app-theme4>
+        <app-theme5 *ngSwitchCase="'theme-5'" [data]="portfolio"></app-theme5>
         <app-theme1 *ngSwitchDefault [data]="portfolio"></app-theme1>
       </div>
     }

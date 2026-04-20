@@ -59,7 +59,12 @@ export interface ProfileData {
   selectedTheme: PortfolioTheme;
 }
 
-export type PortfolioTheme = 'modern-dark' | 'minimal-light' | 'corporate-resume';
+export type PortfolioTheme =
+  | 'modern-dark'
+  | 'minimal-light'
+  | 'corporate-resume'
+  | 'creator-orange'
+  | 'theme-5';
 
 export interface PortfolioData {
   profile: ProfileData;

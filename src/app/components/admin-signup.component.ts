@@ -20,23 +20,23 @@ type SignupField = keyof SignupPayload;
 
             <div class="relative flex h-full flex-col justify-between rounded-[1.8rem] border border-[#f3dcc6] bg-[linear-gradient(180deg,rgba(255,255,255,0.84)_0%,rgba(255,246,235,0.96)_100%)] p-8">
               <div>
-                <p class="text-xs font-semibold uppercase tracking-[0.28em] text-[#db7a28]">Create Portfolio Access</p>
-                <h1 class="mt-4 text-4xl font-black leading-tight tracking-tight text-[#182218]">Build a polished presence from the start</h1>
+                <p class="text-xs font-semibold uppercase tracking-[0.28em] text-[#db7a28]">Create Your Access</p>
+                <h1 class="mt-4 text-4xl font-black leading-tight tracking-tight text-[#182218]">Start your portfolio with a polished first step</h1>
                 <p class="mt-4 text-base leading-7 text-[#72604f]">
-                  Guest-theme inspired onboarding with a soft green palette, clean spacing, and a more premium first impression.
+                  Smooth onboarding for anyone who wants to build a clean, professional, and shareable portfolio.
                 </p>
               </div>
 
               <div class="mt-10 space-y-4">
                 <div class="rounded-[1.4rem] border border-[#f3dcc6] bg-white/90 p-5 shadow-sm">
-                  <p class="text-sm font-semibold text-[#233023]">Personal profile setup</p>
-                  <p class="mt-2 text-sm leading-7 text-[#8a6a51]">Name, title, and slug se aapka public portfolio identity ready hota hai.</p>
+                  <p class="text-sm font-semibold text-[#233023]">Personal setup</p>
+                  <p class="mt-2 text-sm leading-7 text-[#8a6a51]">Name, title, and slug se aapki public portfolio identity ready hoti hai.</p>
                 </div>
                 <div class="rounded-[1.4rem] border border-[#f3dcc6] bg-white/90 p-5 shadow-sm">
                   <div class="flex items-center justify-between gap-4">
                     <div>
                       <p class="text-sm font-semibold text-[#233023]">Shareable portfolio link</p>
-                      <p class="mt-2 text-sm leading-7 text-[#8a6a51]">Signup ke baad same slug par live portfolio render ho jayega.</p>
+                      <p class="mt-2 text-sm leading-7 text-[#8a6a51]">Signup ke baad aapka live portfolio same slug par render ho jayega.</p>
                     </div>
                     <div class="flex h-14 w-14 items-center justify-center rounded-full border-4 border-[#f1bf89] text-sm font-bold text-[#c87424]">Live</div>
                   </div>
@@ -47,7 +47,7 @@ type SignupField = keyof SignupPayload;
                 <div class="flex items-end justify-between gap-4">
                   <div>
                     <p class="text-xs font-semibold uppercase tracking-[0.24em] text-[#d08c55]">What you get</p>
-                    <p class="mt-3 text-2xl font-bold text-[#1c281c]">A cleaner, more professional auth experience</p>
+                    <p class="mt-3 text-2xl font-bold text-[#1c281c]">A simple start for every kind of portfolio</p>
                   </div>
                   <div class="flex gap-2">
                     <span class="h-2.5 w-2.5 rounded-full bg-[#f4c28f]"></span>
@@ -69,7 +69,7 @@ type SignupField = keyof SignupPayload;
                 <p class="text-sm font-semibold uppercase tracking-[0.3em] text-[#db7a28]">Get started</p>
                 <h2 class="mt-4 text-4xl font-black tracking-tight text-[#182218] sm:text-5xl">Create your account</h2>
                 <p class="mt-4 text-base leading-7 text-[#72604f]">
-                  Har user ke liye alag portfolio profile banega, aur signup ke baad aap apni hi details manage kar paoge.
+                  Yeh platform sabke liye hai. Signup ke baad aap apni details manage karke apna portfolio confidently publish kar paoge.
                 </p>
               </div>
 
@@ -137,7 +137,7 @@ type SignupField = keyof SignupPayload;
                 </div>
 
                 <div>
-                  <label class="mb-2 block text-sm font-semibold text-[#35261b]">Portfolio title</label>
+                  <label class="mb-2 block text-sm font-semibold text-[#35261b]">Profile title</label>
                   <input
                     [(ngModel)]="form.title"
                     (ngModelChange)="clearFieldError('title')"
@@ -146,7 +146,7 @@ type SignupField = keyof SignupPayload;
                     class="w-full rounded-[1.1rem] border bg-[#fffdfa] px-5 py-4 text-base text-slate-900 outline-none transition focus:border-[#f2aa67] focus:ring-4 focus:ring-[#ffe4ca]"
                     [class.border-red-400]="fieldErrors().title"
                     [class.border-[#ecd7c3]]="!fieldErrors().title"
-                    placeholder="Frontend Developer"
+                  placeholder="Designer, Student, Teacher, Freelancer"
                   />
                   @if (fieldErrors().title) {
                     <p class="mt-2 text-sm text-red-600">{{ fieldErrors().title }}</p>
@@ -157,7 +157,7 @@ type SignupField = keyof SignupPayload;
               <div class="mt-5">
                 <label class="mb-2 block text-sm font-semibold text-[#35261b]">Portfolio slug</label>
                 <div class="mb-3 rounded-[1.1rem] border border-[#f6dac5] bg-[#fff6ee] px-4 py-4 text-sm text-[#7b624b]">
-                  Public URL:
+                  Public portfolio URL:
                   <span class="ml-1 font-semibold text-[#a85a17]">{{ previewUrl() }}</span>
                 </div>
                 <input
