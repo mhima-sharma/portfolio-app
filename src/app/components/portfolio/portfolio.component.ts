@@ -7,11 +7,13 @@ import { Theme2Component } from '../themes/theme2.component';
 import { Theme3Component } from '../themes/theme3.component';
 import { Theme4Component } from '../themes/theme4.component';
 import { Theme5Component } from '../themes/theme5.component';
+import { Theme6Component } from '../themes/theme6.component';
+import { Theme7Component } from '../themes/theme7.component';
 
 @Component({
   selector: 'app-portfolio',
   standalone: true,
-  imports: [CommonModule, Theme1Component, Theme2Component, Theme3Component, Theme4Component, Theme5Component],
+  imports: [CommonModule, Theme1Component, Theme2Component, Theme3Component, Theme4Component, Theme5Component, Theme6Component, Theme7Component],
   template: `
     @if (isLoading()) {
       <div class="flex min-h-screen items-center justify-center bg-slate-950 px-4 text-white">
@@ -35,6 +37,8 @@ import { Theme5Component } from '../themes/theme5.component';
         <app-theme3 *ngSwitchCase="'corporate-resume'" [data]="portfolio"></app-theme3>
         <app-theme4 *ngSwitchCase="'creator-orange'" [data]="portfolio"></app-theme4>
         <app-theme5 *ngSwitchCase="'theme-5'" [data]="portfolio"></app-theme5>
+        <app-theme6 *ngSwitchCase="'premium-signature'" [data]="portfolio"></app-theme6>
+        <app-theme7 *ngSwitchCase="'theme-5-boys'" [data]="portfolio"></app-theme7>
         <app-theme1 *ngSwitchDefault [data]="portfolio"></app-theme1>
       </div>
     }
@@ -65,6 +69,10 @@ export class PortfolioComponent {
 
     try {
       const data = await this.portfolioService.getUserProfile(slug);
+      if (currentRequestId !== this.requestId) {
+        return;
+      }
+      await this.portfolioService.loadPremiumGallery(data.profile.slug || slug);
       if (currentRequestId !== this.requestId) {
         return;
       }

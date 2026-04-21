@@ -9,8 +9,14 @@ import {
   ProfileData,
   PortfolioData,
   PortfolioTheme,
+  PremiumGalleryImage,
 } from '../models/portfolio.model';
-import { API_BASE_URL, HEALTH_URL } from '../config/api.config';
+import {
+  API_BASE_URL,
+  CLOUDINARY_CLOUD_NAME,
+  CLOUDINARY_UPLOAD_PRESET,
+  HEALTH_URL,
+} from '../config/api.config';
 import { firstValueFrom } from 'rxjs';
 
 const DEFAULT_CONTACT: ContactData = {
@@ -42,6 +48,7 @@ export class PortfolioService {
   private skillsData = signal<Skill[]>([]);
   private projectsData = signal<Project[]>([]);
   private experienceData = signal<Experience[]>([]);
+  private premiumGalleryData = signal<PremiumGalleryImage[]>([]);
   currentProfile = signal<ProfileData>({ ...DEFAULT_PROFILE });
   selectedTheme = signal<PortfolioTheme>('modern-dark');
   isUsingDefaultThemeFallback = signal(false);
@@ -60,6 +67,7 @@ export class PortfolioService {
   getSkills = this.skillsData.asReadonly();
   getProjects = this.projectsData.asReadonly();
   getExperience = this.experienceData.asReadonly();
+  getPremiumGallery = this.premiumGalleryData.asReadonly();
 
   constructor() {}
 
@@ -82,6 +90,7 @@ export class PortfolioService {
 
   loadPortfolio(profileSlug?: string) {
     const requestId = ++this.activeLoadRequestId;
+    const normalizedSlug = this.normalizeSlug(profileSlug);
     this.isLoading.set(true);
     this.error.set(null);
 
@@ -92,6 +101,7 @@ export class PortfolioService {
           }
 
           this.applyPortfolioData(portfolio);
+          void this.loadPremiumGallery(portfolio.profile.slug || normalizedSlug);
           this.isLoading.set(false);
         })
       .catch((error) => {
@@ -99,7 +109,6 @@ export class PortfolioService {
             return;
           }
 
-          const normalizedSlug = this.normalizeSlug(profileSlug);
           console.error('Failed to load portfolio data:', error);
           this.error.set('Unable to load live portfolio data.');
           this.currentProfile.set({
@@ -113,6 +122,7 @@ export class PortfolioService {
           this.skillsData.set([]);
           this.projectsData.set([]);
           this.experienceData.set([]);
+          this.premiumGalleryData.set([]);
           this.about.set({ bio: '', description: '', yearsExperience: 0 });
           this.contact.set({ ...DEFAULT_CONTACT });
           this.isLoading.set(false);
@@ -167,6 +177,113 @@ export class PortfolioService {
     }));
 
     return theme;
+  }
+
+  async loadPremiumGallery(slug?: string) {
+    const normalizedSlug = this.normalizeSlug(slug);
+    if (!normalizedSlug) {
+      this.premiumGalleryData.set([]);
+      return [];
+    }
+
+    try {
+      const response = await firstValueFrom(
+        this.http.get<{ resources?: any[] }>(this.getPremiumGalleryListUrl(normalizedSlug))
+      );
+
+      const rawItems = response?.resources ?? [];
+      const gallery = Array.isArray(rawItems)
+        ? rawItems.map((item: any) => this.mapCloudinaryGalleryItem(item, normalizedSlug))
+        : [];
+
+      this.premiumGalleryData.set(this.sortPremiumGallery(gallery));
+      return this.premiumGalleryData();
+    } catch {
+      this.premiumGalleryData.set([]);
+      return [];
+    }
+  }
+
+  async uploadPremiumGalleryImageToCloudinary(
+    file: File,
+    options?: { slug?: string; title?: string; altText?: string; isFeatured?: boolean }
+  ): Promise<string> {
+    if (!CLOUDINARY_CLOUD_NAME || CLOUDINARY_CLOUD_NAME === 'your-cloud-name') {
+      throw new Error('Cloudinary cloud name is not configured yet.');
+    }
+
+    if (!CLOUDINARY_UPLOAD_PRESET || CLOUDINARY_UPLOAD_PRESET === 'your-upload-preset') {
+      throw new Error('Cloudinary upload preset is not configured yet.');
+    }
+
+    const formData = new FormData();
+    const normalizedSlug = this.normalizeSlug(options?.slug);
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+
+    if (normalizedSlug) {
+      formData.append('folder', this.getPremiumGalleryFolder(normalizedSlug));
+      formData.append('tags', this.getPremiumGalleryTag(normalizedSlug));
+
+      const contextEntries = [
+        ['title', options?.title?.trim() ?? ''],
+        ['alt', options?.altText?.trim() ?? ''],
+        ['slug', normalizedSlug],
+        ['isFeatured', options?.isFeatured ? 'true' : 'false'],
+      ].filter(([, value]) => Boolean(value));
+
+      if (contextEntries.length) {
+        formData.append(
+          'context',
+          contextEntries.map(([key, value]) => `${key}=${this.escapeCloudinaryContextValue(value)}`).join('|')
+        );
+      }
+    }
+
+    const response = await fetch(
+      `https://api.cloudinary.com/v1_1/${encodeURIComponent(CLOUDINARY_CLOUD_NAME)}/image/upload`,
+      {
+        method: 'POST',
+        body: formData,
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error('Cloudinary upload failed.');
+    }
+
+    const data = await response.json();
+    if (!data?.secure_url) {
+      throw new Error('Cloudinary did not return an image URL.');
+    }
+
+    return data.secure_url;
+  }
+
+  async createPremiumGalleryItem(
+    slug: string,
+    payload: { imageUrl: string; title: string; altText: string; isFeatured?: boolean },
+    headers?: HttpHeaders
+  ) {
+    void headers;
+    const item = this.mapPremiumGalleryItem(
+      {
+        ...payload,
+        slug,
+        id: `${slug}-${Date.now()}`,
+      },
+      slug
+    );
+
+    this.premiumGalleryData.update((items) => this.sortPremiumGallery([...items, item]));
+    return item;
+  }
+
+  async deletePremiumGalleryItem(slug: string, imageId: string | number, headers?: HttpHeaders) {
+    void slug;
+    void imageId;
+    void headers;
+    throw new Error('Direct Cloudinary gallery mode cannot delete images from the frontend. Delete them from Cloudinary Media Library.');
   }
 
   async updateAbout(payload: AboutData, headers: HttpHeaders): Promise<void> {
@@ -406,6 +523,39 @@ export class PortfolioService {
     });
   }
 
+  private mapPremiumGalleryItem(item: any, fallbackSlug: string): PremiumGalleryImage {
+    return {
+      id: item.id ?? item._id ?? item.imageId ?? `${fallbackSlug}-${item.imageUrl ?? Math.random()}`,
+      slug: item.slug ?? fallbackSlug,
+      imageUrl: item.imageUrl ?? item.url ?? '',
+      title: item.title ?? '',
+      altText: item.altText ?? item.alt ?? '',
+      sortOrder: Number(item.sortOrder ?? 0),
+      isFeatured: Boolean(item.isFeatured),
+    };
+  }
+
+  private mapCloudinaryGalleryItem(item: any, fallbackSlug: string): PremiumGalleryImage {
+    const customContext = item?.context?.custom ?? {};
+
+    return this.mapPremiumGalleryItem(
+      {
+        id: item.public_id ?? item.asset_id ?? item.asset_folder ?? item.secure_url,
+        slug: customContext.slug ?? fallbackSlug,
+        imageUrl: this.buildCloudinaryDeliveryUrl(item),
+        title: customContext.title ?? item.display_name ?? '',
+        altText: customContext.alt ?? '',
+        sortOrder: this.toTimestamp(item.created_at),
+        isFeatured: customContext.isFeatured === 'true',
+      },
+      fallbackSlug
+    );
+  }
+
+  private sortPremiumGallery(items: PremiumGalleryImage[]) {
+    return [...items].sort((a, b) => b.sortOrder - a.sortOrder);
+  }
+
   private isCurrentExperience(item: Experience): boolean {
     const duration = item.duration.trim().toLowerCase();
     return !item.endDate || duration.includes('present') || duration.includes('current');
@@ -448,6 +598,43 @@ export class PortfolioService {
 
   private normalizeSlug(profileSlug?: string): string {
     return (profileSlug ?? '').trim().toLowerCase();
+  }
+
+  private getPremiumGalleryFolder(slug: string): string {
+    return `premium-gallery/${slug}`;
+  }
+
+  private getPremiumGalleryTag(slug: string): string {
+    return `premium-gallery-${slug}`;
+  }
+
+  private getPremiumGalleryListUrl(slug: string): string {
+    const tag = encodeURIComponent(this.getPremiumGalleryTag(slug));
+    const cacheBuster = Date.now();
+    return `https://res.cloudinary.com/${encodeURIComponent(CLOUDINARY_CLOUD_NAME)}/image/list/${tag}.json?ts=${cacheBuster}`;
+  }
+
+  private buildCloudinaryDeliveryUrl(item: any): string {
+    if (item?.secure_url) {
+      return item.secure_url;
+    }
+
+    if (item?.url?.startsWith('https://')) {
+      return item.url;
+    }
+
+    const publicId = item?.public_id ?? '';
+    if (!publicId) {
+      return item?.url ?? '';
+    }
+
+    const versionSegment = item?.version ? `/v${item.version}` : '';
+    const formatSegment = item?.format ? `.${item.format}` : '';
+    return `https://res.cloudinary.com/${encodeURIComponent(CLOUDINARY_CLOUD_NAME)}/image/upload${versionSegment}/${publicId}${formatSegment}`;
+  }
+
+  private escapeCloudinaryContextValue(value: string): string {
+    return value.replace(/[=|]/g, ' ').trim();
   }
 
   private mapPortfolioResponse(data: any, normalizedSlug: string): PortfolioData {
@@ -515,6 +702,10 @@ export class PortfolioService {
         return 'creator-orange';
       case 'theme-5':
         return 'theme-5';
+      case 'premium-signature':
+        return 'premium-signature';
+      case 'theme-5-boys':
+        return 'theme-5-boys';
       case 'modern-dark':
       default:
         return 'modern-dark';

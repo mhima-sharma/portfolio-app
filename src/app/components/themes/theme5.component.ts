@@ -58,17 +58,7 @@ import { PortfolioData } from '../../models/portfolio.model';
                 </p>
               </div>
 
-              <div class="grid gap-6 md:grid-cols-[0.9fr_1.1fr_0.95fr]">
-                <article class="rounded-[2rem] bg-white p-4 shadow-[0_18px_45px_rgba(24,21,18,0.08)]">
-                  <div class="overflow-hidden rounded-[1.5rem] bg-[#ede5d5] p-3">
-                    <img
-                      src="/assets/image.png"
-                      alt="Portfolio identity card"
-                      class="h-56 w-full rounded-[1.2rem] object-cover"
-                    />
-                  </div>
-                </article>
-
+              <div class="grid gap-6 md:grid-cols-[1.1fr_0.95fr]">
                 <article id="experience" class="rounded-[2rem] bg-white p-5 shadow-[0_18px_45px_rgba(24,21,18,0.08)]">
                   <p class="text-sm font-bold uppercase tracking-[0.28em] text-[#8c7a64]">Experience</p>
                   <div class="mt-4 space-y-4">

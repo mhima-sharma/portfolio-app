@@ -59,12 +59,24 @@ export interface ProfileData {
   selectedTheme: PortfolioTheme;
 }
 
+export interface PremiumGalleryImage {
+  id: string | number;
+  slug: string;
+  imageUrl: string;
+  title: string;
+  altText: string;
+  sortOrder: number;
+  isFeatured: boolean;
+}
+
 export type PortfolioTheme =
   | 'modern-dark'
   | 'minimal-light'
   | 'corporate-resume'
   | 'creator-orange'
-  | 'theme-5';
+  | 'theme-5'
+  | 'premium-signature'
+  | 'theme-5-boys';
 
 export interface PortfolioData {
   profile: ProfileData;

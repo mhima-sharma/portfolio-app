@@ -683,6 +683,68 @@ type WizardStep = {
                       </div>
                     }
 
+                    <section class="surface-card premium-gallery-card">
+                      <div class="surface-card__header">
+                        <div>
+                          <p class="surface-card__eyebrow">Premium Add-On</p>
+                          <h3 class="surface-card__title">Image Gallery</h3>
+                          <p class="admin-topbar__copy">
+                            Upload images from admin to Cloudinary and load them on the premium theme using your slug tag <strong>{{ profileSlug() || 'slug' }}</strong>.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div class="builder-layout builder-layout--single">
+                        <div class="builder-form">
+                          <div class="form-grid">
+                            <div class="form-field form-field--full">
+                              <label>Gallery Image</label>
+                              <input type="file" accept="image/*" class="input-base" (change)="onPremiumGalleryFileSelected($event)" />
+                            </div>
+                            <div class="form-field">
+                              <label>Title</label>
+                              <input [(ngModel)]="premiumGalleryForm.title" type="text" class="input-base" placeholder="Featured screen, home section, branding visual..." />
+                            </div>
+                            <div class="form-field">
+                              <label>Alt Text</label>
+                              <input [(ngModel)]="premiumGalleryForm.altText" type="text" class="input-base" placeholder="Describe the image for accessibility" />
+                            </div>
+                          </div>
+
+                          <div class="editor-actions">
+                            <button class="btn-secondary" type="button" (click)="resetPremiumGalleryForm()">Reset</button>
+                            <button class="btn-primary" type="button" (click)="savePremiumGalleryImage()" [disabled]="premiumGalleryUploading()">
+                              {{ premiumGalleryUploading() ? 'Uploading...' : 'Upload To Premium Gallery' }}
+                            </button>
+                          </div>
+                        </div>
+
+                        <div class="builder-list">
+                          <div class="builder-list__head">
+                            <h4>Saved Gallery Images</h4>
+                            <span>{{ premiumGallery().length }} saved</span>
+                          </div>
+
+                          @if (premiumGallery().length) {
+                            <div class="premium-gallery-grid">
+                              @for (item of premiumGallery(); track item.id) {
+                                <article class="premium-gallery-item">
+                                  <img [src]="item.imageUrl" [alt]="item.altText || item.title || 'Gallery image'" class="premium-gallery-item__image" />
+                                  <div class="premium-gallery-item__body">
+                                    <p class="premium-gallery-item__title">{{ item.title || 'Untitled image' }}</p>
+                                    <p class="premium-gallery-item__meta">{{ item.altText || 'No alt text added yet.' }}</p>
+                                  </div>
+                                  <p class="premium-gallery-item__meta">Delete or manage this image from Cloudinary Media Library.</p>
+                                </article>
+                              }
+                            </div>
+                          } @else {
+                            <div class="empty-state">Premium gallery images Cloudinary tag list se load hongi, and public premium theme slug ke through fetch karega.</div>
+                          }
+                        </div>
+                      </div>
+                    </section>
+
                     <div class="publish-card">
                       <p class="publish-card__eyebrow">Final Step</p>
                       <h4 class="publish-card__title">Your portfolio is ready to share</h4>
@@ -886,12 +948,19 @@ export class AdminDashboardComponent {
   profileSlug = signal('');
   publicPortfolioUrl = signal('');
   themeSaving = signal(false);
+  premiumGalleryUploading = signal(false);
   platformMessageSending = signal(false);
+  premiumGallery = this.portfolioService.getPremiumGallery;
   platformContactForm = {
     name: '',
     email: '',
     message: '',
   };
+  premiumGalleryForm = {
+    title: '',
+    altText: '',
+  };
+  private selectedPremiumGalleryFile: File | null = null;
 
   currentStep = computed(() => this.wizardSteps[this.activeStep()]);
 
@@ -911,6 +980,11 @@ export class AdminDashboardComponent {
       }
 
       this.publicPortfolioUrl.set(slug ? `${window.location.origin}/${slug}` : '');
+    });
+
+    effect(() => {
+      const slug = this.authService.admin()?.profile?.slug?.trim() || '';
+      void this.portfolioService.loadPremiumGallery(slug);
     });
 
     effect(() => {
@@ -1122,6 +1196,73 @@ export class AdminDashboardComponent {
     } finally {
       this.themeSaving.set(false);
     }
+  }
+
+  onPremiumGalleryFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement | null;
+    this.selectedPremiumGalleryFile = input?.files?.[0] ?? null;
+    this.error.set(null);
+  }
+
+  resetPremiumGalleryForm() {
+    this.premiumGalleryForm = {
+      title: '',
+      altText: '',
+    };
+    this.selectedPremiumGalleryFile = null;
+  }
+
+  async savePremiumGalleryImage() {
+    const slug = this.authService.getCurrentSlug();
+    if (!slug) {
+      this.error.set('Logged-in profile slug not available.');
+      return false;
+    }
+
+    if (!this.selectedPremiumGalleryFile) {
+      this.error.set('Please choose an image before uploading.');
+      return false;
+    }
+
+    this.premiumGalleryUploading.set(true);
+
+    try {
+      this.error.set(null);
+      const imageUrl = await this.portfolioService.uploadPremiumGalleryImageToCloudinary(this.selectedPremiumGalleryFile, {
+        slug,
+        title: this.premiumGalleryForm.title.trim(),
+        altText: this.premiumGalleryForm.altText.trim(),
+      });
+      await this.portfolioService.createPremiumGalleryItem(
+        slug,
+        {
+          imageUrl,
+          title: this.premiumGalleryForm.title.trim(),
+          altText: this.premiumGalleryForm.altText.trim(),
+        },
+      );
+      this.resetPremiumGalleryForm();
+      this.setStatus('Premium gallery image uploaded to Cloudinary.');
+      return true;
+    } catch (error: any) {
+      this.error.set(error?.message ?? 'Unable to upload premium gallery image.');
+      return false;
+    } finally {
+      this.premiumGalleryUploading.set(false);
+    }
+  }
+
+  async deletePremiumGalleryImage(imageId: string | number) {
+    const slug = this.authService.getCurrentSlug();
+    if (!slug) {
+      this.error.set('Logged-in profile slug not available.');
+      return false;
+    }
+
+    return this.runAction(async () => {
+      await this.portfolioService.deletePremiumGalleryItem(slug, imageId, this.authService.authHeaders());
+      this.setStatus('Premium gallery image deleted.');
+    });
   }
 
   editSkill(skill: Skill) {

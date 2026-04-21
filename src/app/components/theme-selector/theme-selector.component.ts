@@ -129,5 +129,23 @@ export class ThemeSelectorComponent {
       surface: 'linear-gradient(135deg, #f8f4ec, #efe6d5)',
       previewClasses: ['h-4 w-28', 'h-20 w-full rounded-[1.5rem]', 'h-24 w-16 rounded-[1.25rem]', 'h-3 w-24'],
     },
+    {
+      id: 'premium-signature',
+      name: 'Premium Signature',
+      badge: 'PS',
+      summary: 'Premium presentation with rich dark panels, elegant metrics, and polished showcase blocks.',
+      accent: '#c8a56a',
+      surface: 'linear-gradient(135deg, #111827, #1f2937)',
+      previewClasses: ['h-4 w-24', 'h-16 w-full rounded-[1.4rem]', 'h-8 w-20 rounded-full', 'h-3 w-32'],
+    },
+    {
+      id: 'theme-5-boys',
+      name: 'Theme 5 Boys',
+      badge: 'TB',
+      summary: 'Theme 5 inspired editorial layout with the boys avatar from local assets.',
+      accent: '#1d4ed8',
+      surface: 'linear-gradient(135deg, #eff6ff, #dbeafe)',
+      previewClasses: ['h-4 w-28', 'h-20 w-full rounded-[1.5rem]', 'h-24 w-16 rounded-[1.25rem]', 'h-3 w-24'],
+    },
   ];
 }
