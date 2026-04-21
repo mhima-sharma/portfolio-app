@@ -9,9 +9,10 @@ import { ThemeSelectorComponent } from './theme-selector/theme-selector.componen
 import { IconComponent } from './ui/icon.component';
 import { EMAILJS_CONFIG, isEmailJsConfigured } from '../config/email.config';
 import { ELearningPanelComponent } from './e-learning-panel.component';
+import { PlatformAdminService } from '../services/platform-admin.service';
 
 type ValidationErrors = Record<string, string>;
-type AdminPanel = 'dashboard' | 'create' | 'elearning' | 'contact';
+type AdminPanel = 'dashboard' | 'create' | 'elearning' | 'platform' | 'contact';
 
 type WizardStep = {
   title: string;
@@ -41,7 +42,7 @@ type WizardStep = {
         </div>
 
         <nav class="admin-nav">
-          @for (panel of panels; track panel.id) {
+          @for (panel of availablePanels(); track panel.id) {
             <button
               type="button"
               class="admin-nav__item"
@@ -94,6 +95,8 @@ type WizardStep = {
                     ? 'Guided Setup'
                     : activePanel() === 'elearning'
                       ? 'Course Control'
+                      : activePanel() === 'platform'
+                        ? 'Platform Control'
                       : 'Support'
               }}
             </p>
@@ -105,6 +108,8 @@ type WizardStep = {
                     ? 'Content Setup'
                     : activePanel() === 'elearning'
                       ? 'E-Learning'
+                      : activePanel() === 'platform'
+                        ? 'Platform Analytics'
                       : 'Contact Us'
               }}
             </h2>
@@ -115,6 +120,8 @@ type WizardStep = {
                 Complete your profile and content in a guided, professional setup flow.
               } @else if (activePanel() === 'elearning') {
                 Hidden login, course sync and full curriculum inspection from the same admin workspace.
+              } @else if (activePanel() === 'platform') {
+                Super admin ke liye signups, premium gallery, aur e-learning controls ek jagah par.
               } @else {
                 Contact the platform team for support, setup issues or admin assistance.
               }
@@ -133,8 +140,8 @@ type WizardStep = {
           <div class="banner banner--success">{{ status() }}</div>
         }
 
-        @if (error()) {
-          <div class="banner banner--error">{{ error() }}</div>
+        @if (error() || platformAdmin.error()) {
+          <div class="banner banner--error">{{ error() || platformAdmin.error() }}</div>
         }
 
         @if (activePanel() === 'dashboard') {
@@ -157,9 +164,33 @@ type WizardStep = {
               </article>
               <article class="metric-card">
                 <p class="metric-card__label">Theme</p>
-                <p class="metric-card__value metric-card__value--small">{{ selectedTheme() }}</p>
-                <p class="metric-card__hint">Active theme used by the public page.</p>
+                <p class="metric-card__value metric-card__value--small">{{ effectiveThemeForSelector() }}</p>
+                <p class="metric-card__hint">
+                  {{
+                    isPremiumThemeSelected() && !hasPremiumAccess()
+                      ? 'Premium locked hai, isliye abhi default active display theme dikh raha hai.'
+                      : 'Active theme used by the public page.'
+                  }}
+                </p>
               </article>
+              <article class="metric-card">
+                <p class="metric-card__label">Uploaded Images</p>
+                <p class="metric-card__value">{{ premiumGallery().length }}</p>
+                <p class="metric-card__hint">Current profile slug ke premium gallery images ka total count.</p>
+              </article>
+              @if (isSuperAdmin()) {
+                <article class="metric-card">
+                  <p class="metric-card__label">Signups</p>
+                  <p class="metric-card__value">{{ displayMetric(platformAdmin.analytics().totalSignups) }}</p>
+                  <p class="metric-card__hint">
+                    {{
+                      platformAdmin.analytics().source === 'api'
+                        ? 'Live platform signup count from backend analytics.'
+                        : 'Backend analytics endpoint add karne ke baad live signup count yahan dikh jayega.'
+                    }}
+                  </p>
+                </article>
+              }
             </div>
 
             <div class="dashboard-grid">
@@ -672,8 +703,10 @@ type WizardStep = {
                 @case (6) {
                   <div class="publish-layout">
                     <app-theme-selector
-                      [activeTheme]="selectedTheme()"
+                      [activeTheme]="effectiveThemeForSelector()"
                       [isSaving]="themeSaving()"
+                      [premiumPrice]="premiumPrice()"
+                      [hasPremiumAccess]="hasPremiumAccess()"
                       (themeSelected)="saveTheme($event)"
                     ></app-theme-selector>
 
@@ -683,67 +716,187 @@ type WizardStep = {
                       </div>
                     }
 
-                    <section class="surface-card premium-gallery-card">
-                      <div class="surface-card__header">
-                        <div>
-                          <p class="surface-card__eyebrow">Premium Add-On</p>
-                          <h3 class="surface-card__title">Image Gallery</h3>
-                          <p class="admin-topbar__copy">
-                            Upload images from admin to Cloudinary and load them on the premium theme using your slug tag <strong>{{ profileSlug() || 'slug' }}</strong>.
-                          </p>
-                        </div>
+                    @if (isPremiumThemeSelected() && !hasPremiumAccess()) {
+                      <div class="banner banner--warning">
+                        Premium theme saved dikh raha hai, lekin access unlock nahi hua hai. Isliye abhi default theme active treat ho raha hai.
                       </div>
+                    }
 
-                      <div class="builder-layout builder-layout--single">
-                        <div class="builder-form">
-                          <div class="form-grid">
-                            <div class="form-field form-field--full">
-                              <label>Gallery Image</label>
-                              <input type="file" accept="image/*" class="input-base" (change)="onPremiumGalleryFileSelected($event)" />
-                            </div>
-                            <div class="form-field">
-                              <label>Title</label>
-                              <input [(ngModel)]="premiumGalleryForm.title" type="text" class="input-base" placeholder="Featured screen, home section, branding visual..." />
-                            </div>
-                            <div class="form-field">
-                              <label>Alt Text</label>
-                              <input [(ngModel)]="premiumGalleryForm.altText" type="text" class="input-base" placeholder="Describe the image for accessibility" />
-                            </div>
-                          </div>
-
-                          <div class="editor-actions">
-                            <button class="btn-secondary" type="button" (click)="resetPremiumGalleryForm()">Reset</button>
-                            <button class="btn-primary" type="button" (click)="savePremiumGalleryImage()" [disabled]="premiumGalleryUploading()">
-                              {{ premiumGalleryUploading() ? 'Uploading...' : 'Upload To Premium Gallery' }}
-                            </button>
+                    @if (premiumCheckoutOpen() && premiumPendingTheme(); as pendingTheme) {
+                      <section class="surface-card premium-gallery-card">
+                        <div class="surface-card__header">
+                          <div>
+                            <p class="surface-card__eyebrow">Premium Themes</p>
+                            <h3 class="surface-card__title">Unlock premium experience</h3>
+                            <p class="admin-topbar__copy">
+                              Premium theme use karne se pehle user ko facilities dikhengi, phir super admin ke decided amount par unlock flow complete hoga.
+                            </p>
                           </div>
                         </div>
 
-                        <div class="builder-list">
-                          <div class="builder-list__head">
-                            <h4>Saved Gallery Images</h4>
-                            <span>{{ premiumGallery().length }} saved</span>
+                        <div class="builder-layout builder-layout--single">
+                          <div class="builder-list">
+                            <div class="builder-list__head">
+                              <h4>What premium includes</h4>
+                              <span>For {{ pendingTheme }}</span>
+                            </div>
+
+                            <div class="stack-list">
+                              <article class="stack-item">
+                                <div>
+                                  <p class="stack-item__title">Blog-ready storytelling layout</p>
+                                  <p class="stack-item__copy">User apni long-form story, case study, ya blog style content premium layout me better tarike se present kar sakta hai.</p>
+                                </div>
+                              </article>
+                              <article class="stack-item">
+                                <div>
+                                  <p class="stack-item__title">Picture gallery experience</p>
+                                  <p class="stack-item__copy">Cloudinary based image gallery premium sections me show hogi aur visual portfolio stronger lagega.</p>
+                                </div>
+                              </article>
+                              <article class="stack-item">
+                                <div>
+                                  <p class="stack-item__title">Premium presentation</p>
+                                  <p class="stack-item__copy">Rich blocks, better visual hierarchy, aur standout showcase sections premium themes me milenge.</p>
+                                </div>
+                              </article>
+                            </div>
                           </div>
 
-                          @if (premiumGallery().length) {
-                            <div class="premium-gallery-grid">
-                              @for (item of premiumGallery(); track item.id) {
-                                <article class="premium-gallery-item">
-                                  <img [src]="item.imageUrl" [alt]="item.altText || item.title || 'Gallery image'" class="premium-gallery-item__image" />
-                                  <div class="premium-gallery-item__body">
-                                    <p class="premium-gallery-item__title">{{ item.title || 'Untitled image' }}</p>
-                                    <p class="premium-gallery-item__meta">{{ item.altText || 'No alt text added yet.' }}</p>
-                                  </div>
-                                  <p class="premium-gallery-item__meta">Delete or manage this image from Cloudinary Media Library.</p>
-                                </article>
-                              }
+                          <div class="builder-form">
+                            <div class="publish-card">
+                              <p class="publish-card__eyebrow">Premium Access</p>
+                              <h4 class="publish-card__title">Pay INR {{ premiumPrice() }} to unlock</h4>
+                              <p class="publish-card__copy">
+                                Yeh amount super admin decide karta hai. Payment confirm hote hi premium theme activate ho jayega aur gallery/blog style facilities use ki ja sakengi.
+                              </p>
+
+                              <div class="publish-summary">
+                                <div class="publish-summary__item">
+                                  <span>Theme</span>
+                                  <strong>{{ pendingTheme }}</strong>
+                                </div>
+                                <div class="publish-summary__item">
+                                  <span>Amount</span>
+                                  <strong>INR {{ premiumPrice() }}</strong>
+                                </div>
+                                <div class="publish-summary__item">
+                                  <span>Status</span>
+                                  <strong>{{ hasPremiumAccess() ? 'Unlocked' : 'Locked' }}</strong>
+                                </div>
+                              </div>
+
+                              <div class="wizard-actions wizard-actions--publish">
+                                <button class="btn-secondary" type="button" (click)="closePremiumCheckout()">Maybe Later</button>
+                                <button class="btn-primary" type="button" (click)="completePremiumPurchase()" [disabled]="themeSaving()">
+                                  {{ hasPremiumAccess() ? 'Activate Premium Theme' : 'Pay And Unlock' }}
+                                </button>
+                              </div>
                             </div>
-                          } @else {
-                            <div class="empty-state">Premium gallery images Cloudinary tag list se load hongi, and public premium theme slug ke through fetch karega.</div>
-                          }
+                          </div>
                         </div>
-                      </div>
-                    </section>
+                      </section>
+                    }
+
+                    @if (canManagePremiumGallery()) {
+                      <section class="surface-card premium-gallery-card">
+                        <div class="surface-card__header">
+                          <div>
+                            <p class="surface-card__eyebrow">Premium Add-On</p>
+                            <h3 class="surface-card__title">Image Gallery</h3>
+                            <p class="admin-topbar__copy">
+                              Upload images from admin to Cloudinary and load them on the premium theme using your slug tag <strong>{{ profileSlug() || 'slug' }}</strong>.
+                            </p>
+                          </div>
+                        </div>
+
+                        <div class="builder-layout builder-layout--single">
+                          <div class="builder-form">
+                            <div class="form-grid">
+                              <div class="form-field form-field--full">
+                                <label>Gallery Image</label>
+                                <input type="file" accept="image/*" class="input-base" (change)="onPremiumGalleryFileSelected($event)" />
+                              </div>
+                              <div class="form-field">
+                                <label>Title</label>
+                                <input [(ngModel)]="premiumGalleryForm.title" type="text" class="input-base" placeholder="Featured screen, home section, branding visual..." />
+                              </div>
+                              <div class="form-field">
+                                <label>Alt Text</label>
+                                <input [(ngModel)]="premiumGalleryForm.altText" type="text" class="input-base" placeholder="Describe the image for accessibility" />
+                              </div>
+                            </div>
+
+                            <div class="editor-actions">
+                              <button class="btn-secondary" type="button" (click)="resetPremiumGalleryForm()">Reset</button>
+                              <button class="btn-primary" type="button" (click)="savePremiumGalleryImage()" [disabled]="premiumGalleryUploading()">
+                                {{ premiumGalleryUploading() ? 'Uploading...' : 'Upload To Premium Gallery' }}
+                              </button>
+                            </div>
+                          </div>
+
+                          <div class="builder-list">
+                            <div class="builder-list__head">
+                              <h4>Saved Gallery Images</h4>
+                              <span>{{ premiumGallery().length }} saved</span>
+                            </div>
+
+                            @if (premiumGallery().length) {
+                              <div class="premium-gallery-grid">
+                                @for (item of premiumGallery(); track item.id) {
+                                  <article class="premium-gallery-item">
+                                    <img [src]="item.imageUrl" [alt]="item.altText || item.title || 'Gallery image'" class="premium-gallery-item__image" />
+                                    <div class="premium-gallery-item__body">
+                                      <p class="premium-gallery-item__title">{{ item.title || 'Untitled image' }}</p>
+                                      <p class="premium-gallery-item__meta">{{ item.altText || 'No alt text added yet.' }}</p>
+                                    </div>
+                                    <p class="premium-gallery-item__meta">Delete or manage this image from Cloudinary Media Library.</p>
+                                  </article>
+                                }
+                              </div>
+                            } @else {
+                              <div class="empty-state">Premium gallery images Cloudinary tag list se load hongi, and public premium theme slug ke through fetch karega.</div>
+                            }
+                          </div>
+                        </div>
+                      </section>
+                    } @else if (!hasPremiumAccess()) {
+                      <section class="surface-card premium-gallery-card">
+                        <div class="surface-card__header">
+                          <div>
+                            <p class="surface-card__eyebrow">Premium Add-On</p>
+                            <h3 class="surface-card__title">Unlock Premium First</h3>
+                            <p class="admin-topbar__copy">
+                              Image gallery aur premium blog-style presentation use karne ke liye pehle premium access unlock karo.
+                            </p>
+                          </div>
+                        </div>
+                      </section>
+                    } @else if (!isPremiumThemeSelected()) {
+                      <section class="surface-card premium-gallery-card">
+                        <div class="surface-card__header">
+                          <div>
+                            <p class="surface-card__eyebrow">Premium Add-On</p>
+                            <h3 class="surface-card__title">Activate a Premium Theme</h3>
+                            <p class="admin-topbar__copy">
+                              Premium access unlock ho chuka hai. Ab Premium Signature ya Theme 5 Boys select karoge to gallery live use kar sakoge.
+                            </p>
+                          </div>
+                        </div>
+                      </section>
+                    } @else {
+                      <section class="surface-card premium-gallery-card">
+                        <div class="surface-card__header">
+                          <div>
+                            <p class="surface-card__eyebrow">Premium Add-On</p>
+                            <h3 class="surface-card__title">Image Gallery Disabled</h3>
+                            <p class="admin-topbar__copy">
+                              Super admin ne image gallery ko abhi platform level par pause kiya hua hai.
+                            </p>
+                          </div>
+                        </div>
+                      </section>
+                    }
 
                     <div class="publish-card">
                       <p class="publish-card__eyebrow">Final Step</p>
@@ -780,7 +933,11 @@ type WizardStep = {
                         </div>
                         <div class="publish-summary__item">
                           <span>Theme</span>
-                          <strong>{{ selectedTheme() }}</strong>
+                          <strong>{{ effectiveThemeForSelector() }}</strong>
+                        </div>
+                        <div class="publish-summary__item">
+                          <span>Premium</span>
+                          <strong>{{ hasPremiumAccess() ? 'Unlocked' : 'Locked' }}</strong>
                         </div>
                       </div>
 
@@ -796,7 +953,134 @@ type WizardStep = {
             </section>
           </section>
         } @else if (activePanel() === 'elearning') {
-          <app-e-learning-panel></app-e-learning-panel>
+          @if (isELearningEnabled()) {
+            <app-e-learning-panel></app-e-learning-panel>
+          } @else {
+            <section class="dashboard-view">
+              <section class="surface-card">
+                <div class="surface-card__header">
+                  <div>
+                    <p class="surface-card__eyebrow">Feature Disabled</p>
+                    <h3 class="surface-card__title">E-Learning is currently off</h3>
+                    <p class="admin-topbar__copy">
+                      Super admin ise platform controls se dubara enable kar sakta hai.
+                    </p>
+                  </div>
+                </div>
+              </section>
+            </section>
+          }
+        } @else if (activePanel() === 'platform') {
+          <section class="dashboard-view">
+            <div class="stats-grid">
+              <article class="metric-card">
+                <p class="metric-card__label">Total Signups</p>
+                <p class="metric-card__value">{{ displayMetric(platformAdmin.analytics().totalSignups) }}</p>
+                <p class="metric-card__hint">Backend analytics endpoint se total account signups yahan aayenge.</p>
+              </article>
+              <article class="metric-card">
+                <p class="metric-card__label">Active Portfolios</p>
+                <p class="metric-card__value">{{ displayMetric(platformAdmin.analytics().activePortfolios) }}</p>
+                <p class="metric-card__hint">Published or active portfolios ka backend count.</p>
+              </article>
+              <article class="metric-card">
+                <p class="metric-card__label">Premium Images</p>
+                <p class="metric-card__value">{{ displayMetric(platformAdmin.analytics().totalPremiumImages ?? premiumGallery().length) }}</p>
+                <p class="metric-card__hint">
+                  {{
+                    platformAdmin.analytics().source === 'api'
+                      ? 'Cloudinary ya backend se synced premium image total.'
+                      : 'Backend na ho to available portfolio slugs ke basis par all users premium images ka total count dikh raha hai.'
+                  }}
+                </p>
+              </article>
+              <article class="metric-card">
+                <p class="metric-card__label">Analytics Source</p>
+                <p class="metric-card__value metric-card__value--small">{{ platformAdmin.analytics().source }}</p>
+                <p class="metric-card__hint">
+                  {{
+                    platformAdmin.analytics().source === 'api'
+                      ? 'Live backend data is available.'
+                      : 'Frontend fallback mode active hai. Backend connect karne par live counts milenge.'
+                  }}
+                </p>
+              </article>
+            </div>
+
+            <div class="dashboard-grid">
+              <section class="surface-card">
+                <div class="surface-card__header">
+                  <div>
+                    <p class="surface-card__eyebrow">Super Admin</p>
+                    <h3 class="surface-card__title">Platform Controls</h3>
+                    <p class="admin-topbar__copy">
+                      <strong>{{ superAdminEmail }}</strong> se login karne par yeh panel show hota hai. Yahan se image aur e-learning features ko on/off kiya ja sakta hai.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="form-grid">
+                  <section class="surface-card rounded-[1.25rem] border border-slate-200 bg-slate-50 p-4">
+                    <div class="space-y-4">
+                      <div>
+                        <p class="surface-card__title">Premium Theme Pricing</p>
+                        <p class="admin-topbar__copy">Users ko premium facilities dekhne ke baad isi amount par paywall dikhaya jayega.</p>
+                      </div>
+
+                      <div class="form-field">
+                        <label>Premium Amount</label>
+                        <input
+                          [(ngModel)]="premiumPricingForm.amount"
+                          type="number"
+                          min="1"
+                          class="input-base"
+                          placeholder="1499"
+                        />
+                      </div>
+
+                      <div class="editor-actions">
+                        <button class="btn-primary" type="button" (click)="savePremiumPricing()">
+                          Save Premium Price
+                        </button>
+                      </div>
+                    </div>
+                  </section>
+
+                  <label class="surface-card rounded-[1.25rem] border border-slate-200 bg-slate-50 p-4">
+                    <div class="flex items-start justify-between gap-4">
+                      <div>
+                        <p class="surface-card__title">Image Gallery</p>
+                        <p class="admin-topbar__copy">Premium gallery upload aur public premium gallery sections ko control karo.</p>
+                      </div>
+                      <input
+                        type="checkbox"
+                        [ngModel]="isImageGalleryEnabled()"
+                        (ngModelChange)="toggleImageGallery($event)"
+                      />
+                    </div>
+                  </label>
+
+                  <label class="surface-card rounded-[1.25rem] border border-slate-200 bg-slate-50 p-4">
+                    <div class="flex items-start justify-between gap-4">
+                      <div>
+                        <p class="surface-card__title">E-Learning</p>
+                        <p class="admin-topbar__copy">Hidden login, course sync aur instructor explorer ko globally control karo.</p>
+                      </div>
+                      <input
+                        type="checkbox"
+                        [ngModel]="isELearningEnabled()"
+                        (ngModelChange)="toggleELearning($event)"
+                      />
+                    </div>
+                  </label>
+                </div>
+
+                <div class="wizard-actions wizard-actions--publish">
+                  <button class="btn-secondary" type="button" (click)="refreshPlatformOverview()">Refresh Analytics</button>
+                </div>
+              </section>
+            </div>
+          </section>
         } @else {
           <section class="dashboard-view">
             <section class="surface-card">
@@ -839,7 +1123,9 @@ type WizardStep = {
 export class AdminDashboardComponent {
   portfolioService = inject(PortfolioService);
   authService = inject(AuthService);
+  platformAdmin = inject(PlatformAdminService);
   router = inject(Router);
+  superAdminEmail = 'sharmamahima0510@gmail.com';
 
   status = signal<string | null>(null);
   error = signal<string | null>(null);
@@ -849,10 +1135,11 @@ export class AdminDashboardComponent {
   isSidebarOpen = signal(false);
   showRoadmap = signal(!this.hasSeenRoadmap());
 
-  panels: Array<{ id: AdminPanel; label: string; hint: string; icon: 'dashboard' | 'layers' | 'education' | 'mail' }> = [
+  panels: Array<{ id: AdminPanel; label: string; hint: string; icon: 'dashboard' | 'layers' | 'education' | 'mail' | 'summary' }> = [
     { id: 'dashboard', label: 'Dashboard', hint: 'Overview and quick actions', icon: 'dashboard' },
     { id: 'create', label: 'Content Setup', hint: 'Guided multi-step builder', icon: 'layers' },
     { id: 'elearning', label: 'E-Learning', hint: 'Hidden login and course explorer', icon: 'education' },
+    { id: 'platform', label: 'Platform', hint: 'Analytics and feature toggles', icon: 'summary' },
     { id: 'contact', label: 'Contact Us', hint: 'Reach the platform team', icon: 'mail' },
   ];
 
@@ -949,8 +1236,13 @@ export class AdminDashboardComponent {
   publicPortfolioUrl = signal('');
   themeSaving = signal(false);
   premiumGalleryUploading = signal(false);
+  premiumCheckoutOpen = signal(false);
+  premiumPendingTheme = signal<PortfolioTheme | null>(null);
   platformMessageSending = signal(false);
   premiumGallery = this.portfolioService.getPremiumGallery;
+  premiumPricingForm = {
+    amount: 1499,
+  };
   platformContactForm = {
     name: '',
     email: '',
@@ -963,6 +1255,38 @@ export class AdminDashboardComponent {
   private selectedPremiumGalleryFile: File | null = null;
 
   currentStep = computed(() => this.wizardSteps[this.activeStep()]);
+  isSuperAdmin = computed(() =>
+    this.platformAdmin.isSuperAdminEmail(this.authService.admin()?.email)
+  );
+  premiumPrice = this.platformAdmin.premiumThemePrice;
+  isImageGalleryEnabled = this.platformAdmin.imageGalleryEnabled;
+  isELearningEnabled = this.platformAdmin.eLearningEnabled;
+  hasPremiumAccess = computed(() =>
+    this.isSuperAdmin() || this.platformAdmin.hasPremiumAccess(this.profileSlug())
+  );
+  isPremiumThemeSelected = computed(() => this.isPremiumTheme(this.selectedTheme()));
+  effectiveThemeForSelector = computed<PortfolioTheme>(() =>
+    this.isPremiumThemeSelected() && !this.hasPremiumAccess() ? 'modern-dark' : this.selectedTheme()
+  );
+  canManagePremiumGallery = computed(() =>
+    this.isImageGalleryEnabled() && this.hasPremiumAccess() && this.isPremiumThemeSelected()
+  );
+  premiumUnlockDetails = computed(() =>
+    this.platformAdmin.getPremiumUnlockDetails(this.profileSlug())
+  );
+  availablePanels = computed(() =>
+    this.panels.filter((panel) => {
+      if (panel.id === 'platform') {
+        return this.isSuperAdmin();
+      }
+
+      if (panel.id === 'elearning') {
+        return this.isELearningEnabled() || this.isSuperAdmin();
+      }
+
+      return true;
+    })
+  );
 
   constructor() {
     effect(() => {
@@ -999,6 +1323,32 @@ export class AdminDashboardComponent {
         email: admin?.email ?? '',
         message: this.platformContactForm.message,
       };
+    });
+
+    effect(() => {
+      this.premiumPricingForm.amount = this.premiumPrice();
+    });
+
+    effect(() => {
+      if (this.activePanel() === 'platform' && !this.isSuperAdmin()) {
+        this.activePanel.set('dashboard');
+      }
+
+      if (this.activePanel() === 'elearning' && !this.isELearningEnabled()) {
+        this.activePanel.set('dashboard');
+      }
+    });
+
+    effect(() => {
+      const admin = this.authService.admin();
+      if (!this.isSuperAdmin() || !admin) {
+        return;
+      }
+
+      void this.platformAdmin.loadPlatformOverview(
+        this.authService.authHeaders(),
+        this.authService.getCurrentSlug()
+      );
     });
   }
 
@@ -1054,6 +1404,18 @@ export class AdminDashboardComponent {
     this.portfolioService.loadPortfolio(this.authService.admin()?.profile?.slug);
     this.hydrateForms();
     this.setStatus('Portfolio refreshed.');
+  }
+
+  refreshPlatformOverview() {
+    if (!this.isSuperAdmin()) {
+      return;
+    }
+
+    void this.platformAdmin.loadPlatformOverview(
+      this.authService.authHeaders(),
+      this.authService.getCurrentSlug()
+    );
+    this.setStatus('Platform analytics refreshed.');
   }
 
   openPortfolio() {
@@ -1184,9 +1546,18 @@ export class AdminDashboardComponent {
       return false;
     }
 
+    if (this.isPremiumTheme(theme) && !this.hasPremiumAccess()) {
+      this.premiumPendingTheme.set(theme);
+      this.premiumCheckoutOpen.set(true);
+      this.error.set(null);
+      this.status.set('Premium theme facilities review karo, phir unlock karke activate karo.');
+      return false;
+    }
+
     this.themeSaving.set(true);
     try {
       this.error.set(null);
+      this.premiumCheckoutOpen.set(false);
       await this.portfolioService.updateTheme(slug, theme, this.authService.authHeaders());
       this.setStatus(`Theme updated to ${theme}.`);
       return true;
@@ -1196,6 +1567,48 @@ export class AdminDashboardComponent {
     } finally {
       this.themeSaving.set(false);
     }
+  }
+
+  closePremiumCheckout() {
+    this.premiumCheckoutOpen.set(false);
+    this.premiumPendingTheme.set(null);
+  }
+
+  async completePremiumPurchase() {
+    const slug = this.authService.getCurrentSlug();
+    const pendingTheme = this.premiumPendingTheme();
+
+    if (!slug || !pendingTheme) {
+      this.error.set('Premium checkout ke liye profile slug ya selected theme missing hai.');
+      return false;
+    }
+
+    this.platformAdmin.unlockPremiumAccess(slug, this.premiumPrice());
+    this.setStatus(`Premium unlocked for INR ${this.premiumPrice()}.`);
+    this.premiumCheckoutOpen.set(false);
+    this.premiumPendingTheme.set(null);
+    return this.saveTheme(pendingTheme);
+  }
+
+  savePremiumPricing() {
+    if (!this.isSuperAdmin()) {
+      return;
+    }
+
+    const amount = Number(this.premiumPricingForm.amount);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      this.error.set('Premium amount should be greater than zero.');
+      return;
+    }
+
+    void this.platformAdmin.updateSettings(
+      {
+        ...this.platformAdmin.settings(),
+        premiumThemePrice: amount,
+      },
+      this.authService.authHeaders()
+    );
+    this.setStatus(`Premium theme price updated to INR ${amount}.`);
   }
 
   onPremiumGalleryFileSelected(event: Event) {
@@ -1250,6 +1663,36 @@ export class AdminDashboardComponent {
     } finally {
       this.premiumGalleryUploading.set(false);
     }
+  }
+
+  toggleImageGallery(enabled: boolean) {
+    if (!this.isSuperAdmin()) {
+      return;
+    }
+
+    void this.platformAdmin.updateSettings(
+      {
+        ...this.platformAdmin.settings(),
+        imageGalleryEnabled: enabled,
+      },
+      this.authService.authHeaders()
+    );
+    this.setStatus(`Image gallery ${enabled ? 'enabled' : 'disabled'}.`);
+  }
+
+  toggleELearning(enabled: boolean) {
+    if (!this.isSuperAdmin()) {
+      return;
+    }
+
+    void this.platformAdmin.updateSettings(
+      {
+        ...this.platformAdmin.settings(),
+        eLearningEnabled: enabled,
+      },
+      this.authService.authHeaders()
+    );
+    this.setStatus(`E-Learning ${enabled ? 'enabled' : 'disabled'}.`);
   }
 
   async deletePremiumGalleryImage(imageId: string | number) {
@@ -1440,6 +1883,14 @@ export class AdminDashboardComponent {
 
   hasValidationError(key: string) {
     return Boolean(this.validationErrors()[key]);
+  }
+
+  displayMetric(value: number | null) {
+    return value ?? '--';
+  }
+
+  isPremiumTheme(theme: PortfolioTheme | null | undefined) {
+    return theme === 'premium-signature' || theme === 'theme-5-boys';
   }
 
   clearValidationError(key: string) {

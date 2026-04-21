@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, input, signal } f
 import { CommonModule } from '@angular/common';
 import { PortfolioData } from '../../models/portfolio.model';
 import { PortfolioService } from '../../services/portfolio.service';
+import { PlatformAdminService } from '../../services/platform-admin.service';
 
 @Component({
   selector: 'app-theme6',
@@ -151,7 +152,7 @@ import { PortfolioService } from '../../services/portfolio.service';
             </div>
           </section>
 
-          @if (premiumGallery().length) {
+          @if (isImageGalleryEnabled() && premiumGallery().length) {
             <section id="gallery" class="mt-6 rounded-[1.7rem] border border-white/10 bg-white/[0.04] p-5 shadow-[0_18px_50px_rgba(0,0,0,0.18)] md:p-6">
               <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
                 <div>
@@ -307,8 +308,10 @@ import { PortfolioService } from '../../services/portfolio.service';
 })
 export class Theme6Component {
   private portfolioService = inject(PortfolioService);
+  private platformAdmin = inject(PlatformAdminService);
   data = input.required<PortfolioData>();
   premiumGallery = this.portfolioService.getPremiumGallery;
+  isImageGalleryEnabled = this.platformAdmin.imageGalleryEnabled;
   protected activeGalleryImageId = signal<string | number | null>(null);
 
   protected navItems = computed(() => {
@@ -320,7 +323,7 @@ export class Theme6Component {
       { label: 'Contact', fragment: 'contact' },
     ];
 
-    if (this.premiumGallery().length) {
+    if (this.isImageGalleryEnabled() && this.premiumGallery().length) {
       items.splice(3, 0, { label: 'Gallery', fragment: 'gallery' });
     }
 

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PortfolioService } from '../../services/portfolio.service';
-import { PortfolioData } from '../../models/portfolio.model';
+import { PortfolioData, PortfolioTheme } from '../../models/portfolio.model';
 import { Theme1Component } from '../themes/theme1.component';
 import { Theme2Component } from '../themes/theme2.component';
 import { Theme3Component } from '../themes/theme3.component';
@@ -9,6 +9,7 @@ import { Theme4Component } from '../themes/theme4.component';
 import { Theme5Component } from '../themes/theme5.component';
 import { Theme6Component } from '../themes/theme6.component';
 import { Theme7Component } from '../themes/theme7.component';
+import { PlatformAdminService } from '../../services/platform-admin.service';
 
 @Component({
   selector: 'app-portfolio',
@@ -47,6 +48,7 @@ import { Theme7Component } from '../themes/theme7.component';
 })
 export class PortfolioComponent {
   private portfolioService = inject(PortfolioService);
+  private platformAdmin = inject(PlatformAdminService);
   private requestId = 0;
 
   profileSlug = input('');
@@ -72,11 +74,12 @@ export class PortfolioComponent {
       if (currentRequestId !== this.requestId) {
         return;
       }
+      const portfolio = this.enforcePremiumThemeAccess(data);
       await this.portfolioService.loadPremiumGallery(data.profile.slug || slug);
       if (currentRequestId !== this.requestId) {
         return;
       }
-      this.portfolioData.set(data);
+      this.portfolioData.set(portfolio);
     } catch (error: any) {
       if (currentRequestId !== this.requestId) {
         return;
@@ -89,5 +92,26 @@ export class PortfolioComponent {
       }
       this.isLoading.set(false);
     }
+  }
+
+  private enforcePremiumThemeAccess(portfolio: PortfolioData): PortfolioData {
+    if (
+      this.isPremiumTheme(portfolio.profile.selectedTheme) &&
+      !this.platformAdmin.hasPremiumAccess(portfolio.profile.slug)
+    ) {
+      return {
+        ...portfolio,
+        profile: {
+          ...portfolio.profile,
+          selectedTheme: 'modern-dark',
+        },
+      };
+    }
+
+    return portfolio;
+  }
+
+  private isPremiumTheme(theme: PortfolioTheme) {
+    return theme === 'premium-signature' || theme === 'theme-5-boys';
   }
 }

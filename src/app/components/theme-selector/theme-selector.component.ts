@@ -45,6 +45,14 @@ type ThemePreview = {
               <div>
                 <h3 class="text-lg font-semibold text-slate-900 dark:text-white">{{ theme.name }}</h3>
                 <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">{{ theme.summary }}</p>
+                @if (isPremiumTheme(theme.id)) {
+                  <p class="mt-2 text-xs font-semibold uppercase tracking-[0.2em] text-orange-500">
+                    Premium theme
+                    @if (!hasPremiumAccess()) {
+                      • Unlock for INR {{ premiumPrice() }}
+                    }
+                  </p>
+                }
               </div>
               <span
                 class="inline-flex h-11 w-11 items-center justify-center rounded-2xl text-sm font-bold text-white"
@@ -65,11 +73,23 @@ type ThemePreview = {
             <button
               type="button"
               class="mt-4 inline-flex w-full items-center justify-center rounded-2xl px-4 py-3 text-sm font-semibold text-white transition-colors"
-              [ngClass]="activeTheme() === theme.id ? 'bg-orange-500' : 'bg-slate-950 hover:bg-slate-800'"
+              [ngClass]="
+                activeTheme() === theme.id
+                  ? 'bg-orange-500'
+                  : isPremiumTheme(theme.id) && !hasPremiumAccess()
+                    ? 'bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400'
+                    : 'bg-slate-950 hover:bg-slate-800'
+              "
               [disabled]="isSaving()"
               (click)="themeSelected.emit(theme.id)"
             >
-              {{ activeTheme() === theme.id ? 'Current layout' : 'Use this layout' }}
+              {{
+                activeTheme() === theme.id
+                  ? 'Current layout'
+                  : isPremiumTheme(theme.id) && !hasPremiumAccess()
+                    ? 'View Premium Access'
+                    : 'Use this layout'
+              }}
             </button>
           </article>
         }
@@ -81,7 +101,15 @@ type ThemePreview = {
 export class ThemeSelectorComponent {
   activeTheme = input<PortfolioTheme>('modern-dark');
   isSaving = input(false);
+  premiumPrice = input(1499);
+  hasPremiumAccess = input(false);
   themeSelected = output<PortfolioTheme>();
+
+  protected premiumThemes: PortfolioTheme[] = ['premium-signature', 'theme-5-boys'];
+
+  protected isPremiumTheme(themeId: PortfolioTheme) {
+    return this.premiumThemes.includes(themeId);
+  }
 
   protected previews: ThemePreview[] = [
     {

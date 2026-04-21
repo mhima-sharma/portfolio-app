@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, input } from '@an
 import { CommonModule } from '@angular/common';
 import { PortfolioData } from '../../models/portfolio.model';
 import { PortfolioService } from '../../services/portfolio.service';
+import { PlatformAdminService } from '../../services/platform-admin.service';
 
 @Component({
   selector: 'app-theme7',
@@ -129,7 +130,7 @@ import { PortfolioService } from '../../services/portfolio.service';
           </div>
         </section>
 
-        @if (premiumGallery().length) {
+        @if (isImageGalleryEnabled() && premiumGallery().length) {
           <section class="mt-8 rounded-[2.5rem] bg-[#fafbfd] px-6 py-8 shadow-[0_30px_80px_rgba(24,21,18,0.08)] md:px-10 md:py-12">
             <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
               <div>
@@ -207,8 +208,10 @@ import { PortfolioService } from '../../services/portfolio.service';
 })
 export class Theme7Component {
   private portfolioService = inject(PortfolioService);
+  private platformAdmin = inject(PlatformAdminService);
   data = input.required<PortfolioData>();
   premiumGallery = this.portfolioService.getPremiumGallery;
+  isImageGalleryEnabled = this.platformAdmin.imageGalleryEnabled;
 
   protected navItems = [
     { label: 'About', fragment: 'about' },
