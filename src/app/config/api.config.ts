@@ -13,4 +13,4 @@ const hostname = isBrowser ? window.location.hostname : '';
 export const COURSE_PROXY_BASE_URL =
   isBrowser && (hostname === 'localhost' || hostname === '127.0.0.1')
     ? 'http://localhost:3000/api/course'
-    : '/api/course';
+    : 'https://scholarsbridge-9fxq.vercel.app/api/v1//api/course';
