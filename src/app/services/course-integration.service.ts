@@ -134,9 +134,9 @@ export class CourseIntegrationService {
   private http = inject(HttpClient);
 
   private readonly apiBase = COURSE_PROXY_BASE_URL;
-  private readonly loginUrl = `${this.apiBase}/login`;
-  private readonly instructorCoursesUrl = `${this.apiBase}/instructor-courses`;
-  private readonly fullCourseDetailsUrl = `${this.apiBase}/details`;
+  private readonly loginUrl = `/login`;
+  private readonly instructorCoursesUrl = `/instructor-courses`;
+  private readonly fullCourseDetailsUrl = `/details`;
 
   private readonly tokenStorageKey = 'course_token';
   private readonly tokenCreatedAtStorageKey = 'course_token_created_at';
