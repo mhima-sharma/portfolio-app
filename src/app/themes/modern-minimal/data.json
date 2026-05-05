@@ -1,0 +1,127 @@
+{
+  "personal": {
+    "name": "John Doe",
+    "title": "Full Stack Developer",
+    "bio": "Passionate developer with 5+ years of experience building web applications",
+    "avatar": "/assets/avatar-placeholder.png",
+    "social": {
+      "github": "https://github.com/johndoe",
+      "linkedin": "https://linkedin.com/in/johndoe",
+      "twitter": "https://twitter.com/johndoe"
+    }
+  },
+  "about": {
+    "description": "I am a full-stack developer with a passion for creating beautiful, functional, and user-centered digital experiences. With over 5 years of experience in the industry, I have worked on a wide range of projects from small business websites to large-scale enterprise applications.",
+    "bio": "When I'm not coding, you can find me exploring new technologies, contributing to open-source projects, or enjoying outdoor activities.",
+    "yearsExperience": 5,
+    "image": "/assets/about-placeholder.png"
+  },
+  "projects": [
+    {
+      "id": 1,
+      "title": "E-Commerce Platform",
+      "description": "A full-featured e-commerce platform built with React and Node.js",
+      "image": "/assets/projects/ecommerce.png",
+      "technologies": ["React", "Node.js", "MongoDB", "Stripe"],
+      "liveLink": "https://example-ecommerce.com",
+      "githubLink": "https://github.com/johndoe/ecommerce",
+      "featured": true
+    },
+    {
+      "id": 2,
+      "title": "Task Management App",
+      "description": "A collaborative task management application with real-time updates",
+      "image": "/assets/projects/taskapp.png",
+      "technologies": ["Angular", "Firebase", "TypeScript"],
+      "liveLink": "https://example-taskapp.com",
+      "githubLink": "https://github.com/johndoe/taskapp",
+      "featured": true
+    },
+    {
+      "id": 3,
+      "title": "Weather Dashboard",
+      "description": "A responsive weather dashboard with location-based forecasts",
+      "image": "/assets/projects/weather.png",
+      "technologies": ["Vue.js", "OpenWeather API", "Chart.js"],
+      "liveLink": "https://example-weather.com",
+      "githubLink": "https://github.com/johndoe/weather",
+      "featured": false
+    }
+  ],
+  "skills": [
+    {
+      "id": 1,
+      "name": "JavaScript",
+      "category": "frontend",
+      "level": 95
+    },
+    {
+      "id": 2,
+      "name": "TypeScript",
+      "category": "frontend",
+      "level": 90
+    },
+    {
+      "id": 3,
+      "name": "React",
+      "category": "frontend",
+      "level": 92
+    },
+    {
+      "id": 4,
+      "name": "Angular",
+      "category": "frontend",
+      "level": 88
+    },
+    {
+      "id": 5,
+      "name": "Vue.js",
+      "category": "frontend",
+      "level": 85
+    },
+    {
+      "id": 6,
+      "name": "Node.js",
+      "category": "backend",
+      "level": 87
+    },
+    {
+      "id": 7,
+      "name": "Python",
+      "category": "backend",
+      "level": 80
+    },
+    {
+      "id": 8,
+      "name": "MongoDB",
+      "category": "database",
+      "level": 82
+    },
+    {
+      "id": 9,
+      "name": "PostgreSQL",
+      "category": "database",
+      "level": 78
+    },
+    {
+      "id": 10,
+      "name": "Git",
+      "category": "tools",
+      "level": 90
+    },
+    {
+      "id": 11,
+      "name": "Docker",
+      "category": "tools",
+      "level": 75
+    }
+  ],
+  "contact": {
+    "email": "john.doe@example.com",
+    "phone": "+1 (555) 123-4567",
+    "location": "San Francisco, CA",
+    "github": "https://github.com/johndoe",
+    "linkedin": "https://linkedin.com/in/johndoe",
+    "twitter": "https://twitter.com/johndoe"
+  }
+}

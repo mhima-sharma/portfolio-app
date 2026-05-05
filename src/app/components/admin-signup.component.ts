@@ -21,22 +21,22 @@ type SignupField = keyof SignupPayload;
             <div class="relative flex h-full flex-col justify-between rounded-[1.8rem] border border-[#f3dcc6] bg-[linear-gradient(180deg,rgba(255,255,255,0.84)_0%,rgba(255,246,235,0.96)_100%)] p-8">
               <div>
                 <p class="text-xs font-semibold uppercase tracking-[0.28em] text-[#db7a28]">Create Your Access</p>
-                <h1 class="mt-4 text-4xl font-black leading-tight tracking-tight text-[#182218]">Start your portfolio with a polished first step</h1>
+                <h1 class="mt-4 text-4xl font-black leading-tight tracking-tight text-[#182218]">Kick off your portfolio with a clean and professional start.</h1>
                 <p class="mt-4 text-base leading-7 text-[#72604f]">
-                  Smooth onboarding for anyone who wants to build a clean, professional, and shareable portfolio.
+                  Get started with a simple and elegant portfolio that showcases your work in the best light.
                 </p>
               </div>
 
               <div class="mt-10 space-y-4">
                 <div class="rounded-[1.4rem] border border-[#f3dcc6] bg-white/90 p-5 shadow-sm">
                   <p class="text-sm font-semibold text-[#233023]">Personal setup</p>
-                  <p class="mt-2 text-sm leading-7 text-[#8a6a51]">Name, title, and slug se aapki public portfolio identity ready hoti hai.</p>
+                  <p class="mt-2 text-sm leading-7 text-[#8a6a51]">Your name, title, and slug define your public portfolio identity.</p>
                 </div>
                 <div class="rounded-[1.4rem] border border-[#f3dcc6] bg-white/90 p-5 shadow-sm">
                   <div class="flex items-center justify-between gap-4">
                     <div>
                       <p class="text-sm font-semibold text-[#233023]">Shareable portfolio link</p>
-                      <p class="mt-2 text-sm leading-7 text-[#8a6a51]">Signup ke baad aapka live portfolio same slug par render ho jayega.</p>
+                      <p class="mt-2 text-sm leading-7 text-[#8a6a51]">After signup, your live portfolio will be available at your chosen slug.</p>
                     </div>
                     <div class="flex h-14 w-14 items-center justify-center rounded-full border-4 border-[#f1bf89] text-sm font-bold text-[#c87424]">Live</div>
                   </div>
@@ -47,7 +47,9 @@ type SignupField = keyof SignupPayload;
                 <div class="flex items-end justify-between gap-4">
                   <div>
                     <p class="text-xs font-semibold uppercase tracking-[0.24em] text-[#d08c55]">What you get</p>
-                    <p class="mt-3 text-2xl font-bold text-[#1c281c]">A simple start for every kind of portfolio</p>
+                    <p class="mt-3 text-2xl font-bold text-[#1c281c]">
+                    Build quickly with clean templates, instant live portfolio, and easy customization—upgrade for multi-language support, custom domains, image galleries, and advanced themes.
+                    </p>
                   </div>
                   <div class="flex gap-2">
                     <span class="h-2.5 w-2.5 rounded-full bg-[#f4c28f]"></span>
@@ -62,14 +64,14 @@ type SignupField = keyof SignupPayload;
             <div class="absolute inset-x-0 top-0 h-28 bg-[radial-gradient(circle_at_top_right,_rgba(251,146,60,0.18),_transparent_58%)]"></div>
             <div class="relative">
               <a routerLink="/" class="inline-flex items-center gap-2 rounded-full border border-[#f6dac5] bg-[#fff6ee] px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-[#c96b1a]">
-                Portfolio Studio
+                FolioCraft
               </a>
 
               <div class="mt-8 max-w-xl">
                 <p class="text-sm font-semibold uppercase tracking-[0.3em] text-[#db7a28]">Get started</p>
                 <h2 class="mt-4 text-4xl font-black tracking-tight text-[#182218] sm:text-5xl">Create your account</h2>
                 <p class="mt-4 text-base leading-7 text-[#72604f]">
-                  Yeh platform sabke liye hai. Signup ke baad aap apni details manage karke apna portfolio confidently publish kar paoge.
+              This platform is built for everyone. After signing up, you can manage your details and confidently publish your portfolio.
                 </p>
               </div>
 
@@ -84,7 +86,7 @@ type SignupField = keyof SignupPayload;
                     class="w-full rounded-[1.1rem] border bg-[#fffdfa] px-5 py-4 text-base text-slate-900 outline-none transition focus:border-[#f2aa67] focus:ring-4 focus:ring-[#ffe4ca]"
                     [class.border-red-400]="fieldErrors().name"
                     [class.border-[#ecd7c3]]="!fieldErrors().name"
-                    placeholder="Madhav Malhotra"
+                    placeholder="Enter your full name"
                   />
                   @if (fieldErrors().name) {
                     <p class="mt-2 text-sm text-red-600">{{ fieldErrors().name }}</p>
@@ -93,15 +95,16 @@ type SignupField = keyof SignupPayload;
 
                 <div>
                   <label class="mb-2 block text-sm font-semibold text-[#35261b]">Email address</label>
-                  <input
+                 <input
                     [(ngModel)]="form.email"
-                    (ngModelChange)="clearFieldError('email')"
+                    (ngModelChange)="onEmailChange($event)"
                     name="email"
                     type="email"
+                    required
                     class="w-full rounded-[1.1rem] border bg-[#fffdfa] px-5 py-4 text-base text-slate-900 outline-none transition focus:border-[#f2aa67] focus:ring-4 focus:ring-[#ffe4ca]"
                     [class.border-red-400]="fieldErrors().email"
                     [class.border-[#ecd7c3]]="!fieldErrors().email"
-                    placeholder="madhav@example.com"
+                    placeholder="e.g. yourname@example.com"
                   />
                   @if (fieldErrors().email) {
                     <p class="mt-2 text-sm text-red-600">{{ fieldErrors().email }}</p>
@@ -168,10 +171,10 @@ type SignupField = keyof SignupPayload;
                   class="w-full rounded-[1.1rem] border bg-[#fffdfa] px-5 py-4 text-base text-slate-900 outline-none transition focus:border-[#f2aa67] focus:ring-4 focus:ring-[#ffe4ca]"
                   [class.border-red-400]="fieldErrors().slug"
                   [class.border-[#ecd7c3]]="!fieldErrors().slug"
-                  placeholder="madhav"
+                  placeholder="Choose a unique slug for your portfolio (e.g., john-doe, jane.designs)"
                 />
                 <p class="mt-2 text-xs leading-6 text-[#8a6a51]">
-                  Lowercase letters, numbers, and hyphens use karo. Yehi aapka public portfolio link hoga.
+                  Choose a unique slug for your portfolio (e.g., john-doe, jane.designs)
                 </p>
                 @if (fieldErrors().slug) {
                   <p class="mt-2 text-sm text-red-600">{{ fieldErrors().slug }}</p>
@@ -255,6 +258,24 @@ export class AdminSignupComponent {
     this.fieldErrors.update((errors) => ({ ...errors, [field]: undefined }));
     this.error.set(null);
   }
+
+  onEmailChange(value: string) {
+  this.form.email = value;
+  this.clearFieldError('email');
+
+  const email = value.trim().toLowerCase();
+
+  if (!email) return;
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!emailRegex.test(email)) {
+    this.fieldErrors.update(errors => ({
+      ...errors,
+      email: 'Enter a valid email address.'
+    }));
+  }
+}
 
   private validate() {
     const errors: Partial<Record<SignupField, string>> = {};

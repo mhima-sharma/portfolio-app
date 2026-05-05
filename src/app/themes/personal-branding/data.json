@@ -1,0 +1,42 @@
+{
+  "profile": {
+    "slug": "personal-branding",
+    "name": "Skyler Park",
+    "title": "Personal Brand Consultant"
+  },
+  "about": {
+    "description": "I build personal brands for ambitious founders, creators, and executives.",
+    "bio": "My work blends storytelling, digital presence, and audience-first strategy to make every brand stand out.",
+    "yearsExperience": 9
+  },
+  "projects": [
+    {
+      "id": "project-alpha",
+      "title": "Founder Story Platform",
+      "description": "Developed a personal website package for startup founders with content-driven conversion flows.",
+      "technologies": ["Next.js", "Tailwind", "Content Strategy"],
+      "liveLink": "",
+      "githubLink": ""
+    },
+    {
+      "id": "project-beta",
+      "title": "Creator Website Launch",
+      "description": "Designed a signature portfolio for a creator, including an integrated newsletter and booking funnel.",
+      "technologies": ["Webflow", "Mailchimp", "Brand Identity"],
+      "liveLink": "",
+      "githubLink": ""
+    }
+  ],
+  "skills": [
+    { "id": "branding", "name": "Brand Strategy", "level": 93 },
+    { "id": "visual", "name": "Visual Identity", "level": 90 },
+    { "id": "strategy", "name": "Content Strategy", "level": 88 },
+    { "id": "growth", "name": "Audience Growth", "level": 86 }
+  ],
+  "contact": {
+    "email": "skyler@brandlab.co",
+    "phone": "+1 (555) 234-5678",
+    "location": "Austin, TX",
+    "linkedin": "linkedin.com/in/skylerpark"
+  }
+}

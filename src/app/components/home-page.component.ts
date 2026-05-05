@@ -10,7 +10,7 @@ import { PortfolioComponent } from './portfolio/portfolio.component';
   standalone: true,
   imports: [CommonModule, PortfolioComponent],
   template: `
-    <app-portfolio [profileSlug]="profileSlug()"></app-portfolio>
+    <app-portfolio [profileSlug]="profileSlug()" [page]="currentPage()"></app-portfolio>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -20,5 +20,10 @@ export class HomePageComponent {
   protected profileSlug = toSignal(
     this.route.paramMap.pipe(map((params) => params.get('profileSlug') ?? '')),
     { initialValue: this.route.snapshot.paramMap.get('profileSlug') ?? '' }
+  );
+
+  protected currentPage = toSignal(
+    this.route.paramMap.pipe(map((params) => params.get('page') ?? 'home')),
+    { initialValue: this.route.snapshot.paramMap.get('page') ?? 'home' }
   );
 }

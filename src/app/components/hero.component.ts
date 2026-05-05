@@ -1,5 +1,6 @@
 import { Component, ChangeDetectionStrategy, computed, inject, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { PortfolioService } from '../services/portfolio.service';
 
 type SocialItem = {
@@ -59,11 +60,11 @@ type SocialItem = {
           }
 
           <div class="flex flex-col sm:flex-row gap-4 justify-end mb-16 animate-slide-up">
-            <a href="#projects" class="btn-primary">
+            <a routerLink="/projects" class="btn-primary">
               <span>{{ projectsCta() }}</span>
               <span>→</span>
             </a>
-            <a href="#contact" class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg border border-white/30 bg-white/10 text-white font-semibold hover:bg-white/15 transition-colors duration-200 backdrop-blur-sm">
+            <a routerLink="/contact" class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg border border-white/30 bg-white/10 text-white font-semibold hover:bg-white/15 transition-colors duration-200 backdrop-blur-sm">
               <span>{{ contactCta() }}</span>
               <span>💬</span>
             </a>
@@ -169,14 +170,14 @@ export class HeroComponent implements OnDestroy {
     const contact = this.portfolioService.contact();
 
     return [
-      { key: 'github', label: 'GitHub', href: contact.github, accent: '#f8fafc', icon: '◉' },
-      { key: 'linkedin', label: 'LinkedIn', href: contact.linkedin, accent: '#0a66c2', icon: '▣' },
-      { key: 'medium', label: 'Medium', href: contact.medium, accent: '#f8fafc', icon: '◐' },
-      { key: 'tableau', label: 'Tableau', href: contact.tableau, accent: '#f28c28', icon: '⋮' },
-      { key: 'leetcode', label: 'LeetCode', href: contact.leetcode, accent: '#f59e0b', icon: '⌁' },
-      { key: 'instagram', label: 'Instagram', href: contact.instagram, accent: '#ec4899', icon: '◎' },
+      { key: 'github', label: 'GitHub', href: contact.github ?? '', accent: '#f8fafc', icon: '◉' },
+      { key: 'linkedin', label: 'LinkedIn', href: contact.linkedin ?? '', accent: '#0a66c2', icon: '▣' },
+      { key: 'medium', label: 'Medium', href: contact.medium ?? '', accent: '#f8fafc', icon: '◐' },
+      { key: 'tableau', label: 'Tableau', href: contact.tableau ?? '', accent: '#f28c28', icon: '⋮' },
+      { key: 'leetcode', label: 'LeetCode', href: contact.leetcode ?? '', accent: '#f59e0b', icon: '⌁' },
+      { key: 'instagram', label: 'Instagram', href: contact.instagram ?? '', accent: '#ec4899', icon: '◎' },
       { key: 'email', label: 'Email', href: contact.email ? `mailto:${contact.email}` : '', accent: '#5eead4', icon: '✉' },
-      { key: 'youtube', label: 'YouTube', href: contact.youtube, accent: '#ef4444', icon: '▶' },
+      { key: 'youtube', label: 'YouTube', href: contact.youtube ?? '', accent: '#ef4444', icon: '▶' },
     ].filter((item) => Boolean(item.href));
   });
 

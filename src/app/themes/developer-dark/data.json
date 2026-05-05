@@ -1,0 +1,42 @@
+{
+  "profile": {
+    "slug": "developer-dark",
+    "name": "Avery Chen",
+    "title": "Full Stack Developer"
+  },
+  "about": {
+    "description": "I architect modern web applications with a strong focus on performance and developer experience.",
+    "bio": "I build scalable products using clean code, robust tooling, and pixel-perfect frontend execution.",
+    "yearsExperience": 10
+  },
+  "projects": [
+    {
+      "id": "project-x",
+      "title": "API Platform Dashboard",
+      "description": "Created a highly responsive admin console for real-time data visibility and analytics.",
+      "technologies": ["Node.js", "Angular", "PostgreSQL"],
+      "liveLink": "https://api-dashboard.example.com",
+      "githubLink": "https://github.com/averychen/api-dashboard"
+    },
+    {
+      "id": "project-y",
+      "title": "Developer Tools Suite",
+      "description": "Built a suite of CLI and UI tools to help developer teams ship faster and with confidence.",
+      "technologies": ["TypeScript", "GraphQL", "Docker"],
+      "liveLink": "",
+      "githubLink": "https://github.com/averychen/devtools"
+    }
+  ],
+  "skills": [
+    { "id": "frontend", "name": "Frontend Development", "level": 94 },
+    { "id": "backend", "name": "Backend Development", "level": 90 },
+    { "id": "infra", "name": "Infrastructure", "level": 82 },
+    { "id": "testing", "name": "Testing & Automation", "level": 88 }
+  ],
+  "contact": {
+    "email": "hi@averychen.dev",
+    "phone": "+1 (555) 987-6543",
+    "location": "San Francisco, CA",
+    "linkedin": "linkedin.com/in/averychen"
+  }
+}

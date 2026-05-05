@@ -2,24 +2,33 @@ import { ChangeDetectionStrategy, Component, effect, inject, input, signal } fro
 import { CommonModule } from '@angular/common';
 import { PortfolioService } from '../../services/portfolio.service';
 import { PortfolioData, PortfolioTheme } from '../../models/portfolio.model';
-import { Theme1Component } from '../themes/theme1.component';
-import { Theme2Component } from '../themes/theme2.component';
-import { Theme3Component } from '../themes/theme3.component';
-import { Theme4Component } from '../themes/theme4.component';
+import { ThemeModernMinimalComponent } from '../../themes/modern-minimal/theme.component';
+import { ThemeCreativeDesignerComponent } from '../../themes/creative-designer/theme.component';
+import { ThemeDeveloperDarkComponent } from '../../themes/developer-dark/theme.component';
+import { ThemeCorporateProfessionalComponent } from '../../themes/corporate-professional/theme.component';
+import { ThemePersonalBrandingComponent } from '../../themes/personal-branding/theme.component';
 import { Theme5Component } from '../themes/theme5.component';
 import { Theme6Component } from '../themes/theme6.component';
-import { Theme7Component } from '../themes/theme7.component';
 import { PlatformAdminService } from '../../services/platform-admin.service';
 
 @Component({
   selector: 'app-portfolio',
   standalone: true,
-  imports: [CommonModule, Theme1Component, Theme2Component, Theme3Component, Theme4Component, Theme5Component, Theme6Component, Theme7Component],
+  imports: [
+    CommonModule,
+    ThemeModernMinimalComponent,
+    ThemeCreativeDesignerComponent,
+    ThemeDeveloperDarkComponent,
+    ThemeCorporateProfessionalComponent,
+    ThemePersonalBrandingComponent,
+    Theme5Component,
+    Theme6Component,
+  ],
   template: `
     @if (isLoading()) {
       <div class="flex min-h-screen items-center justify-center bg-slate-950 px-4 text-white">
         <div class="rounded-[1.75rem] border border-white/10 bg-white/5 px-6 py-5 text-center">
-          <p class="text-sm uppercase tracking-[0.3em] text-orange-300">Loading</p>
+          <p class="text-sm uppercase tracking-[0.3em] text-sky-300">Loading</p>
           <p class="mt-3 text-lg font-semibold">Fetching portfolio theme and profile data...</p>
         </div>
       </div>
@@ -33,14 +42,15 @@ import { PlatformAdminService } from '../../services/platform-admin.service';
       </div>
     } @else if (portfolioData(); as portfolio) {
       <div [ngSwitch]="portfolio.profile.selectedTheme">
-        <app-theme1 *ngSwitchCase="'modern-dark'" [data]="portfolio"></app-theme1>
-        <app-theme2 *ngSwitchCase="'minimal-light'" [data]="portfolio"></app-theme2>
-        <app-theme3 *ngSwitchCase="'corporate-resume'" [data]="portfolio"></app-theme3>
-        <app-theme4 *ngSwitchCase="'creator-orange'" [data]="portfolio"></app-theme4>
+        <app-modern-minimal-theme *ngSwitchCase="'modern-minimal'" [data]="portfolio" [profileSlug]="profileSlug()" [page]="page()"></app-modern-minimal-theme>
+        <app-creative-designer-theme *ngSwitchCase="'creative-designer'" [data]="portfolio" [profileSlug]="profileSlug()" [page]="page()"></app-creative-designer-theme>
+        <app-developer-dark-theme *ngSwitchCase="'developer-dark'" [data]="portfolio" [profileSlug]="profileSlug()" [page]="page()"></app-developer-dark-theme>
+        <app-corporate-professional-theme *ngSwitchCase="'corporate-professional'" [data]="portfolio" [profileSlug]="profileSlug()" [page]="page()"></app-corporate-professional-theme>
+        <app-personal-branding-theme *ngSwitchCase="'personal-branding'" [data]="portfolio" [profileSlug]="profileSlug()" [page]="page()"></app-personal-branding-theme>
         <app-theme5 *ngSwitchCase="'theme-5'" [data]="portfolio"></app-theme5>
+        <app-theme5 *ngSwitchCase="'theme-5-boys'" [data]="portfolio"></app-theme5>
         <app-theme6 *ngSwitchCase="'premium-signature'" [data]="portfolio"></app-theme6>
-        <app-theme7 *ngSwitchCase="'theme-5-boys'" [data]="portfolio"></app-theme7>
-        <app-theme1 *ngSwitchDefault [data]="portfolio"></app-theme1>
+        <app-modern-minimal-theme *ngSwitchDefault [data]="portfolio" [profileSlug]="profileSlug()" [page]="page()"></app-modern-minimal-theme>
       </div>
     }
   `,
@@ -48,10 +58,10 @@ import { PlatformAdminService } from '../../services/platform-admin.service';
 })
 export class PortfolioComponent {
   private portfolioService = inject(PortfolioService);
-  private platformAdmin = inject(PlatformAdminService);
   private requestId = 0;
 
-  profileSlug = input('');
+  profileSlug = input.required<string>();
+  page = input.required<string>();
 
   portfolioData = signal<PortfolioData | null>(null);
   isLoading = signal(true);
@@ -74,12 +84,11 @@ export class PortfolioComponent {
       if (currentRequestId !== this.requestId) {
         return;
       }
-      const portfolio = this.enforcePremiumThemeAccess(data);
       await this.portfolioService.loadPremiumGallery(data.profile.slug || slug);
       if (currentRequestId !== this.requestId) {
         return;
       }
-      this.portfolioData.set(portfolio);
+      this.portfolioData.set(data);
     } catch (error: any) {
       if (currentRequestId !== this.requestId) {
         return;
@@ -92,23 +101,6 @@ export class PortfolioComponent {
       }
       this.isLoading.set(false);
     }
-  }
-
-  private enforcePremiumThemeAccess(portfolio: PortfolioData): PortfolioData {
-    if (
-      this.isPremiumTheme(portfolio.profile.selectedTheme) &&
-      !this.platformAdmin.hasPremiumAccess(portfolio.profile.slug)
-    ) {
-      return {
-        ...portfolio,
-        profile: {
-          ...portfolio.profile,
-          selectedTheme: 'modern-dark',
-        },
-      };
-    }
-
-    return portfolio;
   }
 
   private isPremiumTheme(theme: PortfolioTheme) {

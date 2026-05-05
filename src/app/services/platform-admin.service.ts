@@ -5,7 +5,6 @@ import { API_BASE_URL, CLOUDINARY_CLOUD_NAME } from '../config/api.config';
 
 export type PlatformFeatureSettings = {
   imageGalleryEnabled: boolean;
-  eLearningEnabled: boolean;
   premiumThemePrice: number;
 };
 
@@ -22,7 +21,6 @@ const SETTINGS_STORAGE_KEY = 'portfolio_platform_settings';
 const PREMIUM_UNLOCKS_STORAGE_KEY = 'portfolio_premium_unlocks';
 const DEFAULT_SETTINGS: PlatformFeatureSettings = {
   imageGalleryEnabled: true,
-  eLearningEnabled: true,
   premiumThemePrice: 1499,
 };
 
@@ -55,7 +53,6 @@ export class PlatformAdminService {
   }
 
   imageGalleryEnabled = computed(() => this.settings().imageGalleryEnabled);
-  eLearningEnabled = computed(() => this.settings().eLearningEnabled);
   premiumThemePrice = computed(() => this.settings().premiumThemePrice);
 
   async loadPlatformOverview(headers?: HttpHeaders, profileSlug?: string) {
@@ -151,7 +148,6 @@ export class PlatformAdminService {
 
     return {
       imageGalleryEnabled: Boolean(data.imageGalleryEnabled ?? data.image_gallery_enabled ?? true),
-      eLearningEnabled: Boolean(data.eLearningEnabled ?? data.e_learning_enabled ?? true),
       premiumThemePrice: this.toPositiveNumber(
         data.premiumThemePrice ?? data.premium_theme_price ?? DEFAULT_SETTINGS.premiumThemePrice,
         DEFAULT_SETTINGS.premiumThemePrice
@@ -254,7 +250,6 @@ export class PlatformAdminService {
       const parsed = JSON.parse(raw);
       return {
         imageGalleryEnabled: parsed.imageGalleryEnabled !== false,
-        eLearningEnabled: parsed.eLearningEnabled !== false,
         premiumThemePrice: this.toPositiveNumber(
           parsed.premiumThemePrice,
           DEFAULT_SETTINGS.premiumThemePrice

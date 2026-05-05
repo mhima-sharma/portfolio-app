@@ -21,6 +21,24 @@ import { PlatformAdminService } from '../../services/platform-admin.service';
                   <p class="mt-2 max-w-2xl text-xs leading-6 text-[#d9d1c3] md:text-sm">
                     {{ data().profile.title || 'Professional profile and curated showcase' }}
                   </p>
+                  <div class="mt-2 flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.22em] text-[#e3c999]">
+                    <span>Public page:</span>
+                    <a
+                      [href]="'https://' + shortUrl()"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="underline decoration-[#c8a56a]/40 hover:text-white"
+                    >
+                      {{ shortUrl() }}
+                    </a>
+                    <button
+                      type="button"
+                      class="rounded-full border border-[#c8a56a]/40 bg-[#1a1f2f]/90 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] text-white transition hover:bg-[#c8a56a]/20"
+                      (click)="copyShortUrl()"
+                    >
+                      {{ copied() ? 'Copied' : 'Copy' }}
+                    </button>
+                  </div>
                 </div>
 
                 <nav class="flex flex-wrap gap-2 text-xs">
@@ -85,15 +103,15 @@ import { PlatformAdminService } from '../../services/platform-admin.service';
 
               <div class="mt-5 space-y-3">
                 @for (item of featuredExperience(); track item.id) {
-                  <article class="rounded-[1.2rem] border border-white/10 bg-[#11182b] p-4">
-                    <div class="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+                  <article class="rounded-[1.2rem] border border-white/10 bg-[#11182b] p-3">
+                    <div class="flex flex-col gap-1 md:flex-row md:items-start md:justify-between">
                       <div>
-                        <h4 class="text-base font-semibold text-white">{{ item.position }}</h4>
-                        <p class="mt-1 text-xs text-[#d3c09a]">{{ item.company }}</p>
+                        <h4 class="text-sm font-semibold text-white">{{ item.position }}</h4>
+                        <p class="mt-1 text-[10px] text-[#d3c09a]">{{ item.company }}</p>
                       </div>
-                      <p class="text-xs text-[#a69c8b]">{{ item.duration || dateRange(item.startDate, item.endDate) }}</p>
+                      <p class="text-[10px] text-[#a69c8b]">{{ item.duration || dateRange(item.startDate, item.endDate) }}</p>
                     </div>
-                    <p class="mt-3 text-sm leading-6 text-[#d0c9bc]">{{ item.description }}</p>
+                    <p class="mt-2 text-sm leading-5 text-[#d0c9bc]">{{ item.description }}</p>
                   </article>
                 }
               </div>
@@ -379,6 +397,23 @@ export class Theme6Component {
       copy: 'A premium-style layout built with existing portfolio data only.',
     },
   ]);
+
+  protected shortUrl = computed(() => {
+    const slug = (this.data().profile.slug || 'portfolio').trim().toLowerCase() || 'portfolio';
+    return `${slug}.DesignFolio.com`;
+  });
+
+  protected copied = signal(false);
+
+  protected copyShortUrl() {
+    const url = this.shortUrl();
+    if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(url).then(() => {
+        this.copied.set(true);
+        setTimeout(() => this.copied.set(false), 1800);
+      });
+    }
+  }
 
   protected contactCards = computed(() =>
     [

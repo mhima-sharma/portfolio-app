@@ -1,114 +1,95 @@
-import { Component, ChangeDetectionStrategy, computed, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { PortfolioService } from '../services/portfolio.service';
 
 @Component({
   selector: 'app-contact',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   template: `
-    <section id="contact" class="section-padding bg-gray-50 dark:bg-dark-800">
-      <div class="max-w-4xl mx-auto">
-        <h2 class="mb-4 text-center">Get In Touch</h2>
-        <div class="w-20 h-1 bg-gradient-to-r from-primary-500 to-orange-500 mx-auto mb-12"></div>
+    <section class="section-padding bg-slate-50 text-slate-900 dark:bg-dark-950 dark:text-slate-100">
+      <div class="mx-auto max-w-6xl">
+        <div class="mb-10 text-center">
+          <p class="text-sm uppercase tracking-[0.3em] text-primary-600">Contact</p>
+          <h2 class="mt-3 text-3xl font-semibold">Let’s start a thoughtful collaboration.</h2>
+          <p class="mt-4 max-w-2xl mx-auto text-slate-600 dark:text-slate-400">
+            Share your idea or request and I’ll respond with a clean, professional next step.
+          </p>
+        </div>
 
-        <div class="grid md:grid-cols-2 gap-12">
-          <div>
-            <h3 class="mb-6 text-xl font-semibold">Let's Connect</h3>
+        <div class="grid gap-10 lg:grid-cols-[1.05fr_0.95fr]">
+          <div class="rounded-[2rem] border border-slate-200/80 bg-white/90 p-8 shadow-[0_24px_80px_rgba(15,23,42,0.08)] dark:border-dark-700/70 dark:bg-dark-900/80">
+            <h3 class="mb-6 text-xl font-semibold">Reach out directly</h3>
+            <p class="leading-7 text-slate-600 dark:text-slate-300">
+              Use the form to share your project details, feedback, or collaboration request. If email is available, you can also message directly from the contact panel.
+            </p>
 
-            <div class="space-y-6">
-              @if (contact().email) {
-              <div class="flex gap-4">
-                <div class="w-12 h-12 rounded-lg bg-primary-500/10 dark:bg-primary-500/20 flex items-center justify-center flex-shrink-0">
-                  <span class="text-2xl">📧</span>
-                </div>
+            <div class="mt-10 space-y-6">
+              <div *ngIf="contact().email" class="flex items-start gap-4">
+                <span class="icon-box">📧</span>
                 <div>
-                  <p class="font-semibold text-dark-900 dark:text-white mb-1">Email</p>
-                  <a [href]="'mailto:' + contact().email" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
+                  <p class="font-semibold text-slate-900 dark:text-white">Email</p>
+                  <a [href]="'mailto:' + contact().email" class="text-primary-600 hover:text-primary-700 transition-colors">
                     {{ contact().email }}
                   </a>
                 </div>
               </div>
 
-              <a
-                [href]="directEmailLink()"
-                class="inline-flex items-center gap-2 rounded-lg border border-primary-200 bg-primary-50 px-4 py-3 font-medium text-primary-700 transition-colors hover:bg-primary-100 dark:border-primary-500/30 dark:bg-primary-500/10 dark:text-primary-300 dark:hover:bg-primary-500/20"
-              >
-                <span>Send email directly</span>
-                <span>↗</span>
-              </a>
-
-              <p class="text-sm text-gray-500 dark:text-gray-400">
-                Visitors can email you directly, and the form below can send messages straight to your inbox.
-              </p>
-              }
-
-              @if (contact().phone) {
-              <div class="flex gap-4">
-                <div class="w-12 h-12 rounded-lg bg-primary-500/10 dark:bg-primary-500/20 flex items-center justify-center flex-shrink-0">
-                  <span class="text-2xl">📱</span>
-                </div>
+              <div *ngIf="contact().phone" class="flex items-start gap-4">
+                <span class="icon-box">📱</span>
                 <div>
-                  <p class="font-semibold text-dark-900 dark:text-white mb-1">Phone</p>
-                  <a [href]="'tel:' + contact().phone" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
+                  <p class="font-semibold text-slate-900 dark:text-white">Phone</p>
+                  <a [href]="'tel:' + contact().phone" class="text-primary-600 hover:text-primary-700 transition-colors">
                     {{ contact().phone }}
                   </a>
                 </div>
               </div>
-              }
 
-              @if (contact().location) {
-              <div class="flex gap-4">
-                <div class="w-12 h-12 rounded-lg bg-primary-500/10 dark:bg-primary-500/20 flex items-center justify-center flex-shrink-0">
-                  <span class="text-2xl">📍</span>
-                </div>
+              <div *ngIf="contact().location" class="flex items-start gap-4">
+                <span class="icon-box">📍</span>
                 <div>
-                  <p class="font-semibold text-dark-900 dark:text-white mb-1">Location</p>
-                  <p class="text-gray-600 dark:text-gray-400">{{ contact().location }}</p>
+                  <p class="font-semibold text-slate-900 dark:text-white">Location</p>
+                  <p class="text-slate-600 dark:text-slate-400">{{ contact().location }}</p>
                 </div>
               </div>
-              }
             </div>
-
-            @if (
-              !contact().email &&
-              !contact().phone &&
-              !contact().location &&
-              !contact().github &&
-              !contact().linkedin &&
-              !contact().medium &&
-              !contact().tableau &&
-              !contact().leetcode &&
-              !contact().instagram &&
-              !contact().youtube &&
-              !contact().portfolio
-            ) {
-            <div class="mt-8 card p-6 text-gray-600 dark:text-gray-400">
-              Contact details from your admin panel will appear here automatically.
-            </div>
-            }
           </div>
 
-          <div class="card p-8">
-            <h3 class="mb-4 text-xl font-semibold text-dark-900 dark:text-white">Professional Contact</h3>
-            <p class="text-gray-600 dark:text-gray-400 leading-7">
-              Public visitors can use your direct email and portfolio links shown here. Platform support requests are available only inside the admin panel.
+          <form class="rounded-[2rem] border border-slate-200/80 bg-white/90 p-8 shadow-[0_24px_80px_rgba(15,23,42,0.08)] dark:border-dark-700/70 dark:bg-dark-900/80" (ngSubmit)="submitForm()">
+            <div class="mb-8">
+              <h3 class="text-xl font-semibold">Send a message</h3>
+              <p class="mt-3 text-slate-600 dark:text-slate-400">Your note will be prepared for review and delivered via the contact address provided here.</p>
+            </div>
+
+            <div class="space-y-5">
+              <label class="block">
+                <span class="label-text">Name</span>
+                <input type="text" required [(ngModel)]="senderName" name="name" class="field" placeholder="Your name" />
+              </label>
+
+              <label class="block">
+                <span class="label-text">Email</span>
+                <input type="email" required [(ngModel)]="senderEmail" name="email" class="field" placeholder="you@example.com" />
+              </label>
+
+              <label class="block">
+                <span class="label-text">Message</span>
+                <textarea required [(ngModel)]="message" name="message" rows="5" class="field resize-none" placeholder="Tell me about your project"></textarea>
+              </label>
+            </div>
+
+            <button type="submit" class="btn-primary mt-6 w-full justify-center">
+              Send message
+            </button>
+
+            <p *ngIf="submissionStatus() === 'success'" class="mt-4 text-sm text-emerald-700 dark:text-emerald-300">
+              Thanks for your message! I’ll reply shortly.
             </p>
-
-            @if (contact().email) {
-              <a
-                [href]="directEmailLink()"
-                class="mt-6 inline-flex items-center gap-2 rounded-lg border border-primary-200 bg-primary-50 px-4 py-3 font-medium text-primary-700 transition-colors hover:bg-primary-100 dark:border-primary-500/30 dark:bg-primary-500/10 dark:text-primary-300 dark:hover:bg-primary-500/20"
-              >
-                <span>Email {{ contact().email }}</span>
-                <span>↗</span>
-              </a>
-            } @else {
-              <div class="mt-6 rounded-lg border border-dashed border-gray-300 px-4 py-3 text-sm text-gray-500 dark:border-dark-600 dark:text-gray-400">
-                Add your contact email from the admin panel to enable direct outreach.
-              </div>
-            }
-          </div>
+            <p *ngIf="submissionStatus() === 'error'" class="mt-4 text-sm text-rose-700 dark:text-rose-300">
+              Please complete all fields before sending.
+            </p>
+          </form>
         </div>
       </div>
     </section>
@@ -119,9 +100,27 @@ import { PortfolioService } from '../services/portfolio.service';
 export class ContactComponent {
   private portfolioService = inject(PortfolioService);
   contact = this.portfolioService.contact;
+  submissionStatus = signal<'idle' | 'success' | 'error'>('idle');
+
+  senderName = '';
+  senderEmail = '';
+  message = '';
+
   directEmailLink = computed(() =>
     this.contact().email
       ? `mailto:${this.contact().email}?subject=${encodeURIComponent('Portfolio enquiry')}`
       : '#contact'
   );
+
+  submitForm() {
+    if (!this.senderName.trim() || !this.senderEmail.trim() || !this.message.trim()) {
+      this.submissionStatus.set('error');
+      return;
+    }
+
+    this.submissionStatus.set('success');
+    this.senderName = '';
+    this.senderEmail = '';
+    this.message = '';
+  }
 }

@@ -39,17 +39,20 @@ export interface AboutData {
 }
 
 export interface ContactData {
-  email: string;
-  phone: string;
-  location: string;
-  github: string;
-  linkedin: string;
-  medium: string;
-  tableau: string;
-  leetcode: string;
-  instagram: string;
-  youtube: string;
-  portfolio: string;
+  email?: string;
+  phone?: string;
+  location?: string;
+  github?: string;
+  linkedin?: string;
+  medium?: string;
+  tableau?: string;
+  leetcode?: string;
+  instagram?: string;
+  youtube?: string;
+  portfolio?: string;
+  facebook?: string;
+  twitter?: string;
+  website?: string;
 }
 
 export interface ProfileData {
@@ -76,7 +79,12 @@ export type PortfolioTheme =
   | 'creator-orange'
   | 'theme-5'
   | 'premium-signature'
-  | 'theme-5-boys';
+  | 'theme-5-boys'
+  | 'modern-minimal'
+  | 'creative-designer'
+  | 'developer-dark'
+  | 'corporate-professional'
+  | 'personal-branding';
 
 export interface PortfolioData {
   profile: ProfileData;
@@ -85,4 +93,5 @@ export interface PortfolioData {
   skills: Skill[];
   projects: Project[];
   experience: Experience[];
+  gallery?: PremiumGalleryImage[];
 }

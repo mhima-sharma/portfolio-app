@@ -41,8 +41,7 @@ import { RouterModule } from '@angular/router';
                 Everyone can come here and build a polished portfolio with ease.
               </h2>
               <p class="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
-                Yeh platform sabke liye hai. Student, designer, freelancer, teacher, business owner, ya kisi bhi field ke user
-                apna portfolio create karke dashboard se content manage kar sakte hain aur live page publish kar sakte hain.
+                This platform is designed for a wide range of users, including students, designers, freelancers, teachers, business owners, and professionals from any field. It enables users to create personalized portfolios, manage their content through an intuitive dashboard, and seamlessly publish a live, professional web page.
               </p>
 
               <div class="mt-8 flex flex-wrap gap-4">
@@ -119,8 +118,7 @@ import { RouterModule } from '@angular/router';
                   <div class="mt-6 rounded-[1.5rem] border border-orange-400/20 bg-orange-400/10 p-5">
                     <p class="text-xs uppercase tracking-[0.28em] text-orange-200">How It Works</p>
                     <p class="mt-3 text-sm leading-7 text-slate-100">
-                      Signup ya login ke baad aap apna dashboard open kar sakte ho, content aur layout manage kar sakte ho,
-                      aur same data automatically aapke live portfolio page par show ho jayega.
+                      After signing up or logging in, users can access their dashboard to manage content and customize the layout. All updates are automatically reflected on their live portfolio page in real time.
                     </p>
                   </div>
                 </div>
@@ -133,7 +131,7 @@ import { RouterModule } from '@angular/router';
               <p class="text-xs font-semibold uppercase tracking-[0.28em] text-orange-500">Step 1</p>
               <h3 class="mt-3 text-xl font-bold text-slate-950">Create your account</h3>
               <p class="mt-3 text-sm leading-7 text-slate-600">
-                Name, email, password, title, aur unique public link ke saath apna account create karo.
+                Create your account by providing your name, email, password, professional title, and a unique public link.
               </p>
             </article>
 
@@ -141,7 +139,7 @@ import { RouterModule } from '@angular/router';
               <p class="text-xs font-semibold uppercase tracking-[0.28em] text-orange-500">Step 2</p>
               <h3 class="mt-3 text-xl font-bold text-slate-950">Manage profile content</h3>
               <p class="mt-3 text-sm leading-7 text-slate-600">
-                Dashboard se about, contact, work, experience, aur layout ko apni need ke hisaab se update karo.
+                Use the dashboard to update your about section, contact details, work, experience, and layout according to your requirements.
               </p>
             </article>
 
@@ -149,7 +147,7 @@ import { RouterModule } from '@angular/router';
               <p class="text-xs font-semibold uppercase tracking-[0.28em] text-orange-500">Step 3</p>
               <h3 class="mt-3 text-xl font-bold text-slate-950">Share your live public page</h3>
               <p class="mt-3 text-sm leading-7 text-slate-600">
-                Public link ke through koi bhi aapka portfolio dekh sakta hai aur aapki profile ko samajh sakta hai.
+                Share your unique public link with others to showcase your portfolio and let them get to know your professional profile.
               </p>
             </article>
           </section>

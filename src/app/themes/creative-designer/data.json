@@ -1,0 +1,42 @@
+{
+  "profile": {
+    "slug": "creative-designer",
+    "name": "Morgan Lee",
+    "title": "Creative Designer & Brand Strategist"
+  },
+  "about": {
+    "description": "I design vibrant digital experiences that make brands memorable and content feel alive.",
+    "bio": "With a focus on creative systems, motion, and storytelling, I help products look polished while staying easy to use.",
+    "yearsExperience": 8
+  },
+  "projects": [
+    {
+      "id": "project-a",
+      "title": "Brand Refresh for Luxe Studio",
+      "description": "Delivered a refined identity and launch campaign for a premium interior design studio.",
+      "technologies": ["Figma", "Illustrator", "After Effects"],
+      "liveLink": "https://luxestudio.example.com",
+      "githubLink": ""
+    },
+    {
+      "id": "project-b",
+      "title": "Visual Identity for Podcast Series",
+      "description": "Built striking brand assets, social templates, and motion intros for a growing podcast.",
+      "technologies": ["Photoshop", "Webflow", "Cinema 4D"],
+      "liveLink": "",
+      "githubLink": ""
+    }
+  ],
+  "skills": [
+    { "id": "sketch", "name": "Visual Design", "level": 92 },
+    { "id": "uiux", "name": "UI/UX", "level": 88 },
+    { "id": "motion", "name": "Motion Graphics", "level": 76 },
+    { "id": "branding", "name": "Brand Strategy", "level": 94 }
+  ],
+  "contact": {
+    "email": "hello@morganlee.design",
+    "phone": "+1 (555) 123-4567",
+    "location": "New York, USA",
+    "linkedin": "linkedin.com/in/morganlee"
+  }
+}

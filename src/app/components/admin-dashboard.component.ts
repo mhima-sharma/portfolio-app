@@ -8,11 +8,10 @@ import { AboutData, ContactData, Experience, PortfolioTheme, Project, Skill } fr
 import { ThemeSelectorComponent } from './theme-selector/theme-selector.component';
 import { IconComponent } from './ui/icon.component';
 import { EMAILJS_CONFIG, isEmailJsConfigured } from '../config/email.config';
-import { ELearningPanelComponent } from './e-learning-panel.component';
 import { PlatformAdminService } from '../services/platform-admin.service';
 
 type ValidationErrors = Record<string, string>;
-type AdminPanel = 'dashboard' | 'create' | 'elearning' | 'platform' | 'contact';
+type AdminPanel = 'dashboard' | 'create' | 'platform' | 'contact';
 
 type WizardStep = {
   title: string;
@@ -24,7 +23,7 @@ type WizardStep = {
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, ThemeSelectorComponent, IconComponent, ELearningPanelComponent],
+  imports: [CommonModule, FormsModule, ThemeSelectorComponent, IconComponent],
   template: `
     <div class="admin-shell">
       @if (isSidebarOpen()) {
@@ -36,7 +35,7 @@ type WizardStep = {
           <div class="admin-brand__badge">PM</div>
           <div>
             <p class="admin-brand__eyebrow">Workspace</p>
-            <h1 class="admin-brand__title">Portfolio Studio</h1>
+            <h1 class="admin-brand__title">FolioCraft</h1>
             <p class="admin-brand__copy">Manage your public profile, content, and presentation from one place.</p>
           </div>
         </div>
@@ -93,11 +92,9 @@ type WizardStep = {
                   ? 'Overview'
                   : activePanel() === 'create'
                     ? 'Guided Setup'
-                    : activePanel() === 'elearning'
-                      ? 'Course Control'
-                      : activePanel() === 'platform'
-                        ? 'Platform Control'
-                      : 'Support'
+                    : activePanel() === 'platform'
+                      ? 'Platform Control'
+                    : 'Support'
               }}
             </p>
             <h2 class="admin-topbar__title">
@@ -106,11 +103,9 @@ type WizardStep = {
                   ? 'Admin Dashboard'
                   : activePanel() === 'create'
                     ? 'Content Setup'
-                    : activePanel() === 'elearning'
-                      ? 'E-Learning'
-                      : activePanel() === 'platform'
-                        ? 'Platform Analytics'
-                      : 'Contact Us'
+                    : activePanel() === 'platform'
+                      ? 'Platform Analytics'
+                    : 'Contact Us'
               }}
             </h2>
             <p class="admin-topbar__copy">
@@ -118,10 +113,8 @@ type WizardStep = {
                 Track your content, selected layout, and public link in one place.
               } @else if (activePanel() === 'create') {
                 Complete your profile and content in a guided, professional setup flow.
-              } @else if (activePanel() === 'elearning') {
-                Hidden login, course sync and full curriculum inspection from the same admin workspace.
               } @else if (activePanel() === 'platform') {
-                Super admin ke liye signups, premium gallery, aur e-learning controls ek jagah par.
+                Super admin ke liye signups, premium gallery aur analytics ek jagah par.
               } @else {
                 Contact the platform team for support, setup issues or admin assistance.
               }
@@ -952,24 +945,6 @@ type WizardStep = {
               }
             </section>
           </section>
-        } @else if (activePanel() === 'elearning') {
-          @if (isELearningEnabled()) {
-            <app-e-learning-panel></app-e-learning-panel>
-          } @else {
-            <section class="dashboard-view">
-              <section class="surface-card">
-                <div class="surface-card__header">
-                  <div>
-                    <p class="surface-card__eyebrow">Feature Disabled</p>
-                    <h3 class="surface-card__title">E-Learning is currently off</h3>
-                    <p class="admin-topbar__copy">
-                      Super admin ise platform controls se dubara enable kar sakta hai.
-                    </p>
-                  </div>
-                </div>
-              </section>
-            </section>
-          }
         } @else if (activePanel() === 'platform') {
           <section class="dashboard-view">
             <div class="stats-grid">
@@ -1014,7 +989,7 @@ type WizardStep = {
                     <p class="surface-card__eyebrow">Super Admin</p>
                     <h3 class="surface-card__title">Platform Controls</h3>
                     <p class="admin-topbar__copy">
-                      <strong>{{ superAdminEmail }}</strong> se login karne par yeh panel show hota hai. Yahan se image aur e-learning features ko on/off kiya ja sakta hai.
+                      <strong>{{ superAdminEmail }}</strong> se login karne par yeh panel show hota hai. Yahan se image gallery feature ko on/off kiya ja sakta hai.
                     </p>
                   </div>
                 </div>
@@ -1056,20 +1031,6 @@ type WizardStep = {
                         type="checkbox"
                         [ngModel]="isImageGalleryEnabled()"
                         (ngModelChange)="toggleImageGallery($event)"
-                      />
-                    </div>
-                  </label>
-
-                  <label class="surface-card rounded-[1.25rem] border border-slate-200 bg-slate-50 p-4">
-                    <div class="flex items-start justify-between gap-4">
-                      <div>
-                        <p class="surface-card__title">E-Learning</p>
-                        <p class="admin-topbar__copy">Hidden login, course sync aur instructor explorer ko globally control karo.</p>
-                      </div>
-                      <input
-                        type="checkbox"
-                        [ngModel]="isELearningEnabled()"
-                        (ngModelChange)="toggleELearning($event)"
                       />
                     </div>
                   </label>
@@ -1138,7 +1099,6 @@ export class AdminDashboardComponent {
   panels: Array<{ id: AdminPanel; label: string; hint: string; icon: 'dashboard' | 'layers' | 'education' | 'mail' | 'summary' }> = [
     { id: 'dashboard', label: 'Dashboard', hint: 'Overview and quick actions', icon: 'dashboard' },
     { id: 'create', label: 'Content Setup', hint: 'Guided multi-step builder', icon: 'layers' },
-    { id: 'elearning', label: 'E-Learning', hint: 'Hidden login and course explorer', icon: 'education' },
     { id: 'platform', label: 'Platform', hint: 'Analytics and feature toggles', icon: 'summary' },
     { id: 'contact', label: 'Contact Us', hint: 'Reach the platform team', icon: 'mail' },
   ];
@@ -1260,7 +1220,6 @@ export class AdminDashboardComponent {
   );
   premiumPrice = this.platformAdmin.premiumThemePrice;
   isImageGalleryEnabled = this.platformAdmin.imageGalleryEnabled;
-  isELearningEnabled = this.platformAdmin.eLearningEnabled;
   hasPremiumAccess = computed(() =>
     this.isSuperAdmin() || this.platformAdmin.hasPremiumAccess(this.profileSlug())
   );
@@ -1278,10 +1237,6 @@ export class AdminDashboardComponent {
     this.panels.filter((panel) => {
       if (panel.id === 'platform') {
         return this.isSuperAdmin();
-      }
-
-      if (panel.id === 'elearning') {
-        return this.isELearningEnabled() || this.isSuperAdmin();
       }
 
       return true;
@@ -1331,10 +1286,6 @@ export class AdminDashboardComponent {
 
     effect(() => {
       if (this.activePanel() === 'platform' && !this.isSuperAdmin()) {
-        this.activePanel.set('dashboard');
-      }
-
-      if (this.activePanel() === 'elearning' && !this.isELearningEnabled()) {
         this.activePanel.set('dashboard');
       }
     });
@@ -1680,21 +1631,6 @@ export class AdminDashboardComponent {
     this.setStatus(`Image gallery ${enabled ? 'enabled' : 'disabled'}.`);
   }
 
-  toggleELearning(enabled: boolean) {
-    if (!this.isSuperAdmin()) {
-      return;
-    }
-
-    void this.platformAdmin.updateSettings(
-      {
-        ...this.platformAdmin.settings(),
-        eLearningEnabled: enabled,
-      },
-      this.authService.authHeaders()
-    );
-    this.setStatus(`E-Learning ${enabled ? 'enabled' : 'disabled'}.`);
-  }
-
   async deletePremiumGalleryImage(imageId: string | number) {
     const slug = this.authService.getCurrentSlug();
     if (!slug) {
@@ -1955,9 +1891,9 @@ export class AdminDashboardComponent {
         );
       case 2:
         return (
-          /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.contactForm.email.trim()) &&
-          this.contactForm.phone.trim().length >= 7 &&
-          Boolean(this.contactForm.location.trim())
+          /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.contactForm.email?.trim() ?? '') &&
+          (this.contactForm.phone?.trim().length ?? 0) >= 7 &&
+          Boolean(this.contactForm.location?.trim())
         );
       case 3:
         return this.skills().length > 0;
@@ -1996,9 +1932,9 @@ export class AdminDashboardComponent {
 
   private validateContact() {
     const errors: ValidationErrors = {};
-    const email = this.contactForm.email.trim();
-    const phone = this.contactForm.phone.trim();
-    const location = this.contactForm.location.trim();
+    const email = this.contactForm.email?.trim() ?? '';
+    const phone = this.contactForm.phone?.trim() ?? '';
+    const location = this.contactForm.location?.trim() ?? '';
 
     if (!email) {
       errors['contact.email'] = 'Email is required.';

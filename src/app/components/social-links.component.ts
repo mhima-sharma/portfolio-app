@@ -77,14 +77,14 @@ export class SocialLinksComponent {
     const contact = this.portfolioService.contact();
 
     return [
-      { key: 'github', label: 'GitHub', href: contact.github, accent: '#f8fafc', icon: '◉' },
-      { key: 'linkedin', label: 'LinkedIn', href: contact.linkedin, accent: '#0a66c2', icon: '▣' },
-      { key: 'medium', label: 'Medium', href: contact.medium, accent: '#f8fafc', icon: '◐' },
-      { key: 'tableau', label: 'Tableau', href: contact.tableau, accent: '#f28c28', icon: '⋮' },
-      { key: 'leetcode', label: 'LeetCode', href: contact.leetcode, accent: '#f59e0b', icon: '⌁' },
-      { key: 'instagram', label: 'Instagram', href: contact.instagram, accent: '#ec4899', icon: '◎' },
+      { key: 'github', label: 'GitHub', href: contact.github ?? '', accent: '#f8fafc', icon: '◉' },
+      { key: 'linkedin', label: 'LinkedIn', href: contact.linkedin ?? '', accent: '#0a66c2', icon: '▣' },
+      { key: 'medium', label: 'Medium', href: contact.medium ?? '', accent: '#f8fafc', icon: '◐' },
+      { key: 'tableau', label: 'Tableau', href: contact.tableau ?? '', accent: '#f28c28', icon: '⋮' },
+      { key: 'leetcode', label: 'LeetCode', href: contact.leetcode ?? '', accent: '#f59e0b', icon: '⌁' },
+      { key: 'instagram', label: 'Instagram', href: contact.instagram ?? '', accent: '#ec4899', icon: '◎' },
       { key: 'email', label: 'Email', href: contact.email ? `mailto:${contact.email}` : '', accent: '#5eead4', icon: '✉' },
-      { key: 'youtube', label: 'YouTube', href: contact.youtube, accent: '#ef4444', icon: '▶' },
+      { key: 'youtube', label: 'YouTube', href: contact.youtube ?? '', accent: '#ef4444', icon: '▶' },
     ].filter((item) => Boolean(item.href));
   });
 }

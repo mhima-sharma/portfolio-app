@@ -6,11 +6,16 @@ import { AdminSignupComponent } from './components/admin-signup.component';
 import { AdminDashboardComponent } from './components/admin-dashboard.component';
 import { adminGuard } from './guards/admin.guard';
 import { ResumeComponent } from './components/resume.component';
+import { PortfolioThemeSelectorComponent } from './components/portfolio-theme-selector.component';
 
 export const routes: Routes = [
   {
     path: '',
     component: GuestLandingComponent,
+  },
+  {
+    path: 'themes',
+    component: PortfolioThemeSelectorComponent,
   },
   {
     path: 'admin/login',
@@ -32,6 +37,10 @@ export const routes: Routes = [
   {
     path: ':profileSlug/resume',
     component: ResumeComponent,
+  },
+  {
+    path: ':profileSlug/:page',
+    component: HomePageComponent,
   },
   {
     path: ':profileSlug',

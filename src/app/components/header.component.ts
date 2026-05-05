@@ -1,6 +1,6 @@
 import { Component, signal, ChangeDetectionStrategy, effect, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { PortfolioService } from '../services/portfolio.service';
 
@@ -9,53 +9,52 @@ import { PortfolioService } from '../services/portfolio.service';
   standalone: true,
   imports: [CommonModule, RouterModule],
   template: `
-    <header class="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-dark-900/80 backdrop-blur-md border-b border-gray-200 dark:border-dark-700">
-      <nav class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-4 flex justify-between items-center">
-        <div class="flex items-center gap-2">
-          <div class="w-10 h-10 bg-gradient-to-r from-primary-500 to-orange-500 rounded-lg flex items-center justify-center">
-            <span class="text-white font-bold text-lg">{{ displayInitial() }}</span>
+    <header class="fixed inset-x-0 top-0 z-50 border-b border-slate-200/80 bg-white/90 backdrop-blur dark:border-dark-700 dark:bg-dark-950/90">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 md:px-8">
+        <div class="flex items-center gap-3">
+          <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500 to-violet-600 text-white shadow-sm">
+            {{ displayInitial() }}
           </div>
-          <span class="font-bold text-lg text-dark-900 dark:text-white">{{ displayName() }}</span>
+          <div>
+            <p class="text-sm font-semibold text-slate-900 dark:text-white">{{ displayName() }}</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Modern portfolio</p>
+          </div>
         </div>
 
-        <!-- Desktop Navigation -->
-        <div class="hidden md:flex items-center gap-8">
-          <a [href]="sectionLink('about')" class="text-dark-700 dark:text-gray-300 hover:text-primary-500 transition-colors">About</a>
-          <a [href]="sectionLink('skills')" class="text-dark-700 dark:text-gray-300 hover:text-primary-500 transition-colors">Skills</a>
-          <a [href]="sectionLink('projects')" class="text-dark-700 dark:text-gray-300 hover:text-primary-500 transition-colors">Projects</a>
-          <a [href]="sectionLink('experience')" class="text-dark-700 dark:text-gray-300 hover:text-primary-500 transition-colors">Experience</a>
-          <a [href]="sectionLink('contact')" class="text-dark-700 dark:text-gray-300 hover:text-primary-500 transition-colors">Contact</a>
-        </div>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a routerLink="/" routerLinkActive="active-nav-link" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">Home</a>
+          <a routerLink="/about" routerLinkActive="active-nav-link" class="nav-link">About</a>
+          <a routerLink="/projects" routerLinkActive="active-nav-link" class="nav-link">Projects</a>
+          <a routerLink="/experience" routerLinkActive="active-nav-link" class="nav-link">Experience</a>
+          <a routerLink="/contact" routerLinkActive="active-nav-link" class="nav-link">Contact</a>
+        </nav>
 
-        <!-- Theme Toggle & Mobile Menu -->
-        <div class="flex items-center gap-4">
-          <!-- Theme Toggle -->
+        <div class="flex items-center gap-3">
           <button
+            type="button"
             (click)="toggleTheme()"
-            class="p-2 rounded-lg bg-gray-100 dark:bg-dark-800 text-dark-900 dark:text-yellow-400 hover:bg-gray-200 dark:hover:bg-dark-700 transition-colors"
+            class="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 text-slate-900 transition hover:bg-slate-200 dark:bg-dark-800 dark:text-slate-100 dark:hover:bg-dark-700"
             [attr.aria-label]="isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
           >
             {{ isDark() ? '☀️' : '🌙' }}
           </button>
-
-          <!-- Mobile Menu Toggle -->
           <button
+            type="button"
+            class="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 text-slate-900 transition hover:bg-slate-200 dark:bg-dark-800 dark:text-slate-100 dark:hover:bg-dark-700 md:hidden"
             (click)="toggleMobileMenu()"
-            class="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-800 transition-colors"
           >
-            <span class="text-2xl">{{ isMobileMenuOpen() ? '✕' : '☰' }}</span>
+            {{ isMobileMenuOpen() ? '✕' : '☰' }}
           </button>
         </div>
-      </nav>
+      </div>
 
-      <!-- Mobile Navigation -->
-      <div *ngIf="isMobileMenuOpen()" class="md:hidden border-t border-gray-200 dark:border-dark-700 py-4">
-        <div class="flex flex-col gap-3 px-4">
-          <a [href]="sectionLink('about')" (click)="toggleMobileMenu()" class="text-dark-700 dark:text-gray-300 hover:text-primary-500 py-2">About</a>
-          <a [href]="sectionLink('skills')" (click)="toggleMobileMenu()" class="text-dark-700 dark:text-gray-300 hover:text-primary-500 py-2">Skills</a>
-          <a [href]="sectionLink('projects')" (click)="toggleMobileMenu()" class="text-dark-700 dark:text-gray-300 hover:text-primary-500 py-2">Projects</a>
-          <a [href]="sectionLink('experience')" (click)="toggleMobileMenu()" class="text-dark-700 dark:text-gray-300 hover:text-primary-500 py-2">Experience</a>
-          <a [href]="sectionLink('contact')" (click)="toggleMobileMenu()" class="text-dark-700 dark:text-gray-300 hover:text-primary-500 py-2">Contact</a>
+      <div *ngIf="isMobileMenuOpen()" class="md:hidden border-t border-slate-200/80 bg-white/95 px-4 py-4 dark:border-dark-700 dark:bg-dark-950/95">
+        <div class="flex flex-col gap-3">
+          <a routerLink="/" (click)="toggleMobileMenu()" class="nav-link">Home</a>
+          <a routerLink="/about" (click)="toggleMobileMenu()" class="nav-link">About</a>
+          <a routerLink="/projects" (click)="toggleMobileMenu()" class="nav-link">Projects</a>
+          <a routerLink="/experience" (click)="toggleMobileMenu()" class="nav-link">Experience</a>
+          <a routerLink="/contact" (click)="toggleMobileMenu()" class="nav-link">Contact</a>
         </div>
       </div>
     </header>
@@ -66,7 +65,6 @@ import { PortfolioService } from '../services/portfolio.service';
 export class HeaderComponent {
   private authService = inject(AuthService);
   private portfolioService = inject(PortfolioService);
-  private router = inject(Router);
 
   isMobileMenuOpen = signal(false);
   isDark = signal(this.initializeDarkMode());
@@ -79,7 +77,6 @@ export class HeaderComponent {
   displayInitial = computed(() => this.displayName().charAt(0).toUpperCase() || 'P');
 
   constructor() {
-    // Watch for theme changes and update global state
     effect(() => {
       const isDarkMode = this.isDark();
       if (isDarkMode) {
@@ -97,7 +94,6 @@ export class HeaderComponent {
       if (saved) {
         return saved === 'dark';
       }
-      // Check system preference
       return window.matchMedia('(prefers-color-scheme: dark)').matches;
     }
     return false;
@@ -109,10 +105,5 @@ export class HeaderComponent {
 
   toggleTheme() {
     this.isDark.update((v) => !v);
-  }
-
-  sectionLink(fragment: string): string {
-    const currentPath = this.router.url.split('#')[0].split('?')[0] || '/';
-    return `${currentPath}#${fragment}`;
   }
 }

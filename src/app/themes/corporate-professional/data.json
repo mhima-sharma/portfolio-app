@@ -1,0 +1,42 @@
+{
+  "profile": {
+    "slug": "corporate-professional",
+    "name": "Jordan Kim",
+    "title": "Business Operations Consultant"
+  },
+  "about": {
+    "description": "Delivering structured solutions for operational growth and enterprise product launches.",
+    "bio": "I partner with leadership teams to simplify complex initiatives and improve outcomes with measurable metrics.",
+    "yearsExperience": 12
+  },
+  "projects": [
+    {
+      "id": "project-1",
+      "title": "Enterprise Transformation Program",
+      "description": "Led the operational redesign of a global business unit to reduce inefficiency and increase productivity.",
+      "technologies": ["Process Mapping", "Change Management", "OKRs"],
+      "liveLink": "",
+      "githubLink": ""
+    },
+    {
+      "id": "project-2",
+      "title": "Executive Dashboard Launch",
+      "description": "Designed and implemented a performance dashboard for C-level visibility across portfolio metrics.",
+      "technologies": ["Tableau", "Power BI", "Data Strategy"],
+      "liveLink": "",
+      "githubLink": ""
+    }
+  ],
+  "skills": [
+    { "id": "strategy", "name": "Strategic Planning", "level": 95 },
+    { "id": "analytics", "name": "Data Analytics", "level": 89 },
+    { "id": "communication", "name": "Stakeholder Management", "level": 93 },
+    { "id": "transformation", "name": "Transformation", "level": 91 }
+  ],
+  "contact": {
+    "email": "jordan.kim@consultingco.com",
+    "phone": "+1 (555) 321-4321",
+    "location": "Chicago, IL",
+    "linkedin": "linkedin.com/in/jordankim"
+  }
+}

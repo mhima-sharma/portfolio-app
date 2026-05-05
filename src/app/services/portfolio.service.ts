@@ -37,7 +37,7 @@ const DEFAULT_PROFILE: ProfileData = {
   slug: '',
   name: '',
   title: '',
-  selectedTheme: 'modern-dark',
+  selectedTheme: 'modern-minimal',
 };
 
 @Injectable({ providedIn: 'root' })
@@ -50,7 +50,7 @@ export class PortfolioService {
   private experienceData = signal<Experience[]>([]);
   private premiumGalleryData = signal<PremiumGalleryImage[]>([]);
   currentProfile = signal<ProfileData>({ ...DEFAULT_PROFILE });
-  selectedTheme = signal<PortfolioTheme>('modern-dark');
+  selectedTheme = signal<PortfolioTheme>('modern-minimal');
   isUsingDefaultThemeFallback = signal(false);
 
   about = signal<AboutData>({
@@ -694,21 +694,29 @@ export class PortfolioService {
 
   private normalizeTheme(theme?: string): PortfolioTheme {
     switch ((theme ?? '').trim().toLowerCase()) {
+      case 'modern-minimal':
+        return 'modern-minimal';
+      case 'modern-dark':
+        return 'developer-dark';
       case 'minimal-light':
-        return 'minimal-light';
-      case 'corporate-resume':
-        return 'corporate-resume';
+        return 'modern-minimal';
+      case 'creative-designer':
       case 'creator-orange':
-        return 'creator-orange';
-      case 'theme-5':
-        return 'theme-5';
+        return 'creative-designer';
+      case 'developer-dark':
+        return 'developer-dark';
       case 'premium-signature':
         return 'premium-signature';
       case 'theme-5-boys':
+      case 'theme-5':
         return 'theme-5-boys';
-      case 'modern-dark':
+      case 'corporate-professional':
+      case 'corporate-resume':
+        return 'corporate-professional';
+      case 'personal-branding':
+        return 'personal-branding';
       default:
-        return 'modern-dark';
+        return 'modern-minimal';
     }
   }
 

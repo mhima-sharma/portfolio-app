@@ -16,14 +16,14 @@ import { AuthService } from '../services/auth.service';
             <div class="absolute inset-x-0 top-0 h-28 bg-[radial-gradient(circle_at_top_left,_rgba(251,146,60,0.18),_transparent_60%)]"></div>
             <div class="relative">
               <a routerLink="/" class="inline-flex items-center gap-2 rounded-full border border-[#f6dac5] bg-[#fff6ee] px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-[#c96b1a]">
-                Portfolio Studio
+                FolioCraft
               </a>
 
               <div class="mt-8 max-w-md">
                 <p class="text-sm font-semibold uppercase tracking-[0.3em] text-[#db7a28]">Welcome back</p>
-                <h1 class="mt-4 text-4xl font-black tracking-tight text-[#182218] sm:text-5xl">Sign in and continue building your portfolio</h1>
+                <h1 class="mt-4 text-4xl font-black tracking-tight text-[#182218] sm:text-5xl">Sign in to your account</h1>
                 <p class="mt-4 text-base leading-7 text-[#72604f]">
-                  A clean and welcoming workspace for updating your portfolio, profile sections, and live public page.
+                  A clean and intuitive workspace to manage your portfolio, update profile sections, and maintain your live public page.
                 </p>
               </div>
 
@@ -129,7 +129,7 @@ import { AuthService } from '../services/auth.service';
                 <div class="absolute right-6 bottom-12 flex h-16 w-16 items-center justify-center rounded-full border border-[#f2cda9] bg-white text-xl shadow-sm">UI</div>
                 <div class="absolute left-1/2 top-6 h-16 w-48 -translate-x-1/2 rounded-full border-2 border-dashed border-[#f1bf89]"></div>
                 <div class="absolute inset-x-10 bottom-4 rounded-[1.5rem] border border-[#f3dcc6] bg-white/90 p-5 shadow-sm">
-                  <div class="flex items-center justify-between">
+                  <div class="flex items-center justify-between z-100">
                     <div>
                       <p class="text-lg font-bold text-[#1c281c]">Portfolio Flow</p>
                       <p class="text-sm text-[#8b6b52]">Organize your story and keep updates simple</p>
@@ -153,7 +153,7 @@ import { AuthService } from '../services/auth.service';
                   Build and manage your portfolio in a way that feels easy and approachable
                 </p>
                 <p class="mt-3 text-center text-sm leading-7 text-[#8a6a51]">
-                  Existing account ho to login karo. Naya setup chahiye to signup karke apna portfolio start karo.
+                  Already have an account? Log in to continue. New here? Sign up to start your portfolio.
                 </p>
               </div>
             </div>
