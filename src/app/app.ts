@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Router } from '@angular/router';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -17,11 +18,15 @@ export class App implements OnInit {
     'localhost',
   ];
 
-  constructor(private router: Router) {
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {
     this.initializeTheme();
   }
 
   ngOnInit() {
+    this.redirectAuthenticatedUserFromRoot();
     this.handleSubdomain();
   }
 
@@ -59,6 +64,19 @@ export class App implements OnInit {
       const subdomain = parts[0];
       // Only map real custom-domain subdomains to portfolio slugs.
       void this.router.navigate([subdomain]);
+    }
+  }
+
+  private redirectAuthenticatedUserFromRoot(): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const { pathname } = window.location;
+    const isRootPath = pathname === '/' || pathname === '';
+
+    if (isRootPath && this.authService.isAuthenticated()) {
+      void this.router.navigate(['/admin/dashboard']);
     }
   }
 
