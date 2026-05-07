@@ -768,8 +768,24 @@ type WizardStep = {
                                   <textarea [(ngModel)]="newService.long_description" name="long_description" rows="3" placeholder="Detailed description" class="w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500"></textarea>
                                 </label>
                                 <label class="block space-y-2 text-slate-200">
+                                  <span class="text-sm font-semibold">Service Image</span>
+                                  <label class="flex min-h-[56px] cursor-pointer items-center gap-3 rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-300 transition hover:border-indigo-500">
+                                    <input type="file" accept="image/*" (change)="onServiceFileSelected($event, 'image')" class="hidden" />
+                                    <span class="rounded-full bg-indigo-600 px-4 py-2 font-semibold text-white">Choose file</span>
+                                    <span class="truncate">{{ serviceImageName() || 'No file chosen' }}</span>
+                                  </label>
+                                </label>
+                                <label class="block space-y-2 text-slate-200">
                                   <span class="text-sm font-semibold">Icon</span>
                                   <input [(ngModel)]="newService.icon" name="icon" type="text" placeholder="briefcase, code, palette..." class="w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500" />
+                                </label>
+                                <label class="block space-y-2 text-slate-200">
+                                  <span class="text-sm font-semibold">Service Logo</span>
+                                  <label class="flex min-h-[56px] cursor-pointer items-center gap-3 rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-300 transition hover:border-indigo-500">
+                                    <input type="file" accept="image/*" (change)="onServiceFileSelected($event, 'logo')" class="hidden" />
+                                    <span class="rounded-full bg-indigo-600 px-4 py-2 font-semibold text-white">Choose file</span>
+                                    <span class="truncate">{{ serviceLogoName() || 'No file chosen' }}</span>
+                                  </label>
                                 </label>
                                 <div class="grid gap-4 md:grid-cols-2">
                                   <label class="flex items-center gap-2 rounded-3xl border border-slate-800 bg-slate-900 px-4 py-3 text-slate-200">
@@ -816,6 +832,14 @@ type WizardStep = {
                                   <span class="text-sm font-semibold">Tags</span>
                                   <input [(ngModel)]="newBlog.tags" name="tags" type="text" placeholder="angular, ui, portfolio" class="w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500" />
                                 </label>
+                                <label class="block space-y-2 text-slate-200">
+                                  <span class="text-sm font-semibold">Thumbnail Image</span>
+                                  <label class="flex min-h-[56px] cursor-pointer items-center gap-3 rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-300 transition hover:border-indigo-500">
+                                    <input type="file" accept="image/*" (change)="onBlogThumbnailSelected($event)" class="hidden" />
+                                    <span class="rounded-full bg-indigo-600 px-4 py-2 font-semibold text-white">Choose file</span>
+                                    <span class="truncate">{{ blogThumbnailName() || 'No file chosen' }}</span>
+                                  </label>
+                                </label>
                                 <label class="flex items-center gap-2 text-slate-200">
                                   <input [(ngModel)]="newBlog.is_published" name="is_published" type="checkbox" class="rounded" />
                                   <span class="text-sm font-semibold">Publish immediately</span>
@@ -861,6 +885,24 @@ type WizardStep = {
                                   <span class="text-sm font-semibold">Review</span>
                                   <textarea [(ngModel)]="newTestimonial.review" name="review" rows="3" placeholder="Client feedback" class="w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500" required></textarea>
                                 </label>
+                                <div class="grid gap-4 md:grid-cols-2">
+                                  <label class="block space-y-2 text-slate-200">
+                                    <span class="text-sm font-semibold">Client Image</span>
+                                    <label class="flex min-h-[56px] cursor-pointer items-center gap-3 rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-300 transition hover:border-indigo-500">
+                                      <input type="file" accept="image/*" (change)="onTestimonialFileSelected($event, 'client_image')" class="hidden" />
+                                      <span class="rounded-full bg-indigo-600 px-4 py-2 font-semibold text-white">Choose file</span>
+                                      <span class="truncate">{{ testimonialClientImageName() || 'No file chosen' }}</span>
+                                    </label>
+                                  </label>
+                                  <label class="block space-y-2 text-slate-200">
+                                    <span class="text-sm font-semibold">Company Logo</span>
+                                    <label class="flex min-h-[56px] cursor-pointer items-center gap-3 rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-300 transition hover:border-indigo-500">
+                                      <input type="file" accept="image/*" (change)="onTestimonialFileSelected($event, 'company_logo')" class="hidden" />
+                                      <span class="rounded-full bg-indigo-600 px-4 py-2 font-semibold text-white">Choose file</span>
+                                      <span class="truncate">{{ testimonialCompanyLogoName() || 'No file chosen' }}</span>
+                                    </label>
+                                  </label>
+                                </div>
                                 <label class="block space-y-2 text-slate-200">
                                   <span class="text-sm font-semibold">Rating</span>
                                   <div class="flex flex-wrap gap-2">
@@ -1330,6 +1372,18 @@ export class AdminDashboardComponent {
     rating: 5,
     is_active: true,
   };
+
+  private serviceImageFile: File | null = null;
+  private serviceLogoFile: File | null = null;
+  private blogThumbnailFile: File | null = null;
+  private testimonialClientImageFile: File | null = null;
+  private testimonialCompanyLogoFile: File | null = null;
+
+  serviceImageName = signal('');
+  serviceLogoName = signal('');
+  blogThumbnailName = signal('');
+  testimonialClientImageName = signal('');
+  testimonialCompanyLogoName = signal('');
 
   skills = this.portfolioService.getSkills;
   projects = this.portfolioService.getProjects;
@@ -2154,6 +2208,51 @@ export class AdminDashboardComponent {
     }
   }
 
+  onServiceFileSelected(event: Event, field: 'image' | 'logo') {
+    const input = event.target as HTMLInputElement | null;
+    const file = input?.files?.[0] ?? null;
+    if (!file) {
+      return;
+    }
+
+    if (field === 'image') {
+      this.serviceImageFile = file;
+      this.serviceImageName.set(file.name);
+      return;
+    }
+
+    this.serviceLogoFile = file;
+    this.serviceLogoName.set(file.name);
+  }
+
+  onBlogThumbnailSelected(event: Event) {
+    const input = event.target as HTMLInputElement | null;
+    const file = input?.files?.[0] ?? null;
+    if (!file) {
+      return;
+    }
+
+    this.blogThumbnailFile = file;
+    this.blogThumbnailName.set(file.name);
+  }
+
+  onTestimonialFileSelected(event: Event, field: 'client_image' | 'company_logo') {
+    const input = event.target as HTMLInputElement | null;
+    const file = input?.files?.[0] ?? null;
+    if (!file) {
+      return;
+    }
+
+    if (field === 'client_image') {
+      this.testimonialClientImageFile = file;
+      this.testimonialClientImageName.set(file.name);
+      return;
+    }
+
+    this.testimonialCompanyLogoFile = file;
+    this.testimonialCompanyLogoName.set(file.name);
+  }
+
   async addService() {
     if (!this.newService.title.trim() || !this.newService.short_description.trim()) {
       this.error.set('Service title and short description are required.');
@@ -2161,7 +2260,13 @@ export class AdminDashboardComponent {
     }
 
     return this.runAction(async () => {
-      await this.serviceService.createService(this.newService);
+      const service = await this.serviceService.createService(this.newService);
+      if (this.serviceImageFile) {
+        await this.serviceService.uploadServiceImage(service.id, this.serviceImageFile);
+      }
+      if (this.serviceLogoFile) {
+        await this.serviceService.uploadServiceLogo(service.id, this.serviceLogoFile);
+      }
       this.newService = {
         title: '',
         short_description: '',
@@ -2170,6 +2275,10 @@ export class AdminDashboardComponent {
         price: '',
         is_active: true,
       };
+      this.serviceImageFile = null;
+      this.serviceLogoFile = null;
+      this.serviceImageName.set('');
+      this.serviceLogoName.set('');
       this.setStatus('Service added successfully.');
     });
   }
@@ -2181,10 +2290,13 @@ export class AdminDashboardComponent {
     }
 
     return this.runAction(async () => {
-      await this.blogService.createBlog({
+      const blog = await this.blogService.createBlog({
         ...this.newBlog,
         slug: this.newBlog.slug.trim() || this.slugify(this.newBlog.title),
       });
+      if (this.blogThumbnailFile) {
+        await this.blogService.uploadThumbnail(blog.id, this.blogThumbnailFile);
+      }
       this.newBlog = {
         title: '',
         slug: '',
@@ -2193,6 +2305,8 @@ export class AdminDashboardComponent {
         tags: '',
         is_published: false,
       };
+      this.blogThumbnailFile = null;
+      this.blogThumbnailName.set('');
       this.setStatus('Blog added successfully.');
     });
   }
@@ -2204,7 +2318,13 @@ export class AdminDashboardComponent {
     }
 
     return this.runAction(async () => {
-      await this.testimonialService.createTestimonial(this.newTestimonial);
+      const testimonial = await this.testimonialService.createTestimonial(this.newTestimonial);
+      if (this.testimonialClientImageFile) {
+        await this.testimonialService.uploadClientImage(testimonial.id, this.testimonialClientImageFile);
+      }
+      if (this.testimonialCompanyLogoFile) {
+        await this.testimonialService.uploadCompanyLogo(testimonial.id, this.testimonialCompanyLogoFile);
+      }
       this.newTestimonial = {
         client_name: '',
         client_designation: '',
@@ -2213,6 +2333,10 @@ export class AdminDashboardComponent {
         rating: 5,
         is_active: true,
       };
+      this.testimonialClientImageFile = null;
+      this.testimonialCompanyLogoFile = null;
+      this.testimonialClientImageName.set('');
+      this.testimonialCompanyLogoName.set('');
       this.setStatus('Testimonial added successfully.');
     });
   }

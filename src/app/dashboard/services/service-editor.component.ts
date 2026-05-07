@@ -50,8 +50,14 @@ import { ServiceItem } from '../../models/dashboard.models';
         <div class="grid gap-6 lg:grid-cols-2">
           <label class="block space-y-2">
             <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Service image</span>
-            <input type="file" accept="image/*" (change)="handleFileChange($event)" class="block w-full text-sm text-slate-700 dark:text-slate-200" />
+            <input type="file" accept="image/*" (change)="handleFileChange('image', $event)" class="block w-full text-sm text-slate-700 dark:text-slate-200" />
             <img *ngIf="imagePreview()" [src]="imagePreview()" alt="Image preview" class="mt-3 max-h-52 w-full rounded-3xl object-cover" />
+          </label>
+
+          <label class="block space-y-2">
+            <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Service logo</span>
+            <input type="file" accept="image/*" (change)="handleFileChange('logo', $event)" class="block w-full text-sm text-slate-700 dark:text-slate-200" />
+            <img *ngIf="logoPreview()" [src]="logoPreview()" alt="Logo preview" class="mt-3 max-h-52 w-full rounded-3xl bg-slate-50 object-contain p-4 dark:bg-slate-900" />
           </label>
         </div>
 
@@ -64,6 +70,13 @@ import { ServiceItem } from '../../models/dashboard.models';
           <label class="block space-y-2">
             <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Icon</span>
             <input formControlName="icon" type="text" placeholder="briefcase, code, palette..." class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
+          </label>
+        </div>
+
+        <div class="grid gap-6 lg:grid-cols-2">
+          <label class="block space-y-2">
+            <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Logo URL</span>
+            <input formControlName="logo" type="text" placeholder="https://..." class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
           </label>
         </div>
 
@@ -94,13 +107,16 @@ export class ServiceEditorComponent {
     long_description: [''],
     price: [''],
     image: [''],
+    logo: [''],
     icon: [''],
     is_active: [true],
   });
 
   private serviceId = signal<number | null>(null);
   imageFile = signal<File | null>(null);
+  logoFile = signal<File | null>(null);
   imagePreview = signal<string | null>(null);
+  logoPreview = signal<string | null>(null);
   isSaving = signal(false);
 
   constructor() {
@@ -126,16 +142,18 @@ export class ServiceEditorComponent {
         long_description: service.long_description ?? '',
         price: service.price?.toString() ?? '',
         image: service.image ?? '',
+        logo: service.logo ?? '',
         icon: service.icon ?? '',
         is_active: service.is_active,
       });
       this.imagePreview.set(service.image ?? null);
+      this.logoPreview.set(service.logo ?? null);
     } catch (error) {
       console.error(error);
     }
   }
 
-  handleFileChange(event: Event) {
+  handleFileChange(field: 'image' | 'logo', event: Event) {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0] ?? null;
     if (!file) {
@@ -144,8 +162,15 @@ export class ServiceEditorComponent {
 
     const reader = new FileReader();
     reader.onload = () => {
-      this.imagePreview.set(reader.result as string);
-      this.imageFile.set(file);
+      const preview = reader.result as string;
+      if (field === 'image') {
+        this.imagePreview.set(preview);
+        this.imageFile.set(file);
+        return;
+      }
+
+      this.logoPreview.set(preview);
+      this.logoFile.set(file);
     };
     reader.readAsDataURL(file);
   }
@@ -164,6 +189,7 @@ export class ServiceEditorComponent {
         long_description: this.form.value.long_description ?? '',
         price: this.form.value.price ?? '',
         image: this.form.value.image ?? '',
+        logo: this.form.value.logo ?? '',
         icon: this.form.value.icon ?? '',
         is_active: this.form.value.is_active ?? true,
       };
@@ -178,6 +204,9 @@ export class ServiceEditorComponent {
 
       if (this.imageFile()) {
         await this.serviceService.uploadServiceImage(service.id, this.imageFile()!);
+      }
+      if (this.logoFile()) {
+        await this.serviceService.uploadServiceLogo(service.id, this.logoFile()!);
       }
 
       this.router.navigate(['/admin/dashboard/services']);

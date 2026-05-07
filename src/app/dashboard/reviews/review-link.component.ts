@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
+import { ReviewService } from '../../services/review.service';
 
 @Component({
   selector: 'app-review-link',
@@ -46,6 +47,7 @@ import { AuthService } from '../../services/auth.service';
 })
 export class ReviewLinkComponent {
   private authService = inject(AuthService);
+  private reviewService = inject(ReviewService);
 
   reviewUrl = signal('');
   isGenerating = signal(false);
@@ -64,11 +66,13 @@ export class ReviewLinkComponent {
     this.isGenerating.set(true);
     this.status.set('');
     try {
-      this.reviewUrl.set(this.resolvePublicReviewUrl(slug));
+      const link = await this.reviewService.generateReviewLink(slug);
+      this.reviewUrl.set(link.url || this.resolvePublicReviewUrl(slug));
       this.status.set('Review page link generated successfully. Share it with clients.');
     } catch (error) {
       console.error(error);
-      this.status.set('Unable to generate review link right now.');
+      this.reviewUrl.set(this.resolvePublicReviewUrl(slug));
+      this.status.set('Review page link generated locally. Backend review-link endpoint is unavailable right now.');
     } finally {
       this.isGenerating.set(false);
     }
