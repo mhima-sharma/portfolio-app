@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { PortfolioTheme } from '../../models/portfolio.model';
 import { FREEFOLIO_THEMES } from '../../themes/freefolio/freefolio-theme.registry';
 
@@ -17,7 +18,7 @@ type ThemePreview = {
 @Component({
   selector: 'app-theme-selector',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   template: `
     <section class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-slate-950/70">
       <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
@@ -76,27 +77,38 @@ type ThemePreview = {
               }
             </div>
 
-            <button
-              type="button"
-              class="mt-4 inline-flex w-full items-center justify-center rounded-2xl px-4 py-3 text-sm font-semibold text-white transition-colors"
-              [ngClass]="
-                activeTheme() === theme.id
-                  ? 'bg-orange-500'
-                  : isPremiumTheme(theme.id) && !hasPremiumAccess()
-                    ? 'bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400'
-                    : 'bg-slate-950 hover:bg-slate-800'
-              "
-              [disabled]="isSaving()"
-              (click)="themeSelected.emit(theme.id)"
-            >
-              {{
-                activeTheme() === theme.id
-                  ? 'Current layout'
-                  : isPremiumTheme(theme.id) && !hasPremiumAccess()
-                    ? 'View Premium Access'
-                    : 'Use this layout'
-              }}
-            </button>
+            <div class="mt-4 grid gap-3 sm:grid-cols-2">
+              <a
+                [routerLink]="['/theme-preview', theme.id]"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center justify-center rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
+              >
+                Preview first
+              </a>
+
+              <button
+                type="button"
+                class="inline-flex w-full items-center justify-center rounded-2xl px-4 py-3 text-sm font-semibold text-white transition-colors"
+                [ngClass]="
+                  activeTheme() === theme.id
+                    ? 'bg-orange-500'
+                    : isPremiumTheme(theme.id) && !hasPremiumAccess()
+                      ? 'bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400'
+                      : 'bg-slate-950 hover:bg-slate-800'
+                "
+                [disabled]="isSaving()"
+                (click)="themeSelected.emit(theme.id)"
+              >
+                {{
+                  activeTheme() === theme.id
+                    ? 'Current layout'
+                    : isPremiumTheme(theme.id) && !hasPremiumAccess()
+                      ? 'View Premium Access'
+                      : 'Use this layout'
+                }}
+              </button>
+            </div>
           </article>
         }
       </div>

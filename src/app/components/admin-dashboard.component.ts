@@ -676,7 +676,7 @@ type WizardStep = {
                 }
 
                 @case (6) {
-                  <section class="surface-card bg-slate-950 border border-slate-800">
+                  <section class="surface-card border border-orange-100 bg-orange-50/60">
                     <div class="surface-card__header px-6 py-6">
                       <div>
                         <p class="surface-card__eyebrow">Additional Content</p>
@@ -692,8 +692,9 @@ type WizardStep = {
                           class="rounded-full px-5 py-2 text-sm font-semibold transition"
                           [class.bg-indigo-600]="dashboardTab() === 'services'"
                           [class.text-white]="dashboardTab() === 'services'"
-                          [class.text-slate-400]="dashboardTab() !== 'services'"
-                          [class.border-slate-700]="dashboardTab() !== 'services'"
+                          [class.text-slate-600]="dashboardTab() !== 'services'"
+                          [class.border-slate-300]="dashboardTab() !== 'services'"
+                          [class.bg-white]="dashboardTab() !== 'services'"
                           [class.border]="true"
                           (click)="setContentTab('services')"
                         >
@@ -704,8 +705,9 @@ type WizardStep = {
                           class="rounded-full px-5 py-2 text-sm font-semibold transition"
                           [class.bg-indigo-600]="dashboardTab() === 'blogs'"
                           [class.text-white]="dashboardTab() === 'blogs'"
-                          [class.text-slate-400]="dashboardTab() !== 'blogs'"
-                          [class.border-slate-700]="dashboardTab() !== 'blogs'"
+                          [class.text-slate-600]="dashboardTab() !== 'blogs'"
+                          [class.border-slate-300]="dashboardTab() !== 'blogs'"
+                          [class.bg-white]="dashboardTab() !== 'blogs'"
                           [class.border]="true"
                           (click)="setContentTab('blogs')"
                         >
@@ -716,8 +718,9 @@ type WizardStep = {
                           class="rounded-full px-5 py-2 text-sm font-semibold transition"
                           [class.bg-indigo-600]="dashboardTab() === 'testimonials'"
                           [class.text-white]="dashboardTab() === 'testimonials'"
-                          [class.text-slate-400]="dashboardTab() !== 'testimonials'"
-                          [class.border-slate-700]="dashboardTab() !== 'testimonials'"
+                          [class.text-slate-600]="dashboardTab() !== 'testimonials'"
+                          [class.border-slate-300]="dashboardTab() !== 'testimonials'"
+                          [class.bg-white]="dashboardTab() !== 'testimonials'"
                           [class.border]="true"
                           (click)="setContentTab('testimonials')"
                         >
@@ -728,8 +731,9 @@ type WizardStep = {
                           class="rounded-full px-5 py-2 text-sm font-semibold transition"
                           [class.bg-indigo-600]="dashboardTab() === 'reviews'"
                           [class.text-white]="dashboardTab() === 'reviews'"
-                          [class.text-slate-400]="dashboardTab() !== 'reviews'"
-                          [class.border-slate-700]="dashboardTab() !== 'reviews'"
+                          [class.text-slate-600]="dashboardTab() !== 'reviews'"
+                          [class.border-slate-300]="dashboardTab() !== 'reviews'"
+                          [class.bg-white]="dashboardTab() !== 'reviews'"
                           [class.border]="true"
                           (click)="setContentTab('reviews')"
                         >
@@ -737,58 +741,58 @@ type WizardStep = {
                         </button>
                       </div>
 
-                      <div class="rounded-3xl border border-slate-800 bg-slate-900 p-6 shadow-lg">
+                      <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
                         @if (dashboardTab() === 'services') {
                           <div class="space-y-6">
-                            <div class="rounded-3xl border border-slate-800 bg-slate-950 p-6">
+                            <div class="rounded-3xl border border-slate-200 bg-slate-50 p-6">
                               <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
                                 <div>
                                   <p class="text-sm uppercase tracking-[0.2em] text-slate-500">Service Library</p>
-                                  <h4 class="text-xl font-semibold text-white">Add New Service</h4>
+                                  <h4 class="text-xl font-semibold text-slate-900">Add New Service</h4>
                                 </div>
                                 <button type="button" class="btn-secondary">Add new service</button>
                               </div>
                               <form class="space-y-4" (ngSubmit)="addService()">
                                 <div class="grid gap-4 md:grid-cols-2">
-                                  <label class="block space-y-2 text-slate-200">
+                                  <label class="block space-y-2 text-slate-700">
                                     <span class="text-sm font-semibold">Title</span>
-                                    <input [(ngModel)]="newService.title" name="title" type="text" placeholder="Service title" class="w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500" required />
+                                    <input [(ngModel)]="newService.title" name="title" type="text" placeholder="Service title" class="w-full rounded-3xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500" required />
                                   </label>
-                                  <label class="block space-y-2 text-slate-200">
+                                  <label class="block space-y-2 text-slate-700">
                                     <span class="text-sm font-semibold">Price</span>
-                                    <input [(ngModel)]="newService.price" name="price" type="text" placeholder="₹5000 / Custom quote" class="w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500" />
+                                    <input [(ngModel)]="newService.price" name="price" type="text" placeholder="₹5000 / Custom quote" class="w-full rounded-3xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500" />
                                   </label>
                                 </div>
-                                <label class="block space-y-2 text-slate-200">
+                                <label class="block space-y-2 text-slate-700">
                                   <span class="text-sm font-semibold">Short Description</span>
-                                  <input [(ngModel)]="newService.short_description" name="short_description" type="text" placeholder="Brief description" class="w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500" required />
+                                  <input [(ngModel)]="newService.short_description" name="short_description" type="text" placeholder="Brief description" class="w-full rounded-3xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500" required />
                                 </label>
-                                <label class="block space-y-2 text-slate-200">
+                                <label class="block space-y-2 text-slate-700">
                                   <span class="text-sm font-semibold">Long Description</span>
-                                  <textarea [(ngModel)]="newService.long_description" name="long_description" rows="3" placeholder="Detailed description" class="w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500"></textarea>
+                                  <textarea [(ngModel)]="newService.long_description" name="long_description" rows="3" placeholder="Detailed description" class="w-full rounded-3xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500"></textarea>
                                 </label>
-                                <label class="block space-y-2 text-slate-200">
+                                <label class="block space-y-2 text-slate-700">
                                   <span class="text-sm font-semibold">Service Image</span>
-                                  <label class="flex min-h-[56px] cursor-pointer items-center gap-3 rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-300 transition hover:border-indigo-500">
+                                  <label class="flex min-h-[56px] cursor-pointer items-center gap-3 rounded-3xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-600 transition hover:border-indigo-500">
                                     <input type="file" accept="image/*" (change)="onServiceFileSelected($event, 'image')" class="hidden" />
                                     <span class="rounded-full bg-indigo-600 px-4 py-2 font-semibold text-white">Choose file</span>
                                     <span class="truncate">{{ serviceImageName() || 'No file chosen' }}</span>
                                   </label>
                                 </label>
-                                <label class="block space-y-2 text-slate-200">
+                                <label class="block space-y-2 text-slate-700">
                                   <span class="text-sm font-semibold">Icon</span>
-                                  <input [(ngModel)]="newService.icon" name="icon" type="text" placeholder="briefcase, code, palette..." class="w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500" />
+                                  <input [(ngModel)]="newService.icon" name="icon" type="text" placeholder="briefcase, code, palette..." class="w-full rounded-3xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500" />
                                 </label>
-                                <label class="block space-y-2 text-slate-200">
+                                <label class="block space-y-2 text-slate-700">
                                   <span class="text-sm font-semibold">Service Logo</span>
-                                  <label class="flex min-h-[56px] cursor-pointer items-center gap-3 rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-300 transition hover:border-indigo-500">
+                                  <label class="flex min-h-[56px] cursor-pointer items-center gap-3 rounded-3xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-600 transition hover:border-indigo-500">
                                     <input type="file" accept="image/*" (change)="onServiceFileSelected($event, 'logo')" class="hidden" />
                                     <span class="rounded-full bg-indigo-600 px-4 py-2 font-semibold text-white">Choose file</span>
                                     <span class="truncate">{{ serviceLogoName() || 'No file chosen' }}</span>
                                   </label>
                                 </label>
                                 <div class="grid gap-4 md:grid-cols-2">
-                                  <label class="flex items-center gap-2 rounded-3xl border border-slate-800 bg-slate-900 px-4 py-3 text-slate-200">
+                                  <label class="flex items-center gap-2 rounded-3xl border border-slate-300 bg-white px-4 py-3 text-slate-700">
                                     <input [(ngModel)]="newService.is_active" name="is_active" type="checkbox" class="rounded" />
                                     <span class="text-sm font-semibold">Active service</span>
                                   </label>
@@ -801,46 +805,46 @@ type WizardStep = {
                           </div>
                         } @else if (dashboardTab() === 'blogs') {
                           <div class="space-y-6">
-                            <div class="rounded-3xl border border-slate-800 bg-slate-950 p-6">
+                            <div class="rounded-3xl border border-slate-200 bg-slate-50 p-6">
                               <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
                                 <div>
                                   <p class="text-sm uppercase tracking-[0.2em] text-slate-500">Blog Studio</p>
-                                  <h4 class="text-xl font-semibold text-white">Add New Blog</h4>
+                                  <h4 class="text-xl font-semibold text-slate-900">Add New Blog</h4>
                                 </div>
                                 <button type="button" class="btn-secondary">Add new blog</button>
                               </div>
                               <form class="space-y-4" (ngSubmit)="addBlog()">
                                 <div class="grid gap-4 md:grid-cols-2">
-                                  <label class="block space-y-2 text-slate-200">
+                                  <label class="block space-y-2 text-slate-700">
                                     <span class="text-sm font-semibold">Title</span>
-                                    <input [(ngModel)]="newBlog.title" (ngModelChange)="syncBlogSlug()" name="title" type="text" placeholder="Blog title" class="w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500" required />
+                                    <input [(ngModel)]="newBlog.title" (ngModelChange)="syncBlogSlug()" name="title" type="text" placeholder="Blog title" class="w-full rounded-3xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500" required />
                                   </label>
-                                  <label class="block space-y-2 text-slate-200">
+                                  <label class="block space-y-2 text-slate-700">
                                     <span class="text-sm font-semibold">Slug</span>
-                                    <input [(ngModel)]="newBlog.slug" name="slug" type="text" placeholder="blog-title-slug" class="w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500" />
+                                    <input [(ngModel)]="newBlog.slug" name="slug" type="text" placeholder="blog-title-slug" class="w-full rounded-3xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500" />
                                   </label>
                                 </div>
-                                <label class="block space-y-2 text-slate-200">
+                                <label class="block space-y-2 text-slate-700">
                                   <span class="text-sm font-semibold">Short Description</span>
-                                  <input [(ngModel)]="newBlog.short_description" name="short_description" type="text" placeholder="Brief description" class="w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500" required />
+                                  <input [(ngModel)]="newBlog.short_description" name="short_description" type="text" placeholder="Brief description" class="w-full rounded-3xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500" required />
                                 </label>
-                                <label class="block space-y-2 text-slate-200">
+                                <label class="block space-y-2 text-slate-700">
                                   <span class="text-sm font-semibold">Content</span>
-                                  <textarea [(ngModel)]="newBlog.content" name="content" rows="5" placeholder="Blog content" class="w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500" required></textarea>
+                                  <textarea [(ngModel)]="newBlog.content" name="content" rows="5" placeholder="Blog content" class="w-full rounded-3xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500" required></textarea>
                                 </label>
-                                <label class="block space-y-2 text-slate-200">
+                                <label class="block space-y-2 text-slate-700">
                                   <span class="text-sm font-semibold">Tags</span>
-                                  <input [(ngModel)]="newBlog.tags" name="tags" type="text" placeholder="angular, ui, portfolio" class="w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500" />
+                                  <input [(ngModel)]="newBlog.tags" name="tags" type="text" placeholder="angular, ui, portfolio" class="w-full rounded-3xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500" />
                                 </label>
-                                <label class="block space-y-2 text-slate-200">
+                                <label class="block space-y-2 text-slate-700">
                                   <span class="text-sm font-semibold">Thumbnail Image</span>
-                                  <label class="flex min-h-[56px] cursor-pointer items-center gap-3 rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-300 transition hover:border-indigo-500">
+                                  <label class="flex min-h-[56px] cursor-pointer items-center gap-3 rounded-3xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-600 transition hover:border-indigo-500">
                                     <input type="file" accept="image/*" (change)="onBlogThumbnailSelected($event)" class="hidden" />
                                     <span class="rounded-full bg-indigo-600 px-4 py-2 font-semibold text-white">Choose file</span>
                                     <span class="truncate">{{ blogThumbnailName() || 'No file chosen' }}</span>
                                   </label>
                                 </label>
-                                <label class="flex items-center gap-2 text-slate-200">
+                                <label class="flex items-center gap-2 text-slate-700">
                                   <input [(ngModel)]="newBlog.is_published" name="is_published" type="checkbox" class="rounded" />
                                   <span class="text-sm font-semibold">Publish immediately</span>
                                 </label>
@@ -852,61 +856,61 @@ type WizardStep = {
                           </div>
                         } @else if (dashboardTab() === 'testimonials') {
                           <div class="space-y-6">
-                            <div class="rounded-3xl border border-slate-800 bg-slate-950 p-6">
+                            <div class="rounded-3xl border border-slate-200 bg-slate-50 p-6">
                               <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
                                 <div>
                                   <p class="text-sm uppercase tracking-[0.2em] text-slate-500">Testimonials</p>
-                                  <h4 class="text-xl font-semibold text-white">Add New Testimonial</h4>
+                                  <h4 class="text-xl font-semibold text-slate-900">Add New Testimonial</h4>
                                 </div>
                                 <button type="button" class="btn-secondary">Add new testimonial</button>
                               </div>
                               <form class="space-y-4" (ngSubmit)="addTestimonial()">
                                 <div class="grid gap-4 md:grid-cols-2">
-                                  <label class="block space-y-2 text-slate-200">
+                                  <label class="block space-y-2 text-slate-700">
                                     <span class="text-sm font-semibold">Client Name</span>
-                                    <input [(ngModel)]="newTestimonial.client_name" name="client_name" type="text" placeholder="Client name" class="w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500" required />
+                                    <input [(ngModel)]="newTestimonial.client_name" name="client_name" type="text" placeholder="Client name" class="w-full rounded-3xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500" required />
                                   </label>
-                                  <label class="block space-y-2 text-slate-200">
+                                  <label class="block space-y-2 text-slate-700">
                                     <span class="text-sm font-semibold">Designation</span>
-                                    <input [(ngModel)]="newTestimonial.client_designation" name="client_designation" type="text" placeholder="Founder, Acme" class="w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500" />
+                                    <input [(ngModel)]="newTestimonial.client_designation" name="client_designation" type="text" placeholder="Founder, Acme" class="w-full rounded-3xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500" />
                                   </label>
                                 </div>
                                 <div class="grid gap-4 md:grid-cols-2">
-                                  <label class="block space-y-2 text-slate-200">
+                                  <label class="block space-y-2 text-slate-700">
                                     <span class="text-sm font-semibold">Company Name</span>
-                                    <input [(ngModel)]="newTestimonial.company_name" name="company_name" type="text" placeholder="Acme Pvt Ltd" class="w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500" />
+                                    <input [(ngModel)]="newTestimonial.company_name" name="company_name" type="text" placeholder="Acme Pvt Ltd" class="w-full rounded-3xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500" />
                                   </label>
-                                  <label class="flex items-center gap-2 rounded-3xl border border-slate-800 bg-slate-900 px-4 py-3 text-slate-200">
+                                  <label class="flex items-center gap-2 rounded-3xl border border-slate-300 bg-white px-4 py-3 text-slate-700">
                                     <input [(ngModel)]="newTestimonial.is_active" name="testimonial_is_active" type="checkbox" class="rounded" />
                                     <span class="text-sm font-semibold">Show on public page</span>
                                   </label>
                                 </div>
-                                <label class="block space-y-2 text-slate-200">
+                                <label class="block space-y-2 text-slate-700">
                                   <span class="text-sm font-semibold">Review</span>
-                                  <textarea [(ngModel)]="newTestimonial.review" name="review" rows="3" placeholder="Client feedback" class="w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500" required></textarea>
+                                  <textarea [(ngModel)]="newTestimonial.review" name="review" rows="3" placeholder="Client feedback" class="w-full rounded-3xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500" required></textarea>
                                 </label>
                                 <div class="grid gap-4 md:grid-cols-2">
-                                  <label class="block space-y-2 text-slate-200">
+                                  <label class="block space-y-2 text-slate-700">
                                     <span class="text-sm font-semibold">Client Image</span>
-                                    <label class="flex min-h-[56px] cursor-pointer items-center gap-3 rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-300 transition hover:border-indigo-500">
+                                    <label class="flex min-h-[56px] cursor-pointer items-center gap-3 rounded-3xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-600 transition hover:border-indigo-500">
                                       <input type="file" accept="image/*" (change)="onTestimonialFileSelected($event, 'client_image')" class="hidden" />
                                       <span class="rounded-full bg-indigo-600 px-4 py-2 font-semibold text-white">Choose file</span>
                                       <span class="truncate">{{ testimonialClientImageName() || 'No file chosen' }}</span>
                                     </label>
                                   </label>
-                                  <label class="block space-y-2 text-slate-200">
+                                  <label class="block space-y-2 text-slate-700">
                                     <span class="text-sm font-semibold">Company Logo</span>
-                                    <label class="flex min-h-[56px] cursor-pointer items-center gap-3 rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-300 transition hover:border-indigo-500">
+                                    <label class="flex min-h-[56px] cursor-pointer items-center gap-3 rounded-3xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-600 transition hover:border-indigo-500">
                                       <input type="file" accept="image/*" (change)="onTestimonialFileSelected($event, 'company_logo')" class="hidden" />
                                       <span class="rounded-full bg-indigo-600 px-4 py-2 font-semibold text-white">Choose file</span>
                                       <span class="truncate">{{ testimonialCompanyLogoName() || 'No file chosen' }}</span>
                                     </label>
                                   </label>
                                 </div>
-                                <label class="block space-y-2 text-slate-200">
+                                <label class="block space-y-2 text-slate-700">
                                   <span class="text-sm font-semibold">Rating</span>
                                   <div class="flex flex-wrap gap-2">
-                                    <button type="button" *ngFor="let score of [1,2,3,4,5]" class="rounded-full px-4 py-2 text-sm transition" [ngClass]="newTestimonial.rating >= score ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-300'" (click)="newTestimonial.rating = score">{{ score }}★</button>
+                                    <button type="button" *ngFor="let score of [1,2,3,4,5]" class="rounded-full px-4 py-2 text-sm transition" [ngClass]="newTestimonial.rating >= score ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-700'" (click)="newTestimonial.rating = score">{{ score }}★</button>
                                   </div>
                                 </label>
                                 <button type="submit" class="inline-flex items-center rounded-full bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500">Add Testimonial</button>
@@ -916,11 +920,11 @@ type WizardStep = {
                             <app-testimonial-list></app-testimonial-list>
                           </div>
                         } @else if (dashboardTab() === 'reviews') {
-                          <div class="rounded-3xl border border-slate-800 bg-slate-950 p-6">
+                          <div class="rounded-3xl border border-slate-200 bg-slate-50 p-6">
                             <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
                               <div>
                                 <p class="text-sm uppercase tracking-[0.2em] text-slate-500">Review Collection</p>
-                                <h4 class="text-xl font-semibold text-white">Share your review link</h4>
+                                <h4 class="text-xl font-semibold text-slate-900">Share your review link</h4>
                               </div>
                             </div>
                             <app-review-link></app-review-link>

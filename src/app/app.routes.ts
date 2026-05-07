@@ -5,6 +5,7 @@ import { AdminLoginComponent } from './components/admin-login.component';
 import { AdminSignupComponent } from './components/admin-signup.component';
 import { ResumeComponent } from './components/resume.component';
 import { PortfolioThemeSelectorComponent } from './components/portfolio-theme-selector.component';
+import { ThemePreviewComponent } from './components/theme-preview.component';
 import { adminGuard } from './guards/admin.guard';
 
 import { AdminDashboardComponent } from './components/admin-dashboard.component';
@@ -18,6 +19,10 @@ export const routes: Routes = [
   {
     path: 'themes',
     component: PortfolioThemeSelectorComponent,
+  },
+  {
+    path: 'theme-preview/:themeId',
+    component: ThemePreviewComponent,
   },
   {
     path: 'admin/login',

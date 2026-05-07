@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { ThemePreviewModalComponent } from './theme-preview-modal.component';
 
 interface ThemePreview {
   id: string;
@@ -13,13 +14,13 @@ interface ThemePreview {
 @Component({
   selector: 'app-portfolio-theme-selector',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ThemePreviewModalComponent],
   template: `
     <div class="theme-selector-container">
       <h1 class="text-3xl font-bold text-center mb-8">Choose Your Portfolio Theme</h1>
       <div class="themes-grid">
         @for (theme of themes(); track theme.id) {
-          <div class="theme-card" (click)="selectTheme(theme.id)">
+          <div class="theme-card" (click)="openPreview(theme.id)">
             <div class="theme-preview">
               <img [src]="theme.previewImage" [alt]="theme.name" class="preview-image" />
             </div>
@@ -35,6 +36,13 @@ interface ThemePreview {
           </div>
         }
       </div>
+      @if (showModal()) {
+        <app-theme-preview-modal
+          [themeId]="selectedThemeId()"
+          (themeSelected)="onThemeSelected($event)"
+          (close)="closeModal()">
+        </app-theme-preview-modal>
+      }
     </div>
   `,
   styles: [`
@@ -96,7 +104,17 @@ interface ThemePreview {
 export class PortfolioThemeSelectorComponent {
   private router = inject(Router);
 
+  showModal = signal(false);
+  selectedThemeId = signal('');
+
   themes = signal<ThemePreview[]>([
+    {
+      id: 'freefolio',
+      name: 'Freefolio',
+      description: 'Free and customizable theme',
+      previewImage: '/assets/theme-previews/freefolio.png',
+      colorPalette: ['#ffffff', '#000000', '#f3f4f6', '#6b7280']
+    },
     {
       id: 'modern-minimal',
       name: 'Modern Minimal',
@@ -131,10 +149,33 @@ export class PortfolioThemeSelectorComponent {
       description: 'Unique branding focused theme',
       previewImage: '/assets/theme-previews/personal-branding.png',
       colorPalette: ['#8b5cf6', '#ec4899', '#f59e0b', '#10b981']
+    },
+    {
+      id: 'theme5',
+      name: 'Theme 5',
+      description: 'Elegant theme with warm colors',
+      previewImage: '/assets/theme-previews/theme5.png',
+      colorPalette: ['#f6f2eb', '#181512', '#8b7355', '#d4a574']
+    },
+    {
+      id: 'theme6',
+      name: 'Theme 6',
+      description: 'Modern theme with vibrant colors',
+      previewImage: '/assets/theme-previews/theme6.png',
+      colorPalette: ['#ffffff', '#000000', '#ff6b6b', '#4ecdc4']
     }
   ]);
 
-  selectTheme(themeId: string) {
+  openPreview(themeId: string) {
+    this.selectedThemeId.set(themeId);
+    this.showModal.set(true);
+  }
+
+  closeModal() {
+    this.showModal.set(false);
+  }
+
+  onThemeSelected(themeId: string) {
     // Store selected theme and navigate home so the selected theme can take effect.
     localStorage.setItem('selectedTheme', themeId);
     this.router.navigate(['/']);
