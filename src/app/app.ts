@@ -11,6 +11,12 @@ import { Router } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class App implements OnInit {
+  private readonly ignoredHostSuffixes = [
+    'vercel.app',
+    'onrender.com',
+    'localhost',
+  ];
+
   constructor(private router: Router) {
     this.initializeTheme();
   }
@@ -45,11 +51,30 @@ export class App implements OnInit {
     if (typeof window !== 'undefined') {
       const hostname = window.location.hostname.toLowerCase();
       const parts = hostname.split('.');
-      if (parts.length >= 3 && parts[0] !== 'www' && parts[0] !== 'designfolio') {
-        const subdomain = parts[0];
-        // Navigate to the portfolio with the subdomain as slug
-        this.router.navigate([subdomain]);
+
+      if (!this.shouldResolveSubdomain(hostname, parts)) {
+        return;
       }
+
+      const subdomain = parts[0];
+      // Only map real custom-domain subdomains to portfolio slugs.
+      void this.router.navigate([subdomain]);
     }
+  }
+
+  private shouldResolveSubdomain(hostname: string, parts: string[]): boolean {
+    if (parts.length < 3) {
+      return false;
+    }
+
+    if (parts[0] === 'www' || parts[0] === 'designfolio') {
+      return false;
+    }
+
+    if (this.ignoredHostSuffixes.some((suffix) => hostname === suffix || hostname.endsWith(`.${suffix}`))) {
+      return false;
+    }
+
+    return true;
   }
 }
