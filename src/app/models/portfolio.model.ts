@@ -59,6 +59,11 @@ export interface ProfileData {
   slug: string;
   name: string;
   title: string;
+  displayName?: string;
+  brandName?: string;
+  brandLogo?: string;
+  aboutText?: string;
+  contactData?: ContactData;
   selectedTheme: PortfolioTheme;
 }
 

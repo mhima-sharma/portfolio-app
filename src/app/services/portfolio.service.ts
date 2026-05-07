@@ -38,6 +38,11 @@ const DEFAULT_PROFILE: ProfileData = {
   slug: '',
   name: '',
   title: '',
+  displayName: '',
+  brandName: '',
+  brandLogo: '',
+  aboutText: '',
+  contactData: {},
   selectedTheme: 'modern-minimal',
 };
 
@@ -116,6 +121,11 @@ export class PortfolioService {
             slug: normalizedSlug,
             name: '',
             title: '',
+            displayName: '',
+            brandName: '',
+            brandLogo: '',
+            aboutText: '',
+            contactData: {},
             selectedTheme: 'modern-dark',
           });
           this.selectedTheme.set('modern-dark');
@@ -146,7 +156,12 @@ export class PortfolioService {
       selectedTheme: theme,
       slug: response?.data?.profile?.slug ?? profile.slug,
       title: response?.data?.profile?.title ?? profile.title,
-      name: response?.data?.name ?? profile.name,
+      name: response?.data?.profile?.display_name ?? response?.data?.name ?? profile.name,
+      displayName: response?.data?.profile?.display_name ?? profile.displayName,
+      brandName: response?.data?.profile?.brand_name ?? profile.brandName,
+      brandLogo: response?.data?.profile?.brand_logo ?? profile.brandLogo,
+      aboutText: response?.data?.profile?.about_text ?? profile.aboutText,
+      contactData: response?.data?.profile?.contact_data ?? profile.contactData,
     }));
 
     return theme;
@@ -175,6 +190,11 @@ export class PortfolioService {
       ...profile,
       selectedTheme: theme,
       slug: response?.data?.profile?.slug ?? profile.slug,
+      displayName: response?.data?.profile?.display_name ?? profile.displayName,
+      brandName: response?.data?.profile?.brand_name ?? profile.brandName,
+      brandLogo: response?.data?.profile?.brand_logo ?? profile.brandLogo,
+      aboutText: response?.data?.profile?.about_text ?? profile.aboutText,
+      contactData: response?.data?.profile?.contact_data ?? profile.contactData,
     }));
 
     return theme;
@@ -639,10 +659,17 @@ export class PortfolioService {
   }
 
   private mapPortfolioResponse(data: any, normalizedSlug: string): PortfolioData {
+    const profileContact = data?.profile?.contact_data ?? data?.contact_data ?? {};
+    const contact = data?.contact ?? data?.profile?.contact_data ?? data?.contact_data ?? {};
     const profile: ProfileData = {
       slug: data?.profile?.slug ?? normalizedSlug,
-      name: data?.profile?.name ?? data?.about?.name ?? '',
-      title: data?.profile?.title ?? data?.about?.title ?? '',
+      name: data?.profile?.display_name ?? data?.profile?.name ?? data?.about?.name ?? '',
+      title: data?.profile?.brand_name ?? data?.profile?.title ?? data?.about?.title ?? '',
+      displayName: data?.profile?.display_name ?? data?.profile?.name ?? '',
+      brandName: data?.profile?.brand_name ?? data?.profile?.title ?? '',
+      brandLogo: data?.profile?.brand_logo ?? '',
+      aboutText: data?.profile?.about_text ?? '',
+      contactData: profileContact,
       selectedTheme: this.normalizeTheme(
         data?.profile?.selectedTheme ??
           data?.profile?.selected_theme ??
@@ -654,22 +681,22 @@ export class PortfolioService {
     return {
       profile,
       about: {
-        bio: data?.about?.bio ?? '',
-        description: data?.about?.description ?? '',
+        bio: data?.about?.bio ?? data?.profile?.about_text ?? '',
+        description: data?.about?.description ?? data?.profile?.about_text ?? '',
         yearsExperience: Number(data?.about?.yearsExperience ?? 0),
       },
       contact: {
-        email: data?.contact?.email ?? DEFAULT_CONTACT.email,
-        phone: data?.contact?.phone ?? DEFAULT_CONTACT.phone,
-        location: data?.contact?.location ?? DEFAULT_CONTACT.location,
-        github: data?.contact?.github ?? DEFAULT_CONTACT.github,
-        linkedin: data?.contact?.linkedin ?? DEFAULT_CONTACT.linkedin,
-        medium: data?.contact?.medium ?? DEFAULT_CONTACT.medium,
-        tableau: data?.contact?.tableau ?? DEFAULT_CONTACT.tableau,
-        leetcode: data?.contact?.leetcode ?? DEFAULT_CONTACT.leetcode,
-        instagram: data?.contact?.instagram ?? DEFAULT_CONTACT.instagram,
-        youtube: data?.contact?.youtube ?? DEFAULT_CONTACT.youtube,
-        portfolio: data?.contact?.portfolio ?? DEFAULT_CONTACT.portfolio,
+        email: contact?.email ?? DEFAULT_CONTACT.email,
+        phone: contact?.phone ?? DEFAULT_CONTACT.phone,
+        location: contact?.location ?? DEFAULT_CONTACT.location,
+        github: contact?.github ?? DEFAULT_CONTACT.github,
+        linkedin: contact?.linkedin ?? DEFAULT_CONTACT.linkedin,
+        medium: contact?.medium ?? DEFAULT_CONTACT.medium,
+        tableau: contact?.tableau ?? DEFAULT_CONTACT.tableau,
+        leetcode: contact?.leetcode ?? DEFAULT_CONTACT.leetcode,
+        instagram: contact?.instagram ?? DEFAULT_CONTACT.instagram,
+        youtube: contact?.youtube ?? DEFAULT_CONTACT.youtube,
+        portfolio: contact?.portfolio ?? DEFAULT_CONTACT.portfolio,
       },
       skills: Array.isArray(data?.skills) ? data.skills.map((skill: any) => this.mapSkill(skill)) : [],
       projects: Array.isArray(data?.projects)

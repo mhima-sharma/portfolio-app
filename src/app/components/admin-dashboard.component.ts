@@ -1,17 +1,26 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { PortfolioService } from '../services/portfolio.service';
 import { AuthService } from '../services/auth.service';
 import { AboutData, ContactData, Experience, PortfolioTheme, Project, Skill } from '../models/portfolio.model';
 import { ThemeSelectorComponent } from './theme-selector/theme-selector.component';
 import { IconComponent } from './ui/icon.component';
-import { EMAILJS_CONFIG, isEmailJsConfigured } from '../config/email.config';
+import { ServiceService } from '../services/service.service';
+import { BlogService } from '../services/blog.service';
+import { TestimonialService } from '../services/testimonial.service';
+import { ReviewService } from '../services/review.service';
 import { PlatformAdminService } from '../services/platform-admin.service';
+import { EMAILJS_CONFIG, isEmailJsConfigured } from '../config/email.config';
+import { ServiceListComponent } from '../dashboard/services/service-list.component';
+import { BlogListComponent } from '../dashboard/blogs/blog-list.component';
+import { TestimonialListComponent } from '../dashboard/testimonials/testimonial-list.component';
+import { ReviewLinkComponent } from '../dashboard/reviews/review-link.component';
 
 type ValidationErrors = Record<string, string>;
 type AdminPanel = 'dashboard' | 'create' | 'contact';
+type DashboardTab = 'services' | 'blogs' | 'testimonials' | 'reviews';
 
 type WizardStep = {
   title: string;
@@ -23,7 +32,7 @@ type WizardStep = {
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, ThemeSelectorComponent, IconComponent],
+  imports: [CommonModule, FormsModule, RouterModule, ThemeSelectorComponent, IconComponent, ServiceListComponent, BlogListComponent, TestimonialListComponent, ReviewLinkComponent],
   template: `
     <div class="admin-shell">
       @if (isSidebarOpen()) {
@@ -176,7 +185,7 @@ type WizardStep = {
                     <span class="quick-action__copy">Open the guided workflow from the first step.</span>
                     </span>
                   </button>
-                  <button class="quick-action" type="button" (click)="openCreatePanelAt(6)">
+                  <button class="quick-action" type="button" (click)="openCreatePanelAt(7)">
                     <span class="quick-action__badge">06</span>
                     <span>
                       <span class="quick-action__title">Publish</span>
@@ -667,6 +676,225 @@ type WizardStep = {
                 }
 
                 @case (6) {
+                  <section class="surface-card bg-slate-950 border border-slate-800">
+                    <div class="surface-card__header px-6 py-6">
+                      <div>
+                        <p class="surface-card__eyebrow">Additional Content</p>
+                        <h3 class="surface-card__title">Services, blogs, testimonials aur reviews manage karo</h3>
+                        <p class="admin-topbar__copy">Step 6/7 me yahan se extra public page content add karein aur service library ko configure karein.</p>
+                      </div>
+                    </div>
+
+                    <div class="px-6 pb-6">
+                      <div class="flex flex-wrap gap-3 mb-6">
+                        <button
+                          type="button"
+                          class="rounded-full px-5 py-2 text-sm font-semibold transition"
+                          [class.bg-indigo-600]="dashboardTab() === 'services'"
+                          [class.text-white]="dashboardTab() === 'services'"
+                          [class.text-slate-400]="dashboardTab() !== 'services'"
+                          [class.border-slate-700]="dashboardTab() !== 'services'"
+                          [class.border]="true"
+                          (click)="setContentTab('services')"
+                        >
+                          Services
+                        </button>
+                        <button
+                          type="button"
+                          class="rounded-full px-5 py-2 text-sm font-semibold transition"
+                          [class.bg-indigo-600]="dashboardTab() === 'blogs'"
+                          [class.text-white]="dashboardTab() === 'blogs'"
+                          [class.text-slate-400]="dashboardTab() !== 'blogs'"
+                          [class.border-slate-700]="dashboardTab() !== 'blogs'"
+                          [class.border]="true"
+                          (click)="setContentTab('blogs')"
+                        >
+                          Blogs
+                        </button>
+                        <button
+                          type="button"
+                          class="rounded-full px-5 py-2 text-sm font-semibold transition"
+                          [class.bg-indigo-600]="dashboardTab() === 'testimonials'"
+                          [class.text-white]="dashboardTab() === 'testimonials'"
+                          [class.text-slate-400]="dashboardTab() !== 'testimonials'"
+                          [class.border-slate-700]="dashboardTab() !== 'testimonials'"
+                          [class.border]="true"
+                          (click)="setContentTab('testimonials')"
+                        >
+                          Testimonials
+                        </button>
+                        <button
+                          type="button"
+                          class="rounded-full px-5 py-2 text-sm font-semibold transition"
+                          [class.bg-indigo-600]="dashboardTab() === 'reviews'"
+                          [class.text-white]="dashboardTab() === 'reviews'"
+                          [class.text-slate-400]="dashboardTab() !== 'reviews'"
+                          [class.border-slate-700]="dashboardTab() !== 'reviews'"
+                          [class.border]="true"
+                          (click)="setContentTab('reviews')"
+                        >
+                          Ratings & Reviews
+                        </button>
+                      </div>
+
+                      <div class="rounded-3xl border border-slate-800 bg-slate-900 p-6 shadow-lg">
+                        @if (dashboardTab() === 'services') {
+                          <div class="space-y-6">
+                            <div class="rounded-3xl border border-slate-800 bg-slate-950 p-6">
+                              <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                                <div>
+                                  <p class="text-sm uppercase tracking-[0.2em] text-slate-500">Service Library</p>
+                                  <h4 class="text-xl font-semibold text-white">Add New Service</h4>
+                                </div>
+                                <button type="button" class="btn-secondary">Add new service</button>
+                              </div>
+                              <form class="space-y-4" (ngSubmit)="addService()">
+                                <div class="grid gap-4 md:grid-cols-2">
+                                  <label class="block space-y-2 text-slate-200">
+                                    <span class="text-sm font-semibold">Title</span>
+                                    <input [(ngModel)]="newService.title" name="title" type="text" placeholder="Service title" class="w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500" required />
+                                  </label>
+                                  <label class="block space-y-2 text-slate-200">
+                                    <span class="text-sm font-semibold">Price</span>
+                                    <input [(ngModel)]="newService.price" name="price" type="text" placeholder="₹5000 / Custom quote" class="w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500" />
+                                  </label>
+                                </div>
+                                <label class="block space-y-2 text-slate-200">
+                                  <span class="text-sm font-semibold">Short Description</span>
+                                  <input [(ngModel)]="newService.short_description" name="short_description" type="text" placeholder="Brief description" class="w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500" required />
+                                </label>
+                                <label class="block space-y-2 text-slate-200">
+                                  <span class="text-sm font-semibold">Long Description</span>
+                                  <textarea [(ngModel)]="newService.long_description" name="long_description" rows="3" placeholder="Detailed description" class="w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500"></textarea>
+                                </label>
+                                <label class="block space-y-2 text-slate-200">
+                                  <span class="text-sm font-semibold">Icon</span>
+                                  <input [(ngModel)]="newService.icon" name="icon" type="text" placeholder="briefcase, code, palette..." class="w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500" />
+                                </label>
+                                <div class="grid gap-4 md:grid-cols-2">
+                                  <label class="flex items-center gap-2 rounded-3xl border border-slate-800 bg-slate-900 px-4 py-3 text-slate-200">
+                                    <input [(ngModel)]="newService.is_active" name="is_active" type="checkbox" class="rounded" />
+                                    <span class="text-sm font-semibold">Active service</span>
+                                  </label>
+                                </div>
+                                <button type="submit" class="inline-flex items-center rounded-full bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500">Add Service</button>
+                              </form>
+                            </div>
+
+                            <app-service-list></app-service-list>
+                          </div>
+                        } @else if (dashboardTab() === 'blogs') {
+                          <div class="space-y-6">
+                            <div class="rounded-3xl border border-slate-800 bg-slate-950 p-6">
+                              <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                                <div>
+                                  <p class="text-sm uppercase tracking-[0.2em] text-slate-500">Blog Studio</p>
+                                  <h4 class="text-xl font-semibold text-white">Add New Blog</h4>
+                                </div>
+                                <button type="button" class="btn-secondary">Add new blog</button>
+                              </div>
+                              <form class="space-y-4" (ngSubmit)="addBlog()">
+                                <div class="grid gap-4 md:grid-cols-2">
+                                  <label class="block space-y-2 text-slate-200">
+                                    <span class="text-sm font-semibold">Title</span>
+                                    <input [(ngModel)]="newBlog.title" (ngModelChange)="syncBlogSlug()" name="title" type="text" placeholder="Blog title" class="w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500" required />
+                                  </label>
+                                  <label class="block space-y-2 text-slate-200">
+                                    <span class="text-sm font-semibold">Slug</span>
+                                    <input [(ngModel)]="newBlog.slug" name="slug" type="text" placeholder="blog-title-slug" class="w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500" />
+                                  </label>
+                                </div>
+                                <label class="block space-y-2 text-slate-200">
+                                  <span class="text-sm font-semibold">Short Description</span>
+                                  <input [(ngModel)]="newBlog.short_description" name="short_description" type="text" placeholder="Brief description" class="w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500" required />
+                                </label>
+                                <label class="block space-y-2 text-slate-200">
+                                  <span class="text-sm font-semibold">Content</span>
+                                  <textarea [(ngModel)]="newBlog.content" name="content" rows="5" placeholder="Blog content" class="w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500" required></textarea>
+                                </label>
+                                <label class="block space-y-2 text-slate-200">
+                                  <span class="text-sm font-semibold">Tags</span>
+                                  <input [(ngModel)]="newBlog.tags" name="tags" type="text" placeholder="angular, ui, portfolio" class="w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500" />
+                                </label>
+                                <label class="flex items-center gap-2 text-slate-200">
+                                  <input [(ngModel)]="newBlog.is_published" name="is_published" type="checkbox" class="rounded" />
+                                  <span class="text-sm font-semibold">Publish immediately</span>
+                                </label>
+                                <button type="submit" class="inline-flex items-center rounded-full bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500">Add Blog</button>
+                              </form>
+                            </div>
+
+                            <app-blog-list></app-blog-list>
+                          </div>
+                        } @else if (dashboardTab() === 'testimonials') {
+                          <div class="space-y-6">
+                            <div class="rounded-3xl border border-slate-800 bg-slate-950 p-6">
+                              <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                                <div>
+                                  <p class="text-sm uppercase tracking-[0.2em] text-slate-500">Testimonials</p>
+                                  <h4 class="text-xl font-semibold text-white">Add New Testimonial</h4>
+                                </div>
+                                <button type="button" class="btn-secondary">Add new testimonial</button>
+                              </div>
+                              <form class="space-y-4" (ngSubmit)="addTestimonial()">
+                                <div class="grid gap-4 md:grid-cols-2">
+                                  <label class="block space-y-2 text-slate-200">
+                                    <span class="text-sm font-semibold">Client Name</span>
+                                    <input [(ngModel)]="newTestimonial.client_name" name="client_name" type="text" placeholder="Client name" class="w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500" required />
+                                  </label>
+                                  <label class="block space-y-2 text-slate-200">
+                                    <span class="text-sm font-semibold">Designation</span>
+                                    <input [(ngModel)]="newTestimonial.client_designation" name="client_designation" type="text" placeholder="Founder, Acme" class="w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500" />
+                                  </label>
+                                </div>
+                                <div class="grid gap-4 md:grid-cols-2">
+                                  <label class="block space-y-2 text-slate-200">
+                                    <span class="text-sm font-semibold">Company Name</span>
+                                    <input [(ngModel)]="newTestimonial.company_name" name="company_name" type="text" placeholder="Acme Pvt Ltd" class="w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500" />
+                                  </label>
+                                  <label class="flex items-center gap-2 rounded-3xl border border-slate-800 bg-slate-900 px-4 py-3 text-slate-200">
+                                    <input [(ngModel)]="newTestimonial.is_active" name="testimonial_is_active" type="checkbox" class="rounded" />
+                                    <span class="text-sm font-semibold">Show on public page</span>
+                                  </label>
+                                </div>
+                                <label class="block space-y-2 text-slate-200">
+                                  <span class="text-sm font-semibold">Review</span>
+                                  <textarea [(ngModel)]="newTestimonial.review" name="review" rows="3" placeholder="Client feedback" class="w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500" required></textarea>
+                                </label>
+                                <label class="block space-y-2 text-slate-200">
+                                  <span class="text-sm font-semibold">Rating</span>
+                                  <div class="flex flex-wrap gap-2">
+                                    <button type="button" *ngFor="let score of [1,2,3,4,5]" class="rounded-full px-4 py-2 text-sm transition" [ngClass]="newTestimonial.rating >= score ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-300'" (click)="newTestimonial.rating = score">{{ score }}★</button>
+                                  </div>
+                                </label>
+                                <button type="submit" class="inline-flex items-center rounded-full bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500">Add Testimonial</button>
+                              </form>
+                            </div>
+
+                            <app-testimonial-list></app-testimonial-list>
+                          </div>
+                        } @else if (dashboardTab() === 'reviews') {
+                          <div class="rounded-3xl border border-slate-800 bg-slate-950 p-6">
+                            <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                              <div>
+                                <p class="text-sm uppercase tracking-[0.2em] text-slate-500">Review Collection</p>
+                                <h4 class="text-xl font-semibold text-white">Share your review link</h4>
+                              </div>
+                            </div>
+                            <app-review-link></app-review-link>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  </section>
+
+                  <div class="wizard-actions">
+                    <button class="btn-secondary" type="button" (click)="goToPreviousStep()">Previous</button>
+                    <button class="btn-primary" type="button" (click)="goToNextStep()">Continue</button>
+                  </div>
+                }
+
+                @case (7) {
                   <div class="publish-layout">
                     <app-theme-selector
                       [activeTheme]="effectiveThemeForSelector()"
@@ -962,16 +1190,25 @@ export class AdminDashboardComponent {
   authService = inject(AuthService);
   platformAdmin = inject(PlatformAdminService);
   router = inject(Router);
+  serviceService = inject(ServiceService);
+  blogService = inject(BlogService);
+  testimonialService = inject(TestimonialService);
+  reviewService = inject(ReviewService);
+
+  setContentTab(tab: DashboardTab) {
+    this.dashboardTab.set(tab);
+  }
 
   status = signal<string | null>(null);
   error = signal<string | null>(null);
   validationErrors = signal<ValidationErrors>({});
   activePanel = signal<AdminPanel>('dashboard');
+  dashboardTab = signal<DashboardTab>('services');
   activeStep = signal(this.hasSeenRoadmap() ? 1 : 0);
   isSidebarOpen = signal(false);
   showRoadmap = signal(!this.hasSeenRoadmap());
 
-  panels: Array<{ id: AdminPanel; label: string; hint: string; icon: 'dashboard' | 'layers' | 'education' | 'mail' | 'summary' }> = [
+  panels: Array<{ id: AdminPanel; label: string; hint: string; icon: 'dashboard' | 'layers' | 'mail' }> = [
     { id: 'dashboard', label: 'Dashboard', hint: 'Overview and quick actions', icon: 'dashboard' },
     { id: 'create', label: 'Content Setup', hint: 'Guided multi-step builder', icon: 'layers' },
     { id: 'contact', label: 'Contact Us', hint: 'Reach the platform team', icon: 'mail' },
@@ -1015,9 +1252,15 @@ export class AdminDashboardComponent {
       description: 'Career journey ko structured timeline format me fill karo.',
     },
     {
+      title: 'Additional Content',
+      shortTitle: 'Content',
+      eyebrow: 'Step 6',
+      description: 'Services, blogs, testimonials aur reviews manage karo.',
+    },
+    {
       title: 'Theme And Publish',
       shortTitle: 'Publish',
-      eyebrow: 'Step 6',
+      eyebrow: 'Step 7',
       description: 'Layout choose karo aur final public link copy karke share karo.',
     },
   ];
@@ -1059,6 +1302,33 @@ export class AdminDashboardComponent {
     description: '',
     startDate: '',
     endDate: '',
+  };
+
+  newService = {
+    title: '',
+    short_description: '',
+    long_description: '',
+    icon: '',
+    price: '',
+    is_active: true,
+  };
+
+  newBlog = {
+    title: '',
+    slug: '',
+    short_description: '',
+    content: '',
+    tags: '',
+    is_published: false,
+  };
+
+  newTestimonial = {
+    client_name: '',
+    client_designation: '',
+    company_name: '',
+    review: '',
+    rating: 5,
+    is_active: true,
   };
 
   skills = this.portfolioService.getSkills;
@@ -1876,5 +2146,82 @@ export class AdminDashboardComponent {
       this.error.set(error.message ?? 'Something went wrong.');
       return false;
     }
+  }
+
+  syncBlogSlug() {
+    if (!this.newBlog.slug.trim()) {
+      this.newBlog.slug = this.slugify(this.newBlog.title);
+    }
+  }
+
+  async addService() {
+    if (!this.newService.title.trim() || !this.newService.short_description.trim()) {
+      this.error.set('Service title and short description are required.');
+      return;
+    }
+
+    return this.runAction(async () => {
+      await this.serviceService.createService(this.newService);
+      this.newService = {
+        title: '',
+        short_description: '',
+        long_description: '',
+        icon: '',
+        price: '',
+        is_active: true,
+      };
+      this.setStatus('Service added successfully.');
+    });
+  }
+
+  async addBlog() {
+    if (!this.newBlog.title.trim() || !this.newBlog.short_description.trim() || !this.newBlog.content.trim()) {
+      this.error.set('Blog title, short description, and content are required.');
+      return;
+    }
+
+    return this.runAction(async () => {
+      await this.blogService.createBlog({
+        ...this.newBlog,
+        slug: this.newBlog.slug.trim() || this.slugify(this.newBlog.title),
+      });
+      this.newBlog = {
+        title: '',
+        slug: '',
+        short_description: '',
+        content: '',
+        tags: '',
+        is_published: false,
+      };
+      this.setStatus('Blog added successfully.');
+    });
+  }
+
+  async addTestimonial() {
+    if (!this.newTestimonial.client_name.trim() || !this.newTestimonial.review.trim()) {
+      this.error.set('Client name and review are required.');
+      return;
+    }
+
+    return this.runAction(async () => {
+      await this.testimonialService.createTestimonial(this.newTestimonial);
+      this.newTestimonial = {
+        client_name: '',
+        client_designation: '',
+        company_name: '',
+        review: '',
+        rating: 5,
+        is_active: true,
+      };
+      this.setStatus('Testimonial added successfully.');
+    });
+  }
+
+  private slugify(value: string) {
+    return value
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
   }
 }

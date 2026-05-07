@@ -3,10 +3,12 @@ import { HomePageComponent } from './components/home-page.component';
 import { GuestLandingComponent } from './components/guest-landing.component';
 import { AdminLoginComponent } from './components/admin-login.component';
 import { AdminSignupComponent } from './components/admin-signup.component';
-import { AdminDashboardComponent } from './components/admin-dashboard.component';
-import { adminGuard } from './guards/admin.guard';
 import { ResumeComponent } from './components/resume.component';
 import { PortfolioThemeSelectorComponent } from './components/portfolio-theme-selector.component';
+import { adminGuard } from './guards/admin.guard';
+
+import { AdminDashboardComponent } from './components/admin-dashboard.component';
+import { ReviewPageComponent } from './public/review-page/review-page.component';
 
 export const routes: Routes = [
   {
@@ -29,6 +31,10 @@ export const routes: Routes = [
     path: 'admin/dashboard',
     component: AdminDashboardComponent,
     canActivate: [adminGuard],
+  },
+  {
+    path: 'review/:slug',
+    component: ReviewPageComponent,
   },
   {
     path: 'resume',
