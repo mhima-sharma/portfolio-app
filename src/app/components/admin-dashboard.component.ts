@@ -11,7 +11,7 @@ import { EMAILJS_CONFIG, isEmailJsConfigured } from '../config/email.config';
 import { PlatformAdminService } from '../services/platform-admin.service';
 
 type ValidationErrors = Record<string, string>;
-type AdminPanel = 'dashboard' | 'create' | 'platform' | 'contact';
+type AdminPanel = 'dashboard' | 'create' | 'contact';
 
 type WizardStep = {
   title: string;
@@ -88,24 +88,12 @@ type WizardStep = {
           <div>
             <p class="admin-topbar__eyebrow">
               {{
-                activePanel() === 'dashboard'
-                  ? 'Overview'
-                  : activePanel() === 'create'
-                    ? 'Guided Setup'
-                    : activePanel() === 'platform'
-                      ? 'Platform Control'
-                    : 'Support'
+                activePanel() === 'dashboard' ? 'Overview' : activePanel() === 'create' ? 'Guided Setup' : 'Support'
               }}
             </p>
             <h2 class="admin-topbar__title">
               {{
-                activePanel() === 'dashboard'
-                  ? 'Admin Dashboard'
-                  : activePanel() === 'create'
-                    ? 'Content Setup'
-                    : activePanel() === 'platform'
-                      ? 'Platform Analytics'
-                    : 'Contact Us'
+                activePanel() === 'dashboard' ? 'Admin Dashboard' : activePanel() === 'create' ? 'Content Setup' : 'Contact Us'
               }}
             </h2>
             <p class="admin-topbar__copy">
@@ -113,8 +101,6 @@ type WizardStep = {
                 Track your content, selected layout, and public link in one place.
               } @else if (activePanel() === 'create') {
                 Complete your profile and content in a guided, professional setup flow.
-              } @else if (activePanel() === 'platform') {
-                Super admin ke liye signups, premium gallery aur analytics ek jagah par.
               } @else {
                 Contact the platform team for support, setup issues or admin assistance.
               }
@@ -133,8 +119,8 @@ type WizardStep = {
           <div class="banner banner--success">{{ status() }}</div>
         }
 
-        @if (error() || platformAdmin.error()) {
-          <div class="banner banner--error">{{ error() || platformAdmin.error() }}</div>
+        @if (error()) {
+          <div class="banner banner--error">{{ error() }}</div>
         }
 
         @if (activePanel() === 'dashboard') {
@@ -171,19 +157,6 @@ type WizardStep = {
                 <p class="metric-card__value">{{ premiumGallery().length }}</p>
                 <p class="metric-card__hint">Current profile slug ke premium gallery images ka total count.</p>
               </article>
-              @if (isSuperAdmin()) {
-                <article class="metric-card">
-                  <p class="metric-card__label">Signups</p>
-                  <p class="metric-card__value">{{ displayMetric(platformAdmin.analytics().totalSignups) }}</p>
-                  <p class="metric-card__hint">
-                    {{
-                      platformAdmin.analytics().source === 'api'
-                        ? 'Live platform signup count from backend analytics.'
-                        : 'Backend analytics endpoint add karne ke baad live signup count yahan dikh jayega.'
-                    }}
-                  </p>
-                </article>
-              }
             </div>
 
             <div class="dashboard-grid">
@@ -945,103 +918,6 @@ type WizardStep = {
               }
             </section>
           </section>
-        } @else if (activePanel() === 'platform') {
-          <section class="dashboard-view">
-            <div class="stats-grid">
-              <article class="metric-card">
-                <p class="metric-card__label">Total Signups</p>
-                <p class="metric-card__value">{{ displayMetric(platformAdmin.analytics().totalSignups) }}</p>
-                <p class="metric-card__hint">Backend analytics endpoint se total account signups yahan aayenge.</p>
-              </article>
-              <article class="metric-card">
-                <p class="metric-card__label">Active Portfolios</p>
-                <p class="metric-card__value">{{ displayMetric(platformAdmin.analytics().activePortfolios) }}</p>
-                <p class="metric-card__hint">Published or active portfolios ka backend count.</p>
-              </article>
-              <article class="metric-card">
-                <p class="metric-card__label">Premium Images</p>
-                <p class="metric-card__value">{{ displayMetric(platformAdmin.analytics().totalPremiumImages ?? premiumGallery().length) }}</p>
-                <p class="metric-card__hint">
-                  {{
-                    platformAdmin.analytics().source === 'api'
-                      ? 'Cloudinary ya backend se synced premium image total.'
-                      : 'Backend na ho to available portfolio slugs ke basis par all users premium images ka total count dikh raha hai.'
-                  }}
-                </p>
-              </article>
-              <article class="metric-card">
-                <p class="metric-card__label">Analytics Source</p>
-                <p class="metric-card__value metric-card__value--small">{{ platformAdmin.analytics().source }}</p>
-                <p class="metric-card__hint">
-                  {{
-                    platformAdmin.analytics().source === 'api'
-                      ? 'Live backend data is available.'
-                      : 'Frontend fallback mode active hai. Backend connect karne par live counts milenge.'
-                  }}
-                </p>
-              </article>
-            </div>
-
-            <div class="dashboard-grid">
-              <section class="surface-card">
-                <div class="surface-card__header">
-                  <div>
-                    <p class="surface-card__eyebrow">Super Admin</p>
-                    <h3 class="surface-card__title">Platform Controls</h3>
-                    <p class="admin-topbar__copy">
-                      <strong>{{ superAdminEmail }}</strong> se login karne par yeh panel show hota hai. Yahan se image gallery feature ko on/off kiya ja sakta hai.
-                    </p>
-                  </div>
-                </div>
-
-                <div class="form-grid">
-                  <section class="surface-card rounded-[1.25rem] border border-slate-200 bg-slate-50 p-4">
-                    <div class="space-y-4">
-                      <div>
-                        <p class="surface-card__title">Premium Theme Pricing</p>
-                        <p class="admin-topbar__copy">Users ko premium facilities dekhne ke baad isi amount par paywall dikhaya jayega.</p>
-                      </div>
-
-                      <div class="form-field">
-                        <label>Premium Amount</label>
-                        <input
-                          [(ngModel)]="premiumPricingForm.amount"
-                          type="number"
-                          min="1"
-                          class="input-base"
-                          placeholder="1499"
-                        />
-                      </div>
-
-                      <div class="editor-actions">
-                        <button class="btn-primary" type="button" (click)="savePremiumPricing()">
-                          Save Premium Price
-                        </button>
-                      </div>
-                    </div>
-                  </section>
-
-                  <label class="surface-card rounded-[1.25rem] border border-slate-200 bg-slate-50 p-4">
-                    <div class="flex items-start justify-between gap-4">
-                      <div>
-                        <p class="surface-card__title">Image Gallery</p>
-                        <p class="admin-topbar__copy">Premium gallery upload aur public premium gallery sections ko control karo.</p>
-                      </div>
-                      <input
-                        type="checkbox"
-                        [ngModel]="isImageGalleryEnabled()"
-                        (ngModelChange)="toggleImageGallery($event)"
-                      />
-                    </div>
-                  </label>
-                </div>
-
-                <div class="wizard-actions wizard-actions--publish">
-                  <button class="btn-secondary" type="button" (click)="refreshPlatformOverview()">Refresh Analytics</button>
-                </div>
-              </section>
-            </div>
-          </section>
         } @else {
           <section class="dashboard-view">
             <section class="surface-card">
@@ -1086,7 +962,6 @@ export class AdminDashboardComponent {
   authService = inject(AuthService);
   platformAdmin = inject(PlatformAdminService);
   router = inject(Router);
-  superAdminEmail = 'sharmamahima0510@gmail.com';
 
   status = signal<string | null>(null);
   error = signal<string | null>(null);
@@ -1099,7 +974,6 @@ export class AdminDashboardComponent {
   panels: Array<{ id: AdminPanel; label: string; hint: string; icon: 'dashboard' | 'layers' | 'education' | 'mail' | 'summary' }> = [
     { id: 'dashboard', label: 'Dashboard', hint: 'Overview and quick actions', icon: 'dashboard' },
     { id: 'create', label: 'Content Setup', hint: 'Guided multi-step builder', icon: 'layers' },
-    { id: 'platform', label: 'Platform', hint: 'Analytics and feature toggles', icon: 'summary' },
     { id: 'contact', label: 'Contact Us', hint: 'Reach the platform team', icon: 'mail' },
   ];
 
@@ -1200,9 +1074,6 @@ export class AdminDashboardComponent {
   premiumPendingTheme = signal<PortfolioTheme | null>(null);
   platformMessageSending = signal(false);
   premiumGallery = this.portfolioService.getPremiumGallery;
-  premiumPricingForm = {
-    amount: 1499,
-  };
   platformContactForm = {
     name: '',
     email: '',
@@ -1219,7 +1090,6 @@ export class AdminDashboardComponent {
     this.platformAdmin.isSuperAdminEmail(this.authService.admin()?.email)
   );
   premiumPrice = this.platformAdmin.premiumThemePrice;
-  isImageGalleryEnabled = this.platformAdmin.imageGalleryEnabled;
   hasPremiumAccess = computed(() =>
     this.isSuperAdmin() || this.platformAdmin.hasPremiumAccess(this.profileSlug())
   );
@@ -1228,20 +1098,12 @@ export class AdminDashboardComponent {
     this.isPremiumThemeSelected() && !this.hasPremiumAccess() ? 'modern-dark' : this.selectedTheme()
   );
   canManagePremiumGallery = computed(() =>
-    this.isImageGalleryEnabled() && this.hasPremiumAccess() && this.isPremiumThemeSelected()
+    this.platformAdmin.imageGalleryEnabled() && this.hasPremiumAccess() && this.isPremiumThemeSelected()
   );
   premiumUnlockDetails = computed(() =>
     this.platformAdmin.getPremiumUnlockDetails(this.profileSlug())
   );
-  availablePanels = computed(() =>
-    this.panels.filter((panel) => {
-      if (panel.id === 'platform') {
-        return this.isSuperAdmin();
-      }
-
-      return true;
-    })
-  );
+  availablePanels = computed(() => this.panels);
 
   constructor() {
     effect(() => {
@@ -1280,27 +1142,6 @@ export class AdminDashboardComponent {
       };
     });
 
-    effect(() => {
-      this.premiumPricingForm.amount = this.premiumPrice();
-    });
-
-    effect(() => {
-      if (this.activePanel() === 'platform' && !this.isSuperAdmin()) {
-        this.activePanel.set('dashboard');
-      }
-    });
-
-    effect(() => {
-      const admin = this.authService.admin();
-      if (!this.isSuperAdmin() || !admin) {
-        return;
-      }
-
-      void this.platformAdmin.loadPlatformOverview(
-        this.authService.authHeaders(),
-        this.authService.getCurrentSlug()
-      );
-    });
   }
 
   setActivePanel(panel: AdminPanel) {
@@ -1355,18 +1196,6 @@ export class AdminDashboardComponent {
     this.portfolioService.loadPortfolio(this.authService.admin()?.profile?.slug);
     this.hydrateForms();
     this.setStatus('Portfolio refreshed.');
-  }
-
-  refreshPlatformOverview() {
-    if (!this.isSuperAdmin()) {
-      return;
-    }
-
-    void this.platformAdmin.loadPlatformOverview(
-      this.authService.authHeaders(),
-      this.authService.getCurrentSlug()
-    );
-    this.setStatus('Platform analytics refreshed.');
   }
 
   openPortfolio() {
@@ -1541,27 +1370,6 @@ export class AdminDashboardComponent {
     return this.saveTheme(pendingTheme);
   }
 
-  savePremiumPricing() {
-    if (!this.isSuperAdmin()) {
-      return;
-    }
-
-    const amount = Number(this.premiumPricingForm.amount);
-    if (!Number.isFinite(amount) || amount <= 0) {
-      this.error.set('Premium amount should be greater than zero.');
-      return;
-    }
-
-    void this.platformAdmin.updateSettings(
-      {
-        ...this.platformAdmin.settings(),
-        premiumThemePrice: amount,
-      },
-      this.authService.authHeaders()
-    );
-    this.setStatus(`Premium theme price updated to INR ${amount}.`);
-  }
-
   onPremiumGalleryFileSelected(event: Event) {
     const input = event.target as HTMLInputElement | null;
     this.selectedPremiumGalleryFile = input?.files?.[0] ?? null;
@@ -1614,21 +1422,6 @@ export class AdminDashboardComponent {
     } finally {
       this.premiumGalleryUploading.set(false);
     }
-  }
-
-  toggleImageGallery(enabled: boolean) {
-    if (!this.isSuperAdmin()) {
-      return;
-    }
-
-    void this.platformAdmin.updateSettings(
-      {
-        ...this.platformAdmin.settings(),
-        imageGalleryEnabled: enabled,
-      },
-      this.authService.authHeaders()
-    );
-    this.setStatus(`Image gallery ${enabled ? 'enabled' : 'disabled'}.`);
   }
 
   async deletePremiumGalleryImage(imageId: string | number) {
@@ -1819,10 +1612,6 @@ export class AdminDashboardComponent {
 
   hasValidationError(key: string) {
     return Boolean(this.validationErrors()[key]);
-  }
-
-  displayMetric(value: number | null) {
-    return value ?? '--';
   }
 
   isPremiumTheme(theme: PortfolioTheme | null | undefined) {

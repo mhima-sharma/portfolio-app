@@ -84,7 +84,23 @@ export type PortfolioTheme =
   | 'creative-designer'
   | 'developer-dark'
   | 'corporate-professional'
-  | 'personal-branding';
+  | 'personal-branding'
+  | 'freefolio-anime'
+  | 'freefolio-aurora'
+  | 'freefolio-basic'
+  | 'freefolio-beginner'
+  | 'freefolio-classic'
+  | 'freefolio-clean'
+  | 'freefolio-dark-hack'
+  | 'freefolio-deepsea'
+  | 'freefolio-easy'
+  | 'freefolio-flower'
+  | 'freefolio-hacker'
+  | 'freefolio-indify'
+  | 'freefolio-ingolfur'
+  | 'freefolio-outlines'
+  | 'freefolio-plain'
+  | 'freefolio-simple';
 
 export interface PortfolioData {
   profile: ProfileData;

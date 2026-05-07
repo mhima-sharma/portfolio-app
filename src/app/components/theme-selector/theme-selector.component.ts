@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PortfolioTheme } from '../../models/portfolio.model';
+import { FREEFOLIO_THEMES } from '../../themes/freefolio/freefolio-theme.registry';
 
 type ThemePreview = {
   id: PortfolioTheme;
@@ -10,6 +11,7 @@ type ThemePreview = {
   accent: string;
   surface: string;
   previewClasses: string[];
+  previewImage?: string;
 };
 
 @Component({
@@ -62,12 +64,16 @@ type ThemePreview = {
               </span>
             </div>
 
-            <div class="mt-4 rounded-[1.5rem] p-4" [style.background]="theme.surface">
-              <div class="space-y-3">
-                @for (previewClass of theme.previewClasses; track previewClass) {
-                  <div class="rounded-full bg-white/80 dark:bg-white/10" [class]="previewClass"></div>
-                }
-              </div>
+            <div class="mt-4 overflow-hidden rounded-[1.5rem] p-4" [style.background]="theme.surface">
+              @if (theme.previewImage) {
+                <img [src]="theme.previewImage" [alt]="theme.name" class="h-40 w-full rounded-[1.1rem] object-cover" />
+              } @else {
+                <div class="space-y-3">
+                  @for (previewClass of theme.previewClasses; track previewClass) {
+                    <div class="rounded-full bg-white/80 dark:bg-white/10" [class]="previewClass"></div>
+                  }
+                </div>
+              }
             </div>
 
             <button
@@ -175,5 +181,15 @@ export class ThemeSelectorComponent {
       surface: 'linear-gradient(135deg, #eff6ff, #dbeafe)',
       previewClasses: ['h-4 w-28', 'h-20 w-full rounded-[1.5rem]', 'h-24 w-16 rounded-[1.25rem]', 'h-3 w-24'],
     },
+    ...FREEFOLIO_THEMES.map((theme) => ({
+      id: theme.id,
+      name: theme.name,
+      badge: theme.badge,
+      summary: theme.summary,
+      accent: theme.accent,
+      surface: theme.surface,
+      previewClasses: [],
+      previewImage: theme.previewImage,
+    })),
   ];
 }

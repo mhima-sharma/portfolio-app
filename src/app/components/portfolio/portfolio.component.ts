@@ -10,6 +10,9 @@ import { ThemePersonalBrandingComponent } from '../../themes/personal-branding/t
 import { Theme5Component } from '../themes/theme5.component';
 import { Theme6Component } from '../themes/theme6.component';
 import { PlatformAdminService } from '../../services/platform-admin.service';
+import { FreefolioThemeComponent } from '../../themes/freefolio/theme.component';
+import { isFreefolioTheme } from '../../themes/freefolio/freefolio-theme.registry';
+import { toFreefolioThemeData } from '../../themes/freefolio/freefolio-theme.model';
 
 @Component({
   selector: 'app-portfolio',
@@ -23,6 +26,7 @@ import { PlatformAdminService } from '../../services/platform-admin.service';
     ThemePersonalBrandingComponent,
     Theme5Component,
     Theme6Component,
+    FreefolioThemeComponent,
   ],
   template: `
     @if (isLoading()) {
@@ -41,17 +45,21 @@ import { PlatformAdminService } from '../../services/platform-admin.service';
         </div>
       </div>
     } @else if (portfolioData(); as portfolio) {
-      <div [ngSwitch]="portfolio.profile.selectedTheme">
-        <app-modern-minimal-theme *ngSwitchCase="'modern-minimal'" [data]="portfolio" [profileSlug]="profileSlug()" [page]="page()"></app-modern-minimal-theme>
-        <app-creative-designer-theme *ngSwitchCase="'creative-designer'" [data]="portfolio" [profileSlug]="profileSlug()" [page]="page()"></app-creative-designer-theme>
-        <app-developer-dark-theme *ngSwitchCase="'developer-dark'" [data]="portfolio" [profileSlug]="profileSlug()" [page]="page()"></app-developer-dark-theme>
-        <app-corporate-professional-theme *ngSwitchCase="'corporate-professional'" [data]="portfolio" [profileSlug]="profileSlug()" [page]="page()"></app-corporate-professional-theme>
-        <app-personal-branding-theme *ngSwitchCase="'personal-branding'" [data]="portfolio" [profileSlug]="profileSlug()" [page]="page()"></app-personal-branding-theme>
-        <app-theme5 *ngSwitchCase="'theme-5'" [data]="portfolio"></app-theme5>
-        <app-theme5 *ngSwitchCase="'theme-5-boys'" [data]="portfolio"></app-theme5>
-        <app-theme6 *ngSwitchCase="'premium-signature'" [data]="portfolio"></app-theme6>
-        <app-modern-minimal-theme *ngSwitchDefault [data]="portfolio" [profileSlug]="profileSlug()" [page]="page()"></app-modern-minimal-theme>
-      </div>
+      @if (isFreefolioTheme(portfolio.profile.selectedTheme)) {
+        <app-freefolio-theme [themeId]="portfolio.profile.selectedTheme" [data]="freefolioData(portfolio)"></app-freefolio-theme>
+      } @else {
+        <div [ngSwitch]="portfolio.profile.selectedTheme">
+          <app-modern-minimal-theme *ngSwitchCase="'modern-minimal'" [data]="portfolio" [profileSlug]="profileSlug()" [page]="page()"></app-modern-minimal-theme>
+          <app-creative-designer-theme *ngSwitchCase="'creative-designer'" [data]="portfolio" [profileSlug]="profileSlug()" [page]="page()"></app-creative-designer-theme>
+          <app-developer-dark-theme *ngSwitchCase="'developer-dark'" [data]="portfolio" [profileSlug]="profileSlug()" [page]="page()"></app-developer-dark-theme>
+          <app-corporate-professional-theme *ngSwitchCase="'corporate-professional'" [data]="portfolio" [profileSlug]="profileSlug()" [page]="page()"></app-corporate-professional-theme>
+          <app-personal-branding-theme *ngSwitchCase="'personal-branding'" [data]="portfolio" [profileSlug]="profileSlug()" [page]="page()"></app-personal-branding-theme>
+          <app-theme5 *ngSwitchCase="'theme-5'" [data]="portfolio"></app-theme5>
+          <app-theme5 *ngSwitchCase="'theme-5-boys'" [data]="portfolio"></app-theme5>
+          <app-theme6 *ngSwitchCase="'premium-signature'" [data]="portfolio"></app-theme6>
+          <app-modern-minimal-theme *ngSwitchDefault [data]="portfolio" [profileSlug]="profileSlug()" [page]="page()"></app-modern-minimal-theme>
+        </div>
+      }
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -106,4 +114,7 @@ export class PortfolioComponent {
   private isPremiumTheme(theme: PortfolioTheme) {
     return theme === 'premium-signature' || theme === 'theme-5-boys';
   }
+
+  protected isFreefolioTheme = isFreefolioTheme;
+  protected freefolioData = toFreefolioThemeData;
 }

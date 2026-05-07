@@ -1,5 +1,6 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -9,9 +10,13 @@ import { RouterOutlet } from '@angular/router';
   styleUrl: './app.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class App {
-  constructor() {
+export class App implements OnInit {
+  constructor(private router: Router) {
     this.initializeTheme();
+  }
+
+  ngOnInit() {
+    this.handleSubdomain();
   }
 
   private initializeTheme(): void {
@@ -32,6 +37,18 @@ export class App {
         document.documentElement.classList.add('dark');
       } else {
         document.documentElement.classList.remove('dark');
+      }
+    }
+  }
+
+  private handleSubdomain(): void {
+    if (typeof window !== 'undefined') {
+      const hostname = window.location.hostname.toLowerCase();
+      const parts = hostname.split('.');
+      if (parts.length >= 3 && parts[0] !== 'www' && parts[0] !== 'designfolio') {
+        const subdomain = parts[0];
+        // Navigate to the portfolio with the subdomain as slug
+        this.router.navigate([subdomain]);
       }
     }
   }

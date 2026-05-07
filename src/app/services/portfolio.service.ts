@@ -18,6 +18,7 @@ import {
   HEALTH_URL,
 } from '../config/api.config';
 import { firstValueFrom } from 'rxjs';
+import { isFreefolioTheme } from '../themes/freefolio/freefolio-theme.registry';
 
 const DEFAULT_CONTACT: ContactData = {
   email: 'dev.nest.ms@gmail.com',
@@ -693,7 +694,13 @@ export class PortfolioService {
   }
 
   private normalizeTheme(theme?: string): PortfolioTheme {
-    switch ((theme ?? '').trim().toLowerCase()) {
+    const normalizedTheme = (theme ?? '').trim().toLowerCase() as PortfolioTheme;
+
+    if (isFreefolioTheme(normalizedTheme)) {
+      return normalizedTheme;
+    }
+
+    switch (normalizedTheme) {
       case 'modern-minimal':
         return 'modern-minimal';
       case 'modern-dark':
