@@ -9,41 +9,42 @@ import { AuthService } from '../services/auth.service';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   template: `
-    <div class="min-h-screen overflow-hidden bg-[linear-gradient(180deg,#fff8ef_0%,#fffdf9_54%,#fff3e8_100%)] px-4 py-6 text-slate-900 sm:px-6 lg:px-8">
-      <div class="mx-auto flex min-h-[calc(100vh-3rem)] max-w-6xl items-center">
-        <div class="grid w-full overflow-hidden rounded-[2rem] border border-[#f4dcc8] bg-white shadow-[0_30px_90px_rgba(148,73,12,0.12)] lg:grid-cols-[0.95fr_1.05fr]">
+    <div class="min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top_left,_rgba(96,165,250,0.28),_transparent_28%),radial-gradient(circle_at_top_right,_rgba(167,139,250,0.16),_transparent_24%),radial-gradient(circle_at_bottom_center,_rgba(59,130,246,0.16),_transparent_30%),linear-gradient(180deg,#f8fbff_0%,#eef4ff_42%,#f8fafc_100%)] px-4 py-6 text-slate-900 sm:px-6 lg:px-8">
+      <div class="pointer-events-none absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(148,163,184,0.14)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.14)_1px,transparent_1px)] [background-size:80px_80px]"></div>
+      <div class="relative mx-auto flex min-h-[calc(100vh-3rem)] max-w-6xl items-center">
+        <div class="grid w-full overflow-hidden rounded-[2rem] border border-white/60 bg-white/60 shadow-[0_30px_90px_rgba(15,23,42,0.12)] backdrop-blur-xl lg:grid-cols-[0.95fr_1.05fr]">
           <section class="relative p-6 sm:p-10 lg:p-12">
-            <div class="absolute inset-x-0 top-0 h-28 bg-[radial-gradient(circle_at_top_left,_rgba(251,146,60,0.18),_transparent_60%)]"></div>
+            <div class="absolute inset-x-0 top-0 h-28 bg-[radial-gradient(circle_at_top_left,_rgba(96,165,250,0.18),_transparent_60%)]"></div>
             <div class="relative">
-              <a routerLink="/" class="inline-flex items-center gap-2 rounded-full border border-[#f6dac5] bg-[#fff6ee] px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-[#c96b1a]">
-                FolioCraft
+              <a routerLink="/" class="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-blue-700 shadow-[0_12px_30px_rgba(59,130,246,0.08)] backdrop-blur">
+                CareerFlow
               </a>
 
               <div class="mt-8 max-w-md">
-                <p class="text-sm font-semibold uppercase tracking-[0.3em] text-[#db7a28]">Welcome back</p>
-                <h1 class="mt-4 text-4xl font-black tracking-tight text-[#182218] sm:text-5xl">Sign in to your account</h1>
-                <p class="mt-4 text-base leading-7 text-[#72604f]">
-                  A clean and intuitive workspace to manage your portfolio, update profile sections, and maintain your live public page.
+                <p class="text-sm font-semibold uppercase tracking-[0.3em] text-blue-600">Welcome back</p>
+                <h1 class="mt-4 text-4xl font-black tracking-tight text-slate-950 sm:text-5xl">Login to your workspace</h1>
+                <p class="mt-4 text-base leading-7 text-slate-600">
+                  Access your CareerFlow dashboard to manage your portfolio, resume, themes, and public profile.
                 </p>
               </div>
 
-              <div class="mt-8 flex flex-wrap gap-3 text-sm text-[#72604f]">
-                <div class="rounded-full border border-[#f6dac5] bg-[#fff6ee] px-4 py-2">Secure access</div>
-                <div class="rounded-full border border-[#f6dac5] bg-[#fff6ee] px-4 py-2">Built for every profile</div>
+              <div class="mt-8 flex flex-wrap gap-3 text-sm text-slate-600">
+                <div class="rounded-full border border-white/70 bg-white/72 px-4 py-2 shadow-sm backdrop-blur">Secure admin access</div>
+                <div class="rounded-full border border-white/70 bg-white/72 px-4 py-2 shadow-sm backdrop-blur">Professional workspace</div>
               </div>
 
               <form (ngSubmit)="submit()" class="mt-8 space-y-5" novalidate autocomplete="on">
                 <div>
-                  <label class="mb-2 block text-sm font-semibold text-[#35261b]">Email address</label>
+                  <label class="mb-2 block text-sm font-semibold text-slate-800">Email address</label>
                   <input
                     [(ngModel)]="email"
                     (ngModelChange)="clearFieldError('email')"
                     name="email"
                     type="email"
                     autocomplete="username"
-                    class="w-full rounded-[1.1rem] border bg-[#fffdfa] px-5 py-4 text-base text-slate-900 outline-none transition focus:border-[#f2aa67] focus:ring-4 focus:ring-[#ffe4ca]"
+                    class="w-full rounded-[1.1rem] border bg-white/80 px-5 py-4 text-base text-slate-900 outline-none transition backdrop-blur focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
                     [class.border-red-400]="fieldErrors().email"
-                    [class.border-[#ecd7c3]]="!fieldErrors().email"
+                    [class.border-slate-200]="!fieldErrors().email"
                     placeholder="owner@yourdomain.com"
                   />
                   @if (fieldErrors().email) {
@@ -53,13 +54,13 @@ import { AuthService } from '../services/auth.service';
 
                 <div>
                   <div class="mb-2 flex items-center justify-between gap-3">
-                    <label class="block text-sm font-semibold text-[#35261b]">Password</label>
-                    <span class="text-xs font-medium text-[#c17a37]">Private admin area</span>
+                    <label class="block text-sm font-semibold text-slate-800">Password</label>
+                    <span class="text-xs font-medium text-blue-600">Private admin area</span>
                   </div>
                   <div
-                    class="flex rounded-[1.1rem] border bg-[#fffdfa] transition focus-within:border-[#f2aa67] focus-within:ring-4 focus-within:ring-[#ffe4ca]"
+                    class="flex rounded-[1.1rem] border bg-white/80 transition backdrop-blur focus-within:border-blue-300 focus-within:ring-4 focus-within:ring-blue-100"
                     [class.border-red-400]="fieldErrors().password"
-                    [class.border-[#ecd7c3]]="!fieldErrors().password"
+                    [class.border-slate-200]="!fieldErrors().password"
                   >
                     <input
                       [(ngModel)]="password"
@@ -72,7 +73,7 @@ import { AuthService } from '../services/auth.service';
                     />
                     <button
                       type="button"
-                      class="px-4 text-sm font-semibold text-[#c17a37] transition hover:text-[#9b5b1e]"
+                      class="px-4 text-sm font-semibold text-blue-600 transition hover:text-blue-800"
                       (click)="showPassword = !showPassword"
                     >
                       {{ showPassword ? 'Hide' : 'Show' }}
@@ -91,70 +92,64 @@ import { AuthService } from '../services/auth.service';
 
                 <button
                   type="submit"
-                  class="inline-flex w-full items-center justify-center rounded-[1.1rem] bg-slate-950 px-6 py-4 text-base font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70"
+                  class="inline-flex w-full items-center justify-center rounded-[1.1rem] border border-blue-400/30 bg-[linear-gradient(135deg,#2563eb_0%,#60a5fa_55%,#7c3aed_100%)] px-6 py-4 text-base font-semibold text-white shadow-[0_18px_40px_rgba(37,99,235,0.28)] transition hover:translate-y-[-1px] hover:shadow-[0_22px_48px_rgba(37,99,235,0.34)] disabled:cursor-not-allowed disabled:opacity-70"
                   [disabled]="authService.isLoading()"
                 >
                   {{ authService.isLoading() ? 'Verifying Access...' : 'Login to Dashboard' }}
                 </button>
               </form>
 
-              <div class="mt-8 flex items-center gap-4 text-xs uppercase tracking-[0.24em] text-[#d08c55]">
-                <span class="h-px flex-1 bg-[#f2dfcf]"></span>
+              <div class="mt-8 flex items-center gap-4 text-xs uppercase tracking-[0.24em] text-blue-500">
+                <span class="h-px flex-1 bg-slate-200"></span>
                 <span>Owner only</span>
-                <span class="h-px flex-1 bg-[#f2dfcf]"></span>
+                <span class="h-px flex-1 bg-slate-200"></span>
               </div>
 
-              <p class="mt-8 text-sm text-[#72604f]">
+              <p class="mt-8 text-sm text-slate-600">
                 New here and ready to create your portfolio?
-                <a routerLink="/admin/signup" class="font-semibold text-[#c96b1a] underline decoration-[#f2b071] underline-offset-4">Create your account</a>
+                <a routerLink="/admin/signup" class="font-semibold text-blue-700 underline decoration-blue-300 underline-offset-4">Create your account</a>
               </p>
             </div>
           </section>
 
-          <section class="relative hidden overflow-hidden bg-[linear-gradient(180deg,#fffaf4_0%,#fff2e4_100%)] p-8 lg:block lg:p-10">
-            <div class="absolute left-10 top-10 h-24 w-24 rounded-full bg-[#ffe2c3] blur-2xl"></div>
-            <div class="absolute bottom-12 right-10 h-28 w-28 rounded-full bg-[#ffd7ad] blur-3xl"></div>
+          <section class="relative hidden overflow-hidden bg-[linear-gradient(180deg,rgba(255,255,255,0.42)_0%,rgba(239,246,255,0.82)_100%)] p-8 lg:block lg:p-10">
+            <div class="absolute left-10 top-10 h-24 w-24 rounded-full bg-blue-200/70 blur-2xl animate-[pulse_7s_ease-in-out_infinite]"></div>
+            <div class="absolute bottom-12 right-10 h-28 w-28 rounded-full bg-violet-200/70 blur-3xl animate-[pulse_8s_ease-in-out_infinite]"></div>
 
-            <div class="relative flex h-full flex-col justify-between rounded-[1.8rem] border border-[#f3dcc6] bg-[linear-gradient(180deg,rgba(255,255,255,0.84)_0%,rgba(255,246,235,0.96)_100%)] p-8">
-              <div class="flex items-center justify-between">
-                <div>
-                  <p class="text-xs font-semibold uppercase tracking-[0.28em] text-[#db7a28]">Portfolio Workspace</p>
-                  <h2 class="mt-3 text-2xl font-bold text-[#1f2b1f]">Professional, simple, and open to everyone</h2>
-                </div>
-                <div class="rounded-full border border-[#f2dcc6] bg-white px-4 py-2 text-xs font-semibold text-[#c87424]">Live Preview</div>
+            <div class="relative flex h-full flex-col justify-between rounded-[1.8rem] border border-white/60 bg-[linear-gradient(180deg,rgba(255,255,255,0.76)_0%,rgba(239,246,255,0.88)_100%)] p-8 shadow-[0_24px_60px_rgba(15,23,42,0.08)] backdrop-blur-xl">
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.28em] text-blue-600">CareerFlow Workspace</p>
+                <h2 class="mt-4 max-w-lg text-4xl font-black leading-tight tracking-tight text-slate-950">Continue where your professional presence left off.</h2>
+                <p class="mt-4 max-w-xl text-base leading-7 text-slate-600">
+                  Sign in to update your portfolio, refine your resume, and keep your public profile ready to share.
+                </p>
               </div>
 
-              <div class="relative mx-auto mt-10 flex h-[360px] w-full max-w-[420px] items-center justify-center">
-                <div class="absolute left-6 top-8 flex h-16 w-16 items-center justify-center rounded-full border border-[#f2cda9] bg-white text-xl shadow-sm">A</div>
-                <div class="absolute right-6 bottom-12 flex h-16 w-16 items-center justify-center rounded-full border border-[#f2cda9] bg-white text-xl shadow-sm">UI</div>
-                <div class="absolute left-1/2 top-6 h-16 w-48 -translate-x-1/2 rounded-full border-2 border-dashed border-[#f1bf89]"></div>
-                <div class="absolute inset-x-10 bottom-4 rounded-[1.5rem] border border-[#f3dcc6] bg-white/90 p-5 shadow-sm">
-                  <div class="flex items-center justify-between z-100">
-                    <div>
-                      <p class="text-lg font-bold text-[#1c281c]">Portfolio Flow</p>
-                      <p class="text-sm text-[#8b6b52]">Organize your story and keep updates simple</p>
-                    </div>
-                    <div class="flex h-12 w-12 items-center justify-center rounded-full border-4 border-[#f1bf89] text-sm font-bold text-[#c87424]">84%</div>
+              <div class="mt-12 rounded-[1.8rem] border border-white/70 bg-white/72 p-7 shadow-[0_18px_40px_rgba(15,23,42,0.06)] backdrop-blur transition-transform duration-300 hover:-translate-y-1">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm font-semibold uppercase tracking-[0.22em] text-blue-500">Live Workspace</p>
+                    <h3 class="mt-3 text-2xl font-bold text-slate-950">Everything stays connected in one clear editing flow</h3>
+                  </div>
+                  <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#2563eb_0%,#60a5fa_55%,#7c3aed_100%)] text-sm font-bold text-white shadow-[0_16px_30px_rgba(37,99,235,0.25)]">
+                    Live
                   </div>
                 </div>
-                <div class="relative flex h-64 w-64 items-center justify-center rounded-full border border-[#f0dcc8] bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#fff0df_72%)]">
-                  <div class="absolute top-10 h-16 w-16 rounded-full border-2 border-[#1b231c] bg-white"></div>
-                  <div class="absolute top-24 h-28 w-36 rounded-[40%] border-2 border-[#1b231c] bg-[#ffc98d]"></div>
-                  <div class="absolute left-5 top-28 h-20 w-10 -rotate-[28deg] rounded-full border-2 border-[#1b231c] bg-[#ffc98d]"></div>
-                  <div class="absolute right-5 top-28 h-20 w-10 rotate-[28deg] rounded-full border-2 border-[#1b231c] bg-[#ffc98d]"></div>
-                  <div class="absolute bottom-7 left-16 h-20 w-12 rotate-[22deg] rounded-full border-2 border-[#1b231c] bg-white"></div>
-                  <div class="absolute bottom-7 right-16 h-20 w-12 -rotate-[22deg] rounded-full border-2 border-[#1b231c] bg-white"></div>
-                  <div class="absolute top-[7.2rem] flex h-10 w-20 items-center justify-center text-3xl text-white">♡</div>
-                </div>
-              </div>
 
-              <div class="rounded-[1.5rem] border border-[#f3dcc6] bg-white/80 p-5">
-                <p class="text-center text-2xl font-bold leading-snug text-[#1d291d]">
-                  Build and manage your portfolio in a way that feels easy and approachable
-                </p>
-                <p class="mt-3 text-center text-sm leading-7 text-[#8a6a51]">
-                  Already have an account? Log in to continue. New here? Sign up to start your portfolio.
-                </p>
+                <div class="mt-8 space-y-4 text-slate-600">
+                  <div class="flex items-start gap-3">
+                    <span class="mt-1 h-2.5 w-2.5 rounded-full bg-blue-500"></span>
+                    <p class="text-sm leading-7">Manage your portfolio, resume, and shareable profile from one place.</p>
+                  </div>
+                  <div class="flex items-start gap-3">
+                    <span class="mt-1 h-2.5 w-2.5 rounded-full bg-violet-500"></span>
+                    <p class="text-sm leading-7">Keep your content current without changing your structure or design flow.</p>
+                  </div>
+                  <div class="flex items-start gap-3">
+                    <span class="mt-1 h-2.5 w-2.5 rounded-full bg-sky-500"></span>
+                    <p class="text-sm leading-7">Maintain a polished online presence that always feels ready to send.</p>
+                  </div>
+                </div>
               </div>
             </div>
           </section>

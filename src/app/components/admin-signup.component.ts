@@ -11,81 +11,61 @@ type SignupField = keyof SignupPayload;
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   template: `
-    <div class="min-h-screen overflow-hidden bg-[linear-gradient(180deg,#fff8ef_0%,#fffdf9_54%,#fff3e8_100%)] px-4 py-6 text-slate-900 sm:px-6 lg:px-8">
-      <div class="mx-auto flex min-h-[calc(100vh-3rem)] max-w-7xl items-center">
-        <div class="grid w-full overflow-hidden rounded-[2rem] border border-[#f4dcc8] bg-white shadow-[0_30px_90px_rgba(148,73,12,0.12)] lg:grid-cols-[1.02fr_0.98fr]">
-          <section class="relative hidden overflow-hidden bg-[linear-gradient(180deg,#fffaf4_0%,#fff2e4_100%)] p-8 lg:block lg:p-10">
-            <div class="absolute -left-10 top-10 h-32 w-32 rounded-full bg-[#ffe2c3] blur-3xl"></div>
-            <div class="absolute bottom-0 right-0 h-40 w-40 rounded-full bg-[#ffd7ad] blur-3xl"></div>
+    <div class="min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top_left,_rgba(96,165,250,0.28),_transparent_28%),radial-gradient(circle_at_top_right,_rgba(167,139,250,0.16),_transparent_24%),radial-gradient(circle_at_bottom_center,_rgba(59,130,246,0.16),_transparent_30%),linear-gradient(180deg,#f8fbff_0%,#eef4ff_42%,#f8fafc_100%)] px-4 py-6 text-slate-900 sm:px-6 lg:px-8">
+      <div class="pointer-events-none absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(148,163,184,0.14)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.14)_1px,transparent_1px)] [background-size:80px_80px]"></div>
+      <div class="relative mx-auto flex min-h-[calc(100vh-3rem)] max-w-7xl items-center">
+        <div class="grid w-full overflow-hidden rounded-[2rem] border border-white/60 bg-white/60 shadow-[0_30px_90px_rgba(15,23,42,0.12)] backdrop-blur-xl lg:grid-cols-[1.02fr_0.98fr]">
+          <section class="relative hidden overflow-hidden bg-[linear-gradient(180deg,rgba(255,255,255,0.42)_0%,rgba(239,246,255,0.82)_100%)] p-8 lg:block lg:p-10">
+            <div class="absolute -left-10 top-10 h-32 w-32 rounded-full bg-blue-200/70 blur-3xl animate-[pulse_7s_ease-in-out_infinite]"></div>
+            <div class="absolute bottom-0 right-0 h-40 w-40 rounded-full bg-violet-200/70 blur-3xl animate-[pulse_8s_ease-in-out_infinite]"></div>
 
-            <div class="relative flex h-full flex-col justify-between rounded-[1.8rem] border border-[#f3dcc6] bg-[linear-gradient(180deg,rgba(255,255,255,0.84)_0%,rgba(255,246,235,0.96)_100%)] p-8">
+            <div class="relative flex h-full flex-col justify-between rounded-[1.8rem] border border-white/60 bg-[linear-gradient(180deg,rgba(255,255,255,0.76)_0%,rgba(239,246,255,0.88)_100%)] p-8 shadow-[0_24px_60px_rgba(15,23,42,0.08)] backdrop-blur-xl">
               <div>
-                <p class="text-xs font-semibold uppercase tracking-[0.28em] text-[#db7a28]">Create Your Access</p>
-                <h1 class="mt-4 text-4xl font-black leading-tight tracking-tight text-[#182218]">Kick off your portfolio with a clean and professional start.</h1>
-                <p class="mt-4 text-base leading-7 text-[#72604f]">
-                  Get started with a simple and elegant portfolio that showcases your work in the best light.
+                <p class="text-xs font-semibold uppercase tracking-[0.28em] text-blue-600">Create Your Access</p>
+                <h1 class="mt-4 max-w-lg text-4xl font-black leading-tight tracking-tight text-slate-950">Start with a professional setup that feels ready from day one.</h1>
+                <p class="mt-4 max-w-xl text-base leading-7 text-slate-600">
+                  Create your account and launch a portfolio and resume experience designed to look clean, modern, and credible.
                 </p>
               </div>
 
-              <div class="mt-10 space-y-4">
-                <div class="rounded-[1.4rem] border border-[#f3dcc6] bg-white/90 p-5 shadow-sm">
-                  <p class="text-sm font-semibold text-[#233023]">Personal setup</p>
-                  <p class="mt-2 text-sm leading-7 text-[#8a6a51]">Your name, title, and slug define your public portfolio identity.</p>
-                </div>
-                <div class="rounded-[1.4rem] border border-[#f3dcc6] bg-white/90 p-5 shadow-sm">
-                  <div class="flex items-center justify-between gap-4">
-                    <div>
-                      <p class="text-sm font-semibold text-[#233023]">Shareable portfolio link</p>
-                      <p class="mt-2 text-sm leading-7 text-[#8a6a51]">After signup, your live portfolio will be available at your chosen slug.</p>
-                    </div>
-                    <div class="flex h-14 w-14 items-center justify-center rounded-full border-4 border-[#f1bf89] text-sm font-bold text-[#c87424]">Live</div>
-                  </div>
-                </div>
-              </div>
+              <div class="mt-12 rounded-[1.6rem] border border-white/70 bg-white/68 p-7 shadow-[0_14px_30px_rgba(15,23,42,0.05)] backdrop-blur transition-transform duration-300 hover:-translate-y-1">
+                <p class="text-sm font-semibold uppercase tracking-[0.22em] text-blue-500">CareerFlow Setup</p>
+                <h2 class="mt-3 max-w-md text-2xl font-bold leading-snug text-slate-950">A simple way to launch your professional presence.</h2>
 
-              <div class="mt-10 rounded-[1.6rem] border border-[#f3dcc6] bg-[#fff7ef] p-6">
-                <div class="flex items-end justify-between gap-4">
-                  <div>
-                    <p class="text-xs font-semibold uppercase tracking-[0.24em] text-[#d08c55]">What you get</p>
-                    <p class="mt-3 text-2xl font-bold text-[#1c281c]">
-                    Build quickly with clean templates, instant live portfolio, and easy customization—upgrade for multi-language support, custom domains, image galleries, and advanced themes.
-                    </p>
-                  </div>
-                  <div class="flex gap-2">
-                    <span class="h-2.5 w-2.5 rounded-full bg-[#f4c28f]"></span>
-                    <span class="h-2.5 w-2.5 rounded-full bg-[#d97a28]"></span>
-                  </div>
+                <div class="mt-6 space-y-3 text-slate-600">
+                  <p class="text-sm leading-7">Set up your name, title, and portfolio link in one clean flow.</p>
+                  <p class="text-sm leading-7">Publish a polished profile that stays consistent across portfolio and resume.</p>
                 </div>
               </div>
             </div>
           </section>
 
           <section class="relative p-6 sm:p-10 lg:p-12">
-            <div class="absolute inset-x-0 top-0 h-28 bg-[radial-gradient(circle_at_top_right,_rgba(251,146,60,0.18),_transparent_58%)]"></div>
+            <div class="absolute inset-x-0 top-0 h-28 bg-[radial-gradient(circle_at_top_right,_rgba(96,165,250,0.18),_transparent_58%)]"></div>
             <div class="relative">
-              <a routerLink="/" class="inline-flex items-center gap-2 rounded-full border border-[#f6dac5] bg-[#fff6ee] px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-[#c96b1a]">
-                FolioCraft
+              <a routerLink="/" class="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-blue-700 shadow-[0_12px_30px_rgba(59,130,246,0.08)] backdrop-blur">
+                CareerFlow
               </a>
 
               <div class="mt-8 max-w-xl">
-                <p class="text-sm font-semibold uppercase tracking-[0.3em] text-[#db7a28]">Get started</p>
-                <h2 class="mt-4 text-4xl font-black tracking-tight text-[#182218] sm:text-5xl">Create your account</h2>
-                <p class="mt-4 text-base leading-7 text-[#72604f]">
-              This platform is built for everyone. After signing up, you can manage your details and confidently publish your portfolio.
+                <p class="text-sm font-semibold uppercase tracking-[0.3em] text-blue-600">Get started</p>
+                <h2 class="mt-4 text-4xl font-black tracking-tight text-slate-950 sm:text-5xl">Create your account</h2>
+                <p class="mt-4 text-base leading-7 text-slate-600">
+                  Set up your profile once, choose your preferred presentation, and publish with confidence.
                 </p>
               </div>
 
               <div class="mt-8 grid gap-5 md:grid-cols-2">
                 <div>
-                  <label class="mb-2 block text-sm font-semibold text-[#35261b]">Full name</label>
+                  <label class="mb-2 block text-sm font-semibold text-slate-800">Full name</label>
                   <input
                     [(ngModel)]="form.name"
                     (ngModelChange)="clearFieldError('name')"
                     name="name"
                     type="text"
-                    class="w-full rounded-[1.1rem] border bg-[#fffdfa] px-5 py-4 text-base text-slate-900 outline-none transition focus:border-[#f2aa67] focus:ring-4 focus:ring-[#ffe4ca]"
+                    class="w-full rounded-[1.1rem] border bg-white/80 px-5 py-4 text-base text-slate-900 outline-none transition backdrop-blur focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
                     [class.border-red-400]="fieldErrors().name"
-                    [class.border-[#ecd7c3]]="!fieldErrors().name"
+                    [class.border-slate-200]="!fieldErrors().name"
                     placeholder="Enter your full name"
                   />
                   @if (fieldErrors().name) {
@@ -94,16 +74,16 @@ type SignupField = keyof SignupPayload;
                 </div>
 
                 <div>
-                  <label class="mb-2 block text-sm font-semibold text-[#35261b]">Email address</label>
+                  <label class="mb-2 block text-sm font-semibold text-slate-800">Email address</label>
                  <input
                     [(ngModel)]="form.email"
                     (ngModelChange)="onEmailChange($event)"
                     name="email"
                     type="email"
                     required
-                    class="w-full rounded-[1.1rem] border bg-[#fffdfa] px-5 py-4 text-base text-slate-900 outline-none transition focus:border-[#f2aa67] focus:ring-4 focus:ring-[#ffe4ca]"
+                    class="w-full rounded-[1.1rem] border bg-white/80 px-5 py-4 text-base text-slate-900 outline-none transition backdrop-blur focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
                     [class.border-red-400]="fieldErrors().email"
-                    [class.border-[#ecd7c3]]="!fieldErrors().email"
+                    [class.border-slate-200]="!fieldErrors().email"
                     placeholder="e.g. yourname@example.com"
                   />
                   @if (fieldErrors().email) {
@@ -112,11 +92,11 @@ type SignupField = keyof SignupPayload;
                 </div>
 
                 <div>
-                  <label class="mb-2 block text-sm font-semibold text-[#35261b]">Password</label>
+                  <label class="mb-2 block text-sm font-semibold text-slate-800">Password</label>
                   <div
-                    class="flex rounded-[1.1rem] border bg-[#fffdfa] transition focus-within:border-[#f2aa67] focus-within:ring-4 focus-within:ring-[#ffe4ca]"
+                    class="flex rounded-[1.1rem] border bg-white/80 transition backdrop-blur focus-within:border-blue-300 focus-within:ring-4 focus-within:ring-blue-100"
                     [class.border-red-400]="fieldErrors().password"
-                    [class.border-[#ecd7c3]]="!fieldErrors().password"
+                    [class.border-slate-200]="!fieldErrors().password"
                   >
                     <input
                       [(ngModel)]="form.password"
@@ -128,7 +108,7 @@ type SignupField = keyof SignupPayload;
                     />
                     <button
                       type="button"
-                      class="px-4 text-sm font-semibold text-[#c17a37] transition hover:text-[#9b5b1e]"
+                      class="px-4 text-sm font-semibold text-blue-600 transition hover:text-blue-800"
                       (click)="showPassword = !showPassword"
                     >
                       {{ showPassword ? 'Hide' : 'Show' }}
@@ -140,15 +120,15 @@ type SignupField = keyof SignupPayload;
                 </div>
 
                 <div>
-                  <label class="mb-2 block text-sm font-semibold text-[#35261b]">Profile title</label>
+                  <label class="mb-2 block text-sm font-semibold text-slate-800">Profile title</label>
                   <input
                     [(ngModel)]="form.title"
                     (ngModelChange)="clearFieldError('title')"
                     name="title"
                     type="text"
-                    class="w-full rounded-[1.1rem] border bg-[#fffdfa] px-5 py-4 text-base text-slate-900 outline-none transition focus:border-[#f2aa67] focus:ring-4 focus:ring-[#ffe4ca]"
+                    class="w-full rounded-[1.1rem] border bg-white/80 px-5 py-4 text-base text-slate-900 outline-none transition backdrop-blur focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
                     [class.border-red-400]="fieldErrors().title"
-                    [class.border-[#ecd7c3]]="!fieldErrors().title"
+                    [class.border-slate-200]="!fieldErrors().title"
                   placeholder="Designer, Student, Teacher, Freelancer"
                   />
                   @if (fieldErrors().title) {
@@ -158,22 +138,22 @@ type SignupField = keyof SignupPayload;
               </div>
 
               <div class="mt-5">
-                <label class="mb-2 block text-sm font-semibold text-[#35261b]">Portfolio slug</label>
-                <div class="mb-3 rounded-[1.1rem] border border-[#f6dac5] bg-[#fff6ee] px-4 py-4 text-sm text-[#7b624b]">
+                <label class="mb-2 block text-sm font-semibold text-slate-800">Portfolio slug</label>
+                <div class="mb-3 rounded-[1.1rem] border border-white/70 bg-white/78 px-4 py-4 text-sm text-slate-500 backdrop-blur">
                   Public portfolio URL:
-                  <span class="ml-1 font-semibold text-[#a85a17]">{{ previewUrl() }}</span>
+                  <span class="ml-1 font-semibold text-blue-700">{{ previewUrl() }}</span>
                 </div>
                 <input
                   [(ngModel)]="form.slug"
                   (ngModelChange)="onSlugChange($event)"
                   name="slug"
                   type="text"
-                  class="w-full rounded-[1.1rem] border bg-[#fffdfa] px-5 py-4 text-base text-slate-900 outline-none transition focus:border-[#f2aa67] focus:ring-4 focus:ring-[#ffe4ca]"
+                  class="w-full rounded-[1.1rem] border bg-white/80 px-5 py-4 text-base text-slate-900 outline-none transition backdrop-blur focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
                   [class.border-red-400]="fieldErrors().slug"
-                  [class.border-[#ecd7c3]]="!fieldErrors().slug"
+                  [class.border-slate-200]="!fieldErrors().slug"
                   placeholder="Choose a unique slug for your portfolio (e.g., john-doe, jane.designs)"
                 />
-                <p class="mt-2 text-xs leading-6 text-[#8a6a51]">
+                <p class="mt-2 text-xs leading-6 text-slate-500">
                   Choose a unique slug for your portfolio (e.g., john-doe, jane.designs)
                 </p>
                 @if (fieldErrors().slug) {
@@ -189,16 +169,16 @@ type SignupField = keyof SignupPayload;
 
               <button
                 type="button"
-                class="mt-6 inline-flex w-full items-center justify-center rounded-[1.1rem] bg-slate-950 px-6 py-4 text-base font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70"
+                class="mt-6 inline-flex w-full items-center justify-center rounded-[1.1rem] border border-blue-400/30 bg-[linear-gradient(135deg,#2563eb_0%,#60a5fa_55%,#7c3aed_100%)] px-6 py-4 text-base font-semibold text-white shadow-[0_18px_40px_rgba(37,99,235,0.28)] transition hover:translate-y-[-1px] hover:shadow-[0_22px_48px_rgba(37,99,235,0.34)] disabled:cursor-not-allowed disabled:opacity-70"
                 [disabled]="authService.isLoading()"
                 (click)="submit()"
               >
                 {{ authService.isLoading() ? 'Creating Portfolio...' : 'Create My Portfolio' }}
               </button>
 
-              <p class="mt-8 text-sm text-[#72604f]">
+              <p class="mt-8 text-sm text-slate-600">
                 Already have access?
-                <a routerLink="/admin/login" class="font-semibold text-[#c96b1a] underline decoration-[#f2b071] underline-offset-4">Login here</a>
+                <a routerLink="/admin/login" class="font-semibold text-blue-700 underline decoration-blue-300 underline-offset-4">Login here</a>
               </p>
             </div>
           </section>

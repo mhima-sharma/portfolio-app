@@ -25,9 +25,7 @@ import { PortfolioService } from '../services/portfolio.service';
 
         <div class="mt-8 pt-8 border-t border-dark-700 text-center text-gray-500 text-sm">
           <p>
-            Built with
-            <span class="text-red-500">❤️</span>
-            using Angular & Tailwind CSS
+            CareerFlow helps you build a professional online presence with beautifully designed portfolios and resumes.
           </p>
         </div>
       </div>

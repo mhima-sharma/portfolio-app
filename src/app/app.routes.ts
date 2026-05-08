@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { HomePageComponent } from './components/home-page.component';
-import { GuestLandingComponent } from './components/guest-landing.component';
 import { AdminLoginComponent } from './components/admin-login.component';
 import { AdminSignupComponent } from './components/admin-signup.component';
 import { ResumeComponent } from './components/resume.component';
@@ -14,7 +13,10 @@ import { ReviewPageComponent } from './public/review-page/review-page.component'
 export const routes: Routes = [
   {
     path: '',
-    component: GuestLandingComponent,
+    loadComponent: () =>
+      import('./components/guest-landing.component').then(
+        (m) => m.GuestLandingComponent
+      ),
   },
   {
     path: 'themes',
