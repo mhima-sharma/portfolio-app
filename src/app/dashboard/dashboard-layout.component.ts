@@ -16,11 +16,11 @@ import { RouterModule } from '@angular/router';
             <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Manage services, blogs, testimonials, and reviews from one place.</p>
           </div>
           <nav class="space-y-2 text-sm text-slate-700 dark:text-slate-300">
-            <a routerLink="/admin/dashboard" routerLinkActive="text-indigo-600 font-semibold" class="block rounded-xl px-4 py-3 transition hover:bg-slate-100 dark:hover:bg-slate-800">Overview</a>
-            <a routerLink="/admin/dashboard/services" routerLinkActive="text-indigo-600 font-semibold" class="block rounded-xl px-4 py-3 transition hover:bg-slate-100 dark:hover:bg-slate-800">Services</a>
-            <a routerLink="/admin/dashboard/blogs" routerLinkActive="text-indigo-600 font-semibold" class="block rounded-xl px-4 py-3 transition hover:bg-slate-100 dark:hover:bg-slate-800">Blogs</a>
-            <a routerLink="/admin/dashboard/testimonials" routerLinkActive="text-indigo-600 font-semibold" class="block rounded-xl px-4 py-3 transition hover:bg-slate-100 dark:hover:bg-slate-800">Testimonials</a>
-            <a routerLink="/admin/dashboard/reviews" routerLinkActive="text-indigo-600 font-semibold" class="block rounded-xl px-4 py-3 transition hover:bg-slate-100 dark:hover:bg-slate-800">Review Links</a>
+            <a routerLink="/admin/dashboard" routerLinkActive="text-primary-600 font-semibold" class="block rounded-xl px-4 py-3 transition hover:bg-slate-100 dark:hover:bg-slate-800">Overview</a>
+            <a routerLink="/admin/dashboard/services" routerLinkActive="text-primary-600 font-semibold" class="block rounded-xl px-4 py-3 transition hover:bg-slate-100 dark:hover:bg-slate-800">Services</a>
+            <a routerLink="/admin/dashboard/blogs" routerLinkActive="text-primary-600 font-semibold" class="block rounded-xl px-4 py-3 transition hover:bg-slate-100 dark:hover:bg-slate-800">Blogs</a>
+            <a routerLink="/admin/dashboard/testimonials" routerLinkActive="text-primary-600 font-semibold" class="block rounded-xl px-4 py-3 transition hover:bg-slate-100 dark:hover:bg-slate-800">Testimonials</a>
+            <a routerLink="/admin/dashboard/reviews" routerLinkActive="text-primary-600 font-semibold" class="block rounded-xl px-4 py-3 transition hover:bg-slate-100 dark:hover:bg-slate-800">Review Links</a>
           </nav>
         </aside>
 
@@ -33,7 +33,7 @@ import { RouterModule } from '@angular/router';
               </div>
               <div class="flex flex-wrap gap-3">
                 <a routerLink="/admin/dashboard/services" class="inline-flex items-center rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 shadow-sm transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800">Add Service</a>
-                <a routerLink="/admin/dashboard/blogs" class="inline-flex items-center rounded-full border border-transparent bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500">Manage Blogs</a>
+                <a routerLink="/admin/dashboard/blogs" class="inline-flex items-center rounded-full border border-transparent bg-primary-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-600">Manage Blogs</a>
               </div>
             </div>
           </header>

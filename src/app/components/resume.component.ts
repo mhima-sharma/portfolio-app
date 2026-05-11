@@ -24,7 +24,7 @@ import { IconComponent } from './ui/icon.component';
             <div class="admin-brand__badge">PM</div>
             <div>
               <p class="admin-brand__eyebrow">Workspace</p>
-              <h1 class="admin-brand__title">FolioCraft</h1>
+              <h1 class="admin-brand__title">CareerFlow</h1>
               <p class="admin-brand__copy">Manage your public profile, content, and presentation from one place.</p>
             </div>
           </div>

@@ -1,10 +1,12 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { PortfolioTheme } from '../models/portfolio.model';
 import { ThemePreviewModalComponent } from './theme-preview-modal.component';
+import { FREEFOLIO_THEMES } from '../themes/freefolio/freefolio-theme.registry';
 
 interface ThemePreview {
-  id: string;
+  id: PortfolioTheme;
   name: string;
   description: string;
   previewImage: string;
@@ -105,16 +107,16 @@ export class PortfolioThemeSelectorComponent {
   private router = inject(Router);
 
   showModal = signal(false);
-  selectedThemeId = signal('');
+  selectedThemeId = signal<PortfolioTheme>('modern-minimal');
 
   themes = signal<ThemePreview[]>([
-    {
-      id: 'freefolio',
-      name: 'Freefolio',
-      description: 'Free and customizable theme',
-      previewImage: '/assets/theme-previews/freefolio.png',
-      colorPalette: ['#ffffff', '#000000', '#f3f4f6', '#6b7280']
-    },
+    ...FREEFOLIO_THEMES.map((theme) => ({
+      id: theme.id,
+      name: theme.name,
+      description: theme.summary,
+      previewImage: theme.previewImage,
+      colorPalette: [theme.accent, '#ffffff', '#f3f4f6', '#6b7280'],
+    })),
     {
       id: 'modern-minimal',
       name: 'Modern Minimal',
@@ -151,14 +153,14 @@ export class PortfolioThemeSelectorComponent {
       colorPalette: ['#8b5cf6', '#ec4899', '#f59e0b', '#10b981']
     },
     {
-      id: 'theme5',
+      id: 'theme-5',
       name: 'Theme 5',
       description: 'Elegant theme with warm colors',
       previewImage: '/assets/theme-previews/theme5.png',
       colorPalette: ['#f6f2eb', '#181512', '#8b7355', '#d4a574']
     },
     {
-      id: 'theme6',
+      id: 'premium-signature',
       name: 'Theme 6',
       description: 'Modern theme with vibrant colors',
       previewImage: '/assets/theme-previews/theme6.png',
@@ -166,7 +168,7 @@ export class PortfolioThemeSelectorComponent {
     }
   ]);
 
-  openPreview(themeId: string) {
+  openPreview(themeId: PortfolioTheme) {
     this.selectedThemeId.set(themeId);
     this.showModal.set(true);
   }
@@ -175,7 +177,7 @@ export class PortfolioThemeSelectorComponent {
     this.showModal.set(false);
   }
 
-  onThemeSelected(themeId: string) {
+  onThemeSelected(themeId: PortfolioTheme) {
     // Store selected theme and navigate home so the selected theme can take effect.
     localStorage.setItem('selectedTheme', themeId);
     this.router.navigate(['/']);

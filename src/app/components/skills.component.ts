@@ -71,19 +71,22 @@ export class SkillsComponent {
   private portfolioService = inject(PortfolioService);
 
   skillGroups = computed(() => {
-    const metadata: Record<Skill['category'], { label: string; icon: string }> = {
+    const metadata: Record<string, { label: string; icon: string }> = {
       frontend: { label: 'Frontend Development', icon: '🎨' },
       backend: { label: 'Backend Development', icon: '⚙️' },
       database: { label: 'Databases', icon: '🗄️' },
       tools: { label: 'Tools & Platforms', icon: '🛠️' },
     };
 
-    return (Object.keys(metadata) as Skill['category'][])
+    const allSkills = this.portfolioService.getSkills();
+    const categories = Array.from(new Set(allSkills.map((skill) => skill.category)));
+
+    return categories
       .map((category) => ({
         key: category,
-        label: metadata[category].label,
-        icon: metadata[category].icon,
-        skills: this.portfolioService.getSkillsByCategory(category),
+        label: metadata[category]?.label ?? category.replace(/-/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase()),
+        icon: metadata[category]?.icon ?? '📌',
+        skills: allSkills.filter((skill) => skill.category === category),
       }))
       .filter((group) => group.skills.length);
   });

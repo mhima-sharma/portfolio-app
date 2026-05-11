@@ -8,9 +8,9 @@ import { ThemePersonalBrandingComponent } from '../themes/personal-branding/them
 import { Theme5Component } from './themes/theme5.component';
 import { Theme6Component } from './themes/theme6.component';
 import { FreefolioThemeComponent } from '../themes/freefolio/theme.component';
-import { PortfolioData } from '../models/portfolio.model';
+import { PortfolioData, PortfolioTheme } from '../models/portfolio.model';
 import { FreefolioThemeData } from '../themes/freefolio/freefolio-theme.model';
-import { FreefolioThemeId } from '../themes/freefolio/freefolio-theme.registry';
+import { FreefolioThemeId, FREEFOLIO_THEMES, getFreefolioThemeMeta, isFreefolioTheme } from '../themes/freefolio/freefolio-theme.registry';
 
 @Component({
   selector: 'app-theme-preview-modal',
@@ -34,33 +34,34 @@ import { FreefolioThemeId } from '../themes/freefolio/freefolio-theme.registry';
           <button (click)="closeModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
         </div>
         <div class="overflow-auto max-h-[80vh]">
-          @switch (themeId()) {
-            @case ('modern-minimal') {
-              <app-modern-minimal-theme [data]="previewData" profileSlug="preview" page="home"></app-modern-minimal-theme>
-            }
-            @case ('creative-designer') {
-              <app-creative-designer-theme [data]="previewData" profileSlug="preview" page="home"></app-creative-designer-theme>
-            }
-            @case ('developer-dark') {
-              <app-developer-dark-theme [data]="previewData" profileSlug="preview" page="home"></app-developer-dark-theme>
-            }
-            @case ('corporate-professional') {
-              <app-corporate-professional-theme [data]="previewData" profileSlug="preview" page="home"></app-corporate-professional-theme>
-            }
-            @case ('personal-branding') {
-              <app-personal-branding-theme [data]="previewData" profileSlug="preview" page="home"></app-personal-branding-theme>
-            }
-            @case ('theme5') {
-              <app-theme5 [data]="previewData"></app-theme5>
-            }
-            @case ('theme6') {
-              <app-theme6 [data]="previewData"></app-theme6>
-            }
-            @case ('freefolio') {
-              <app-freefolio-theme [themeId]="getFreefolioThemeId(themeId())" [data]="getFreefolioData()"></app-freefolio-theme>
-            }
-            @default {
-              <div class="p-8 text-center">Theme not found</div>
+          @if (isFreefolioTheme(themeId())) {
+            <app-freefolio-theme [themeId]="getFreefolioThemeId()" [data]="getFreefolioData()"></app-freefolio-theme>
+          } @else {
+            @switch (themeId()) {
+              @case ('modern-minimal') {
+                <app-modern-minimal-theme [data]="previewData" profileSlug="preview" page="home"></app-modern-minimal-theme>
+              }
+              @case ('creative-designer') {
+                <app-creative-designer-theme [data]="previewData" profileSlug="preview" page="home"></app-creative-designer-theme>
+              }
+              @case ('developer-dark') {
+                <app-developer-dark-theme [data]="previewData" profileSlug="preview" page="home"></app-developer-dark-theme>
+              }
+              @case ('corporate-professional') {
+                <app-corporate-professional-theme [data]="previewData" profileSlug="preview" page="home"></app-corporate-professional-theme>
+              }
+              @case ('personal-branding') {
+                <app-personal-branding-theme [data]="previewData" profileSlug="preview" page="home"></app-personal-branding-theme>
+              }
+                @case ('theme-5') {
+                <app-theme5 [data]="previewData"></app-theme5>
+              }
+              @case ('premium-signature') {
+                <app-theme6 [data]="previewData"></app-theme6>
+              }
+              @default {
+                <div class="p-8 text-center">Theme not found</div>
+              }
             }
           }
         </div>
@@ -79,8 +80,8 @@ import { FreefolioThemeId } from '../themes/freefolio/freefolio-theme.registry';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ThemePreviewModalComponent {
-  themeId = input.required<string>();
-  themeSelected = output<string>();
+  themeId = input.required<PortfolioTheme>();
+  themeSelected = output<PortfolioTheme>();
   close = output<void>();
 
   previewData: PortfolioData = {
@@ -135,24 +136,30 @@ export class ThemePreviewModalComponent {
     ]
   };
 
-  private themeNames: Record<string, string> = {
+  private themeNames = {
     'modern-minimal': 'Modern Minimal',
     'creative-designer': 'Creative Designer',
     'developer-dark': 'Developer Dark',
     'corporate-professional': 'Corporate Professional',
     'personal-branding': 'Personal Branding',
-    'theme5': 'Theme 5',
-    'theme6': 'Theme 6',
-    'freefolio': 'Freefolio',
-  };
+    'theme-5': 'Theme 5',
+    'premium-signature': 'Premium Signature',
+    ...Object.fromEntries(FREEFOLIO_THEMES.map((theme) => [theme.id, theme.name])),
+  } as Record<string, string>;
 
   getThemeName(themeId: string): string {
+    if (isFreefolioTheme(themeId as PortfolioTheme)) {
+      return getFreefolioThemeMeta(themeId as FreefolioThemeId).name;
+    }
+
     return this.themeNames[themeId] || 'Unknown Theme';
   }
 
-  getFreefolioThemeId(themeId: string): FreefolioThemeId {
-    // For preview, use a default freefolio theme
-    return 'freefolio-basic';
+  protected isFreefolioTheme = isFreefolioTheme;
+
+  protected getFreefolioThemeId(): FreefolioThemeId {
+    const theme = this.themeId();
+    return isFreefolioTheme(theme) ? theme : 'freefolio-basic';
   }
 
   getFreefolioData(): FreefolioThemeData {

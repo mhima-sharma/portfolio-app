@@ -16,7 +16,7 @@ import { TestimonialItem } from '../../models/dashboard.models';
           <p class="text-sm uppercase tracking-[0.25em] text-slate-500 dark:text-slate-400">Testimonials</p>
           <h1 class="mt-2 text-3xl font-semibold text-slate-900 dark:text-slate-50">Approve and manage reviews</h1>
         </div>
-        <button class="inline-flex items-center rounded-full bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500" type="button" (click)="prepareNew()">Add review</button>
+        <button class="inline-flex items-center rounded-full bg-primary-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-primary-600" type="button" (click)="prepareNew()">Add review</button>
       </div>
 
       <div class="grid gap-6 xl:grid-cols-2">
@@ -26,54 +26,54 @@ import { TestimonialItem } from '../../models/dashboard.models';
             <div class="grid gap-4 lg:grid-cols-2">
               <label class="block space-y-2">
                 <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Client name</span>
-                <input formControlName="client_name" type="text" placeholder="Jane Doe" class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
+                <input formControlName="client_name" type="text" placeholder="Jane Doe" class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-primary-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
               </label>
               <label class="block space-y-2">
                 <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Designation</span>
-                <input formControlName="client_designation" type="text" placeholder="Founder, Acme" class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
+                <input formControlName="client_designation" type="text" placeholder="Founder, Acme" class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-primary-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
               </label>
             </div>
             <div class="grid gap-4 lg:grid-cols-2">
               <label class="block space-y-2">
                 <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Company name</span>
-                <input formControlName="company_name" type="text" placeholder="Acme Pvt Ltd" class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
+                <input formControlName="company_name" type="text" placeholder="Acme Pvt Ltd" class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-primary-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
               </label>
               <label class="inline-flex items-center gap-2 rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-700 dark:bg-slate-900">
-                <input type="checkbox" formControlName="is_active" class="h-5 w-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+                <input type="checkbox" formControlName="is_active" class="h-5 w-5 rounded border-slate-300 text-primary-600 focus:ring-primary-500" />
                 <span class="text-sm text-slate-700 dark:text-slate-200">Show on public page</span>
               </label>
             </div>
             <div class="grid gap-4 lg:grid-cols-2">
               <label class="block space-y-2">
                 <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Review</span>
-                <textarea formControlName="review" rows="4" placeholder="Client feedback" class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"></textarea>
+                <textarea formControlName="review" rows="4" placeholder="Client feedback" class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-primary-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"></textarea>
               </label>
               <label class="block space-y-2">
                 <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Rating</span>
                 <div class="flex flex-wrap gap-2">
-                  <button type="button" *ngFor="let score of [1,2,3,4,5]" class="rounded-full px-4 py-2 text-sm transition" [ngClass]="(form.value.rating ?? 0) >= score ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'" (click)="form.patchValue({ rating: score })">{{ score }}★</button>
+                  <button type="button" *ngFor="let score of [1,2,3,4,5]" class="rounded-full px-4 py-2 text-sm transition" [ngClass]="(form.value.rating ?? 0) >= score ? 'bg-primary-500 text-white' : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'" (click)="form.patchValue({ rating: score })">{{ score }}★</button>
                 </div>
               </label>
             </div>
             <div class="grid gap-4 lg:grid-cols-2">
               <label class="block space-y-2">
                 <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Client image</span>
-                <label class="flex min-h-[56px] cursor-pointer items-center gap-3 rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600 transition hover:border-indigo-400 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
+                <label class="flex min-h-[56px] cursor-pointer items-center gap-3 rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600 transition hover:border-primary-400 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
                   <input type="file" accept="image/*" (change)="handleFile('client_image', $event)" class="hidden" />
-                  <span class="rounded-full bg-indigo-600 px-4 py-2 font-semibold text-white">Choose file</span>
+                  <span class="rounded-full bg-primary-500 px-4 py-2 font-semibold text-white">Choose file</span>
                   <span class="truncate">{{ clientImageName() || 'No file chosen' }}</span>
                 </label>
               </label>
               <label class="block space-y-2">
                 <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Company logo</span>
-                <label class="flex min-h-[56px] cursor-pointer items-center gap-3 rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600 transition hover:border-indigo-400 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
+                <label class="flex min-h-[56px] cursor-pointer items-center gap-3 rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600 transition hover:border-primary-400 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
                   <input type="file" accept="image/*" (change)="handleFile('company_logo', $event)" class="hidden" />
-                  <span class="rounded-full bg-indigo-600 px-4 py-2 font-semibold text-white">Choose file</span>
+                  <span class="rounded-full bg-primary-500 px-4 py-2 font-semibold text-white">Choose file</span>
                   <span class="truncate">{{ companyLogoName() || 'No file chosen' }}</span>
                 </label>
               </label>
             </div>
-            <button class="inline-flex items-center justify-center rounded-full bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500" [disabled]="isSaving()">{{ activeTestimonial() ? 'Update review' : 'Create review' }}</button>
+            <button class="inline-flex items-center justify-center rounded-full bg-primary-500 px-6 py-3 text-sm font-semibold text-white transition hover:bg-primary-600" [disabled]="isSaving()">{{ activeTestimonial() ? 'Update review' : 'Create review' }}</button>
           </form>
         </section>
 

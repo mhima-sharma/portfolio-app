@@ -24,31 +24,31 @@ import { BlogItem } from '../../models/dashboard.models';
         <div class="grid gap-6 lg:grid-cols-2">
           <label class="block space-y-2">
             <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Title</span>
-            <input formControlName="title" type="text" placeholder="Blog title" class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
+            <input formControlName="title" type="text" placeholder="Blog title" class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-primary-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
             <span *ngIf="form.controls.title.invalid && form.controls.title.touched" class="text-sm text-rose-600">Title is required.</span>
           </label>
           <label class="block space-y-2">
             <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Slug</span>
-            <input formControlName="slug" type="text" placeholder="blog-title-slug" class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
+            <input formControlName="slug" type="text" placeholder="blog-title-slug" class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-primary-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
             <span *ngIf="form.controls.slug.invalid && form.controls.slug.touched" class="text-sm text-rose-600">Slug is required.</span>
           </label>
         </div>
 
         <label class="block space-y-2">
           <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Short description</span>
-          <textarea formControlName="short_description" rows="3" placeholder="Summary for cards" class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"></textarea>
+          <textarea formControlName="short_description" rows="3" placeholder="Summary for cards" class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-primary-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"></textarea>
           <span *ngIf="form.controls.short_description.invalid && form.controls.short_description.touched" class="text-sm text-rose-600">Short description is required.</span>
         </label>
 
         <label class="block space-y-2">
           <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Full content</span>
-          <textarea formControlName="content" rows="8" placeholder="Write the full article here" class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"></textarea>
+          <textarea formControlName="content" rows="8" placeholder="Write the full article here" class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-primary-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"></textarea>
           <span *ngIf="form.controls.content.invalid && form.controls.content.touched" class="text-sm text-rose-600">Content is required.</span>
         </label>
 
         <label class="block space-y-2">
           <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Tags</span>
-          <input formControlName="tags" type="text" placeholder="angular, ui, portfolio" class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
+          <input formControlName="tags" type="text" placeholder="angular, ui, portfolio" class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-primary-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
         </label>
 
         <div class="grid gap-6 lg:grid-cols-2">
@@ -59,7 +59,7 @@ import { BlogItem } from '../../models/dashboard.models';
           </label>
           <label class="block space-y-2">
             <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Thumbnail URL</span>
-            <input formControlName="thumbnail" type="text" placeholder="https://..." class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
+            <input formControlName="thumbnail" type="text" placeholder="https://..." class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-primary-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
           </label>
         </div>
 
@@ -67,7 +67,7 @@ import { BlogItem } from '../../models/dashboard.models';
           <div class="space-y-2">
             <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Publish status</span>
             <label class="inline-flex items-center gap-2 rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-700 dark:bg-slate-900">
-              <input type="checkbox" formControlName="is_published" class="h-5 w-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+              <input type="checkbox" formControlName="is_published" class="h-5 w-5 rounded border-slate-300 text-primary-600 focus:ring-primary-500" />
               <span class="text-sm text-slate-700 dark:text-slate-200">Publish immediately</span>
             </label>
           </div>
@@ -75,7 +75,7 @@ import { BlogItem } from '../../models/dashboard.models';
 
         <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <p class="text-sm text-slate-500 dark:text-slate-400">A native blog editor for fast publishing and thumbnail management.</p>
-          <button class="inline-flex items-center justify-center rounded-full bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500" [disabled]="isSaving()">{{ isEditMode() ? 'Save changes' : 'Publish blog' }}</button>
+          <button class="inline-flex items-center justify-center rounded-full bg-primary-500 px-6 py-3 text-sm font-semibold text-white transition hover:bg-primary-600" [disabled]="isSaving()">{{ isEditMode() ? 'Save changes' : 'Publish blog' }}</button>
         </div>
       </form>
     </section>

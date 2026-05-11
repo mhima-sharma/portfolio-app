@@ -16,7 +16,7 @@ import { ServiceItem } from '../../models/dashboard.models';
           <p class="text-sm uppercase tracking-[0.25em] text-slate-500 dark:text-slate-400">Service Library</p>
           <h1 class="mt-2 text-3xl font-semibold text-slate-900 dark:text-slate-50">Manage your services</h1>
         </div>
-        <button class="inline-flex items-center rounded-full bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500" (click)="navigate('/admin/dashboard/services/new')">Add new service</button>
+        <button class="inline-flex items-center rounded-full bg-primary-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-primary-600" (click)="navigate('/admin/dashboard/services/new')">Add new service</button>
       </div>
 
       <div *ngIf="isLoading(); else serviceGrid" class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">

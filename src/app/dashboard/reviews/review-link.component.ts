@@ -24,7 +24,7 @@ import { ReviewService } from '../../services/review.service';
             <p class="mt-3 break-all text-base font-semibold text-slate-900 dark:text-slate-50">{{ reviewUrl() || defaultUrl }}</p>
           </div>
           <div class="flex flex-col gap-3">
-            <button class="rounded-full bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500" type="button" (click)="generate()" [disabled]="isGenerating()">{{ reviewUrl() ? 'Refresh link' : 'Generate link' }}</button>
+            <button class="rounded-full bg-primary-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-primary-600" type="button" (click)="generate()" [disabled]="isGenerating()">{{ reviewUrl() ? 'Refresh link' : 'Generate link' }}</button>
             <button class="rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800" type="button" (click)="copyLink()" [disabled]="!reviewUrl()">Copy link</button>
           </div>
         </div>
@@ -32,11 +32,11 @@ import { ReviewService } from '../../services/review.service';
         <div class="mt-6 grid gap-4 lg:grid-cols-2">
           <label class="block space-y-2">
             <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Review title</span>
-            <input [(ngModel)]="reviewRequestTitle" type="text" placeholder="Project collaboration review" class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100" />
+            <input [(ngModel)]="reviewRequestTitle" type="text" placeholder="Project collaboration review" class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-primary-500 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100" />
           </label>
           <label class="block space-y-2">
             <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Review request</span>
-            <textarea [(ngModel)]="reviewRequestDescription" rows="3" placeholder="Ask clients to review your service quality, communication, delivery, or a specific project." class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"></textarea>
+            <textarea [(ngModel)]="reviewRequestDescription" rows="3" placeholder="Ask clients to review your service quality, communication, delivery, or a specific project." class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-primary-500 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"></textarea>
           </label>
         </div>
 

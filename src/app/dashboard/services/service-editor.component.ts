@@ -24,26 +24,26 @@ import { ServiceItem } from '../../models/dashboard.models';
         <div class="grid gap-6 lg:grid-cols-2">
           <label class="block space-y-2">
             <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Title</span>
-            <input formControlName="title" type="text" placeholder="Service title" class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
+            <input formControlName="title" type="text" placeholder="Service title" class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-primary-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
             <span *ngIf="form.controls.title.invalid && form.controls.title.touched" class="text-sm text-rose-600">Title is required.</span>
           </label>
 
           <label class="block space-y-2">
             <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Price</span>
-            <input formControlName="price" type="text" placeholder="₹ 4999" class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
+            <input formControlName="price" type="text" placeholder="₹ 4999" class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-primary-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
           </label>
         </div>
 
         <div class="grid gap-6 lg:grid-cols-2">
           <label class="block space-y-2">
             <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Short description</span>
-            <textarea formControlName="short_description" rows="3" placeholder="Summary for cards" class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"></textarea>
+            <textarea formControlName="short_description" rows="3" placeholder="Summary for cards" class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-primary-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"></textarea>
             <span *ngIf="form.controls.short_description.invalid && form.controls.short_description.touched" class="text-sm text-rose-600">Short description is required.</span>
           </label>
 
           <label class="block space-y-2">
             <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Long description</span>
-            <textarea formControlName="long_description" rows="5" placeholder="Detailed description for clients" class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"></textarea>
+            <textarea formControlName="long_description" rows="5" placeholder="Detailed description for clients" class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-primary-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"></textarea>
           </label>
         </div>
 
@@ -64,32 +64,32 @@ import { ServiceItem } from '../../models/dashboard.models';
         <div class="grid gap-6 lg:grid-cols-2">
           <label class="block space-y-2">
             <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Image URL</span>
-            <input formControlName="image" type="text" placeholder="https://..." class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
+            <input formControlName="image" type="text" placeholder="https://..." class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-primary-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
           </label>
 
           <label class="block space-y-2">
             <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Icon</span>
-            <input formControlName="icon" type="text" placeholder="briefcase, code, palette..." class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
+            <input formControlName="icon" type="text" placeholder="briefcase, code, palette..." class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-primary-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
           </label>
         </div>
 
         <div class="grid gap-6 lg:grid-cols-2">
           <label class="block space-y-2">
             <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Logo URL</span>
-            <input formControlName="logo" type="text" placeholder="https://..." class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
+            <input formControlName="logo" type="text" placeholder="https://..." class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-primary-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" />
           </label>
         </div>
 
         <div class="grid gap-6 lg:grid-cols-2">
           <label class="inline-flex items-center gap-2 rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-700 dark:bg-slate-900">
-            <input type="checkbox" formControlName="is_active" class="h-5 w-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+            <input type="checkbox" formControlName="is_active" class="h-5 w-5 rounded border-slate-300 text-primary-600 focus:ring-primary-500" />
             <span class="text-sm text-slate-700 dark:text-slate-200">Active service</span>
           </label>
         </div>
 
         <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <p class="text-sm text-slate-500 dark:text-slate-400">Upload an image to make your service card stand out.</p>
-          <button class="inline-flex items-center justify-center rounded-full bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500" [disabled]="isSaving()">{{ isEditMode() ? 'Save changes' : 'Create service' }}</button>
+          <button class="inline-flex items-center justify-center rounded-full bg-primary-500 px-6 py-3 text-sm font-semibold text-white transition hover:bg-primary-600" [disabled]="isSaving()">{{ isEditMode() ? 'Save changes' : 'Create service' }}</button>
         </div>
       </form>
     </section>

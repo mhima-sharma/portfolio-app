@@ -613,7 +613,7 @@ export class PortfolioService {
       case 'programming':
         return 'frontend';
       default:
-        return 'tools';
+        return category?.trim() || 'tools';
     }
   }
 
