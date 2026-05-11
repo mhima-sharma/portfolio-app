@@ -2,9 +2,10 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ThemePreviewModalComponent } from './theme-preview-modal.component';
+import { PortfolioTheme } from '../models/portfolio.model';
 
 interface ThemePreview {
-  id: string;
+  id: PortfolioTheme;
   name: string;
   description: string;
   previewImage: string;
@@ -105,11 +106,11 @@ export class ThemeSelectorComponent {
   private router = inject(Router);
 
   showModal = signal(false);
-  selectedThemeId = signal('');
+  selectedThemeId = signal<PortfolioTheme>('modern-minimal');
 
   themes = signal<ThemePreview[]>([
     {
-      id: 'freefolio',
+      id: 'freefolio-basic',
       name: 'Freefolio',
       description: 'Free and customizable theme',
       previewImage: '/assets/theme-previews/freefolio.png',
@@ -151,14 +152,14 @@ export class ThemeSelectorComponent {
       colorPalette: ['#8b5cf6', '#ec4899', '#f59e0b', '#10b981']
     },
     {
-      id: 'theme5',
+      id: 'theme-5',
       name: 'Theme 5',
       description: 'Elegant theme with warm colors',
       previewImage: '/assets/theme-previews/theme5.png',
       colorPalette: ['#f6f2eb', '#181512', '#8b7355', '#d4a574']
     },
     {
-      id: 'theme6',
+      id: 'premium-signature',
       name: 'Theme 6',
       description: 'Modern theme with vibrant colors',
       previewImage: '/assets/theme-previews/theme6.png',
@@ -166,7 +167,7 @@ export class ThemeSelectorComponent {
     }
   ]);
 
-  openPreview(themeId: string) {
+  openPreview(themeId: PortfolioTheme) {
     this.selectedThemeId.set(themeId);
     this.showModal.set(true);
   }
@@ -175,7 +176,7 @@ export class ThemeSelectorComponent {
     this.showModal.set(false);
   }
 
-  onThemeSelected(themeId: string) {
+  onThemeSelected(themeId: PortfolioTheme) {
     // Store selected theme and navigate to portfolio
     localStorage.setItem('selectedTheme', themeId);
     this.router.navigate(['/portfolio']);
