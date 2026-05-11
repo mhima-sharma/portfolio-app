@@ -8,3 +8,4 @@ export const EMAILJS_CONFIG = {
 export function isEmailJsConfigured(): boolean {
   return !Object.values(EMAILJS_CONFIG).some((value) => value.startsWith('YOUR_EMAILJS_'));
 }
+// email details 

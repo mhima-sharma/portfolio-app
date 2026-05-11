@@ -19,7 +19,6 @@ import { BlogItem } from '../../models/dashboard.models';
         </div>
         <button class="inline-flex items-center rounded-full border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" type="button" (click)="navigate('/admin/dashboard/blogs')">Back to blogs</button>
       </div>
-
       <form [formGroup]="form" class="space-y-6" (ngSubmit)="submit()">
         <div class="grid gap-6 lg:grid-cols-2">
           <label class="block space-y-2">
