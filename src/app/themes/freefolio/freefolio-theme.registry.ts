@@ -1,5 +1,12 @@
 import { PortfolioTheme } from '../../models/portfolio.model';
-import { FreefolioThemeData, FreefolioThemeProject, FreefolioThemeSkill } from './freefolio-theme.model';
+import {
+  FreefolioThemeBlog,
+  FreefolioThemeData,
+  FreefolioThemeProject,
+  FreefolioThemeService,
+  FreefolioThemeSkill,
+  FreefolioThemeTestimonial,
+} from './freefolio-theme.model';
 
 export type FreefolioThemeId = Extract<
   PortfolioTheme,
@@ -307,6 +314,9 @@ function buildFreefolioHydrationScript(themeId: FreefolioThemeId, data: Freefoli
           .split(/\\n{2,}/)
           .map((part) => part.trim())
           .filter(Boolean);
+        const aboutSummary = aboutParts.join(' ');
+        const portfolioName = data.display_name || data.full_name || data.brand_name || 'Portfolio Owner';
+        const professionalTitle = data.title || data.brand_name || 'Professional Portfolio';
 
         const findFirst = (selectors) => {
           for (const selector of selectors) {
@@ -342,11 +352,11 @@ function buildFreefolioHydrationScript(themeId: FreefolioThemeId, data: Freefoli
 
         const fillList = (containerSelectors, itemSelectors, items, fillItem) => {
           const container = findFirst(containerSelectors);
-          if (!container || !items.length) return;
+          if (!container || !items.length) return false;
 
           const existingItems = findAll(itemSelectors);
           const template = existingItems[0] || container.firstElementChild;
-          if (!template) return;
+          if (!template) return false;
 
           container.innerHTML = '';
 
@@ -355,9 +365,335 @@ function buildFreefolioHydrationScript(themeId: FreefolioThemeId, data: Freefoli
             fillItem(node, item, index);
             container.appendChild(node);
           });
+
+          return true;
         };
 
-        document.title = data.full_name ? data.full_name + ' Portfolio' : document.title;
+        const setLink = (selectors, href) => {
+          if (!href) return;
+          const node = findFirst(selectors);
+          if (node) node.setAttribute('href', href);
+        };
+
+        const getDetailsHost = () => document.querySelector('main') || document.body;
+
+        const ensureDetailsRoot = () => {
+          let root = document.querySelector('[data-freefolio-runtime-root]');
+          if (root) return root;
+
+          root = document.createElement('section');
+          root.className = 'ff-runtime-root';
+          root.setAttribute('data-freefolio-runtime-root', 'true');
+          getDetailsHost().appendChild(root);
+          return root;
+        };
+
+        const clearNode = (node) => {
+          while (node.firstChild) {
+            node.removeChild(node.firstChild);
+          }
+        };
+
+        const ensureDetailSection = (key, title, subtitle) => {
+          const root = ensureDetailsRoot();
+          let section = root.querySelector('[data-freefolio-section="' + key + '"]');
+
+          if (!section) {
+            section = document.createElement('section');
+            section.className = 'ff-runtime-section';
+            section.setAttribute('data-freefolio-section', key);
+
+            const header = document.createElement('div');
+            header.className = 'ff-runtime-header';
+
+            const titleNode = document.createElement('h2');
+            titleNode.className = 'ff-runtime-title';
+            titleNode.textContent = title;
+            header.appendChild(titleNode);
+
+            if (subtitle) {
+              const subtitleNode = document.createElement('p');
+              subtitleNode.className = 'ff-runtime-subtitle';
+              subtitleNode.textContent = subtitle;
+              header.appendChild(subtitleNode);
+            }
+
+            const body = document.createElement('div');
+            body.className = 'ff-runtime-body';
+            section.appendChild(header);
+            section.appendChild(body);
+            root.appendChild(section);
+          }
+
+          const body = section.querySelector('.ff-runtime-body');
+          clearNode(body);
+          return body;
+        };
+
+        const appendProfileDetails = () => {
+          const profileFacts = [
+            data.full_name ? { label: 'Name', value: data.full_name } : null,
+            data.display_name && data.display_name !== data.full_name
+              ? { label: 'Display Name', value: data.display_name }
+              : null,
+            data.brand_name && data.brand_name !== data.title ? { label: 'Brand', value: data.brand_name } : null,
+            data.title ? { label: 'Role', value: data.title } : null,
+            data.years_experience ? { label: 'Experience', value: data.years_experience + ' years' } : null,
+            data.slug ? { label: 'Slug', value: data.slug } : null,
+          ].filter(Boolean);
+
+          if (!profileFacts.length && !data.about_text && !data.brand_logo) return;
+
+          const body = ensureDetailSection(
+            'profile',
+            'Profile Snapshot',
+            data.about_text || aboutSummary || professionalTitle
+          );
+
+          if (data.brand_logo) {
+            const logo = document.createElement('img');
+            logo.className = 'ff-runtime-logo';
+            logo.src = data.brand_logo;
+            logo.alt = portfolioName;
+            body.appendChild(logo);
+          }
+
+          if (profileFacts.length) {
+            const grid = document.createElement('div');
+            grid.className = 'ff-runtime-grid';
+
+            profileFacts.forEach((fact) => {
+              const card = document.createElement('article');
+              card.className = 'ff-runtime-card';
+
+              const label = document.createElement('span');
+              label.className = 'ff-runtime-label';
+              label.textContent = fact.label;
+
+              const value = document.createElement('strong');
+              value.className = 'ff-runtime-value';
+              value.textContent = fact.value;
+
+              card.appendChild(label);
+              card.appendChild(value);
+              grid.appendChild(card);
+            });
+
+            body.appendChild(grid);
+          }
+        };
+
+        const appendExperienceDetails = () => {
+          if (!data.experience.length) return;
+
+          const body = ensureDetailSection(
+            'experience',
+            'Experience',
+            'Recent roles and professional milestones'
+          );
+          const grid = document.createElement('div');
+          grid.className = 'ff-runtime-grid';
+
+          data.experience.forEach((item) => {
+            const card = document.createElement('article');
+            card.className = 'ff-runtime-card';
+
+            const title = document.createElement('strong');
+            title.className = 'ff-runtime-value';
+            title.textContent = item.position || 'Role';
+
+            const meta = document.createElement('span');
+            meta.className = 'ff-runtime-label';
+            meta.textContent = [item.company, item.duration].filter(Boolean).join(' • ');
+
+            const description = document.createElement('p');
+            description.className = 'ff-runtime-copy';
+            description.textContent = item.description || '';
+
+            card.appendChild(title);
+            if (meta.textContent) card.appendChild(meta);
+            if (description.textContent) card.appendChild(description);
+            grid.appendChild(card);
+          });
+
+          body.appendChild(grid);
+        };
+
+        const appendContactDetails = () => {
+          if (!data.contactItems.length) return;
+
+          const body = ensureDetailSection(
+            'contact',
+            'Contact & Links',
+            'Every link and detail shared by the user'
+          );
+          const grid = document.createElement('div');
+          grid.className = 'ff-runtime-grid';
+
+          data.contactItems.forEach((item) => {
+            const card = document.createElement('article');
+            card.className = 'ff-runtime-card';
+
+            const label = document.createElement('span');
+            label.className = 'ff-runtime-label';
+            label.textContent = item.label;
+
+            const value = item.href ? document.createElement('a') : document.createElement('strong');
+            value.className = 'ff-runtime-value';
+            value.textContent = item.value;
+
+            if (item.href) {
+              value.setAttribute('href', item.href);
+              value.setAttribute('target', '_blank');
+              value.setAttribute('rel', 'noopener noreferrer');
+            }
+
+            card.appendChild(label);
+            card.appendChild(value);
+            grid.appendChild(card);
+          });
+
+          body.appendChild(grid);
+        };
+
+        const appendReusableSections = () => {
+          appendProfileDetails();
+          appendExperienceDetails();
+          appendContactDetails();
+        };
+
+        document.title = portfolioName ? portfolioName + ' Portfolio' : document.title;
+
+        if (themeId === 'freefolio-anime') {
+          const homeName = document.querySelector('.home-text h1');
+          if (homeName) {
+            homeName.textContent = data.full_name || 'Portfolio Owner';
+          }
+
+          const homeRole = document.querySelector('.home-text h6');
+          if (homeRole) {
+            homeRole.innerHTML = 'a passionate <span>' + (data.title || 'Creative Professional') + '</span>';
+          }
+
+          const primaryButtons = Array.from(document.querySelectorAll('.btn'));
+          if (primaryButtons[0]) {
+            primaryButtons[0].textContent = data.projects.length ? 'See My Work' : 'Get In Touch';
+            primaryButtons[0].setAttribute('href', data.projects.length ? '#resume' : '#contact');
+          }
+
+          const aboutHeading = document.querySelector('.about-text h2');
+          if (aboutHeading) {
+            aboutHeading.textContent = "I'm a " + (data.title || 'Creative Professional') + '.';
+          }
+
+          const aboutParagraph = document.querySelector('.about-text p');
+          if (aboutParagraph) {
+            aboutParagraph.textContent = aboutParts.join(' ') || 'More about this portfolio owner will appear here soon.';
+          }
+
+          if (primaryButtons[1]) {
+            primaryButtons[1].textContent = data.projects.length ? 'Browse Projects' : 'Contact Me';
+            primaryButtons[1].setAttribute('href', data.projects.length ? '#resume' : '#contact');
+          }
+
+          const servicesHeading = document.querySelector('.services .center h3');
+          if (servicesHeading) {
+            servicesHeading.textContent = data.skills.length ? 'SKILLS' : 'WHAT I DO';
+          }
+
+          fillList(
+            ['.service-content'],
+            ['.service-content .row'],
+            data.skills,
+            (node, skill, index) => {
+              const icon = node.querySelector('i');
+              if (icon) {
+                icon.className = index % 2 === 0 ? 'bx bx-code-alt' : 'bx bx-brain';
+              }
+
+              const titleNode = node.querySelector('h3');
+              if (titleNode) titleNode.textContent = skill.name;
+
+              const descriptionNode = node.querySelector('p');
+              if (descriptionNode) descriptionNode.textContent = skill.level + '% proficiency';
+            }
+          );
+
+          const ctaHeading = document.querySelector('.cta h4');
+          if (ctaHeading) {
+            ctaHeading.textContent = 'Let\\'s build something great together.';
+          }
+
+          const ctaButton = document.querySelector('.cta .btn');
+          if (ctaButton) {
+            ctaButton.textContent = 'Contact Me';
+            ctaButton.setAttribute('href', '#contact');
+          }
+
+          const resumeHeading = document.querySelector('.resume .center h3');
+          if (resumeHeading) {
+            resumeHeading.textContent =
+              data.projects.length && data.experience.length ? 'Projects & Experience' : data.projects.length ? 'Projects' : 'Experience';
+          }
+
+          const resumeItems = [
+            ...data.projects.map((project) => ({
+              eyebrow: project.technologies.length ? project.technologies.join(' • ') : 'Featured project',
+              title: project.title,
+              description: project.description,
+              meta: project.liveLink || project.githubLink || 'Portfolio project',
+            })),
+            ...data.experience.map((experience) => ({
+              eyebrow: experience.duration || 'Recent experience',
+              title: experience.position,
+              description: experience.description,
+              meta: experience.company,
+            })),
+          ];
+
+          fillList(
+            ['.resume-content'],
+            ['.resume-content .box'],
+            resumeItems,
+            (node, item) => {
+              const eyebrowNode = node.querySelector('h6');
+              if (eyebrowNode) eyebrowNode.textContent = item.eyebrow;
+
+              const titleNode = node.querySelector('h4');
+              if (titleNode) titleNode.textContent = item.title;
+
+              const descriptionNode = node.querySelector('p');
+              if (descriptionNode) descriptionNode.textContent = item.description;
+
+              const metaNode = node.querySelector('h5');
+              if (metaNode) metaNode.textContent = item.meta;
+            }
+          );
+
+          const contactHeading = document.querySelector('.contact-center h3');
+          if (contactHeading) {
+            contactHeading.textContent = data.contactItems.length ? 'Contact Details' : 'Get In Touch';
+          }
+
+          const contactForm = document.querySelector('.contact-form form');
+          if (contactForm && data.contactItems.length) {
+            contactForm.innerHTML = data.contactItems
+              .map((item) => {
+                const value = item.label + ': ' + item.value;
+                return item.href
+                  ? '<a class="send-btn" href="' + item.href + '" style="display:block; margin-bottom: 12px; text-align:center;">' + value + '</a>'
+                  : '<input type="text" readonly value="' + value.replace(/"/g, '&quot;') + '">';
+              })
+              .join('');
+          }
+
+          const footerText = document.querySelector('.footer p');
+          if (footerText) {
+            footerText.textContent = portfolioName ? 'Built for ' + portfolioName : footerText.textContent;
+          }
+
+          return;
+        }
 
         if (themeId === 'freefolio-aurora') {
           const brand = document.querySelector('nav .gradient-text');
@@ -379,7 +715,7 @@ function buildFreefolioHydrationScript(themeId: FreefolioThemeId, data: Freefoli
 
           const aboutLine = document.querySelector('#home h1 + p + p');
           if (aboutLine) {
-            aboutLine.textContent = aboutParts.join(' ');
+            aboutLine.textContent = aboutSummary;
             aboutLine.className = 'text-lg text-gray-400 max-w-2xl mx-auto mb-12';
           }
 
@@ -411,7 +747,7 @@ function buildFreefolioHydrationScript(themeId: FreefolioThemeId, data: Freefoli
 
           const description = document.querySelector('.home__description p');
           if (description) {
-            description.textContent = aboutParts.join(' ');
+            description.textContent = aboutSummary;
             description.style.color = '#a2acbd';
           }
 
@@ -441,7 +777,7 @@ function buildFreefolioHydrationScript(themeId: FreefolioThemeId, data: Freefoli
             '.header__sup-text',
             'main h1'
           ],
-          data.full_name
+          portfolioName
         );
 
         setText(
@@ -466,6 +802,23 @@ function buildFreefolioHydrationScript(themeId: FreefolioThemeId, data: Freefoli
           '.hero-text p',
           '.header__msg'
         ]);
+
+        setText(
+          ['.nav__logo', '.brand', '.navbar-brand', '.site-title', '.logo-text'],
+          data.brand_name || portfolioName
+        );
+
+        setLink(['a.home__hire', '.navbar a[href="#contact"]', 'a.contact-link', 'a[href="#contact"]'], data.contactItems[0]?.href);
+        setLink(
+          ['a.home__download', 'a.resume-link'],
+          data.contactItems.find((item) => item.key === 'portfolio' || item.key === 'website')?.href
+        );
+
+        const brandImage = findFirst(['.nav__logo img', '.brand img', '.navbar-brand img', '.logo img']);
+        if (brandImage && data.brand_logo) {
+          brandImage.setAttribute('src', data.brand_logo);
+          brandImage.setAttribute('alt', portfolioName);
+        }
 
         fillList(
           ['.projects-cards', '.project-boxes', '.project-container', '.works', '.cards', '.portfolio-container'],
@@ -513,6 +866,7 @@ function buildFreefolioHydrationScript(themeId: FreefolioThemeId, data: Freefoli
             if (descNode) descNode.textContent = skill.level + '% proficiency';
           }
         );
+
       })();
     </script>
   `;
@@ -589,6 +943,227 @@ function renderProgressSkills(skills: FreefolioThemeSkill[], barClass: string) {
     .join('');
 }
 
+function renderSimpleContactList(items: FreefolioThemeData['contactItems'], className = '') {
+  return items
+    .map((item) =>
+      item.href
+        ? `<a href="${escapeHtml(item.href)}" target="_blank" rel="noopener noreferrer" class="${className}">${escapeHtml(item.label)}: ${escapeHtml(item.value)}</a>`
+        : `<span class="${className}">${escapeHtml(item.label)}: ${escapeHtml(item.value)}</span>`
+    )
+    .join('');
+}
+
+function renderExperienceCards(
+  experience: FreefolioThemeData['experience'],
+  classes: { wrapper: string; title: string; meta: string; description: string }
+) {
+  return experience
+    .map(
+      (item) => `
+        <article class="${classes.wrapper}">
+          <h3 class="${classes.title}">${escapeHtml(item.position)}</h3>
+          <p class="${classes.meta}">${escapeHtml(item.company)}${item.duration ? ` • ${escapeHtml(item.duration)}` : ''}</p>
+          <p class="${classes.description}">${escapeHtml(item.description)}</p>
+        </article>
+      `
+    )
+    .join('');
+}
+
+function formatMetaDate(value?: string) {
+  if (!value) {
+    return '';
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return escapeHtml(value);
+  }
+
+  return escapeHtml(
+    date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    })
+  );
+}
+
+function renderSharedServices(services: FreefolioThemeService[]) {
+  if (!services.length) {
+    return '';
+  }
+
+  return `
+    <section class="ff-shared-section" id="ff-services">
+      <div class="ff-shared-shell">
+        <div class="ff-shared-heading">
+          <span class="ff-shared-kicker">Services</span>
+          <h2>What ${escapeHtml(services.length > 1 ? 'I Offer' : 'I Offer')}</h2>
+        </div>
+        <div class="ff-shared-grid">
+          ${services
+            .map(
+              (service) => `
+                <article class="ff-shared-card">
+                  ${service.image ? `<img src="${escapeHtml(service.image)}" alt="${escapeHtml(service.title)}" class="ff-shared-image">` : ''}
+                  <h3>${escapeHtml(service.title)}</h3>
+                  <p>${escapeHtml(service.shortDescription || service.longDescription || '')}</p>
+                  ${service.price ? `<span class="ff-shared-chip">${escapeHtml(service.price)}</span>` : ''}
+                </article>
+              `
+            )
+            .join('')}
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function renderSharedBlogs(blogs: FreefolioThemeBlog[]) {
+  if (!blogs.length) {
+    return '';
+  }
+
+  return `
+    <section class="ff-shared-section" id="ff-blogs">
+      <div class="ff-shared-shell">
+        <div class="ff-shared-heading">
+          <span class="ff-shared-kicker">Blogs</span>
+          <h2>Latest Writing</h2>
+        </div>
+        <div class="ff-shared-grid">
+          ${blogs
+            .map(
+              (blog) => `
+                <article class="ff-shared-card">
+                  ${blog.thumbnail ? `<img src="${escapeHtml(blog.thumbnail)}" alt="${escapeHtml(blog.title)}" class="ff-shared-image">` : ''}
+                  <div class="ff-shared-row">
+                    ${formatMetaDate(blog.createdAt) ? `<span class="ff-shared-meta">${formatMetaDate(blog.createdAt)}</span>` : ''}
+                    ${blog.tags.length ? `<span class="ff-shared-meta">${escapeHtml(blog.tags.join(' • '))}</span>` : ''}
+                  </div>
+                  <h3>${escapeHtml(blog.title)}</h3>
+                  <p>${escapeHtml(blog.description || summarizeText(blog.content, 180))}</p>
+                </article>
+              `
+            )
+            .join('')}
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function renderSharedTestimonials(testimonials: FreefolioThemeTestimonial[]) {
+  if (!testimonials.length) {
+    return '';
+  }
+
+  return `
+    <section class="ff-shared-section" id="ff-testimonials">
+      <div class="ff-shared-shell">
+        <div class="ff-shared-heading">
+          <span class="ff-shared-kicker">Testimonials</span>
+          <h2>What Clients Say</h2>
+        </div>
+        <div class="ff-shared-grid">
+          ${testimonials
+            .map(
+              (testimonial) => `
+                <article class="ff-shared-card">
+                  <div class="ff-shared-rating">${'★'.repeat(Math.max(0, Math.min(5, testimonial.rating || 0)))}${'☆'.repeat(Math.max(0, 5 - Math.min(5, testimonial.rating || 0)))}</div>
+                  <p>${escapeHtml(testimonial.review)}</p>
+                  <h3>${escapeHtml(testimonial.name)}</h3>
+                  <span class="ff-shared-meta">${escapeHtml(
+                    [testimonial.designation, testimonial.company].filter(Boolean).join(' • ')
+                  )}</span>
+                </article>
+              `
+            )
+            .join('')}
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function renderSharedGallery(gallery: FreefolioThemeData['gallery']) {
+  if (!gallery.length) {
+    return '';
+  }
+
+  return `
+    <section class="ff-shared-section" id="ff-gallery">
+      <div class="ff-shared-shell">
+        <div class="ff-shared-heading">
+          <span class="ff-shared-kicker">Portfolio Gallery</span>
+          <h2>Visual Showcase</h2>
+        </div>
+        <div class="ff-shared-grid">
+          ${gallery
+            .map(
+              (image) => `
+                <article class="ff-shared-card">
+                  <img src="${escapeHtml(image.imageUrl)}" alt="${escapeHtml(image.altText || image.title)}" class="ff-shared-image">
+                  <h3>${escapeHtml(image.title || 'Project Visual')}</h3>
+                  <p>${escapeHtml(image.altText || 'Gallery item')}</p>
+                  ${image.isFeatured ? `<span class="ff-shared-chip">Featured</span>` : ''}
+                </article>
+              `
+            )
+            .join('')}
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function renderSharedContacts(contactItems: FreefolioThemeData['contactItems']) {
+  if (!contactItems.length) {
+    return '';
+  }
+
+  return `
+    <section class="ff-shared-section" id="ff-contact">
+      <div class="ff-shared-shell">
+        <div class="ff-shared-heading">
+          <span class="ff-shared-kicker">Connect</span>
+          <h2>Contact & Profiles</h2>
+        </div>
+        <div class="ff-shared-grid">
+          ${contactItems
+            .map(
+              (item) => `
+                <article class="ff-shared-card">
+                  <span class="ff-shared-meta">${escapeHtml(item.label)}</span>
+                  <h3>${escapeHtml(item.value)}</h3>
+                  ${item.href ? `<a class="ff-shared-link" href="${escapeHtml(item.href)}" target="_blank" rel="noopener noreferrer">Open link</a>` : ''}
+                </article>
+              `
+            )
+            .join('')}
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function renderSharedDataSections(data: FreefolioThemeData) {
+  const sections = [
+    renderSharedServices(data.services),
+    renderSharedBlogs(data.blogs),
+    renderSharedTestimonials(data.testimonials),
+    renderSharedGallery(data.gallery),
+    renderSharedContacts(data.contactItems),
+  ].filter(Boolean);
+
+  if (!sections.length) {
+    return '';
+  }
+
+  return `<div class="ff-shared-stack">${sections.join('')}</div>`;
+}
+
 function renderThemeBody(themeId: FreefolioThemeId, data: FreefolioThemeData) {
   switch (themeId) {
     case 'freefolio-anime':
@@ -636,7 +1211,7 @@ function renderThemeBody(themeId: FreefolioThemeId, data: FreefolioThemeData) {
           </div>
         </section>
         <section class="resume" id="resume">
-          <div class="center"><h3>Projects</h3></div>
+          <div class="center"><h3>${data.experience.length ? 'Projects & Experience' : 'Projects'}</h3></div>
           <div class="resume-content">
             ${data.projects
               .map(
@@ -650,6 +1225,34 @@ function renderThemeBody(themeId: FreefolioThemeId, data: FreefolioThemeData) {
                 `
               )
               .join('')}
+            ${data.experience
+              .map(
+                (item) => `
+                  <div class="box">
+                    <h6>${escapeHtml(item.duration || 'Experience')}</h6>
+                    <h4>${escapeHtml(item.position)}</h4>
+                    <p>${escapeHtml(item.description)}</p>
+                    <h5>${escapeHtml(item.company)}</h5>
+                  </div>
+                `
+              )
+              .join('')}
+          </div>
+        </section>
+        <section class="contact" id="contact">
+          <div class="contact-center"><h3>Contact</h3></div>
+          <div class="contact-form">
+            <form>
+              ${data.contactItems.length
+                ? data.contactItems
+                    .map((item) =>
+                      item.href
+                        ? `<a href="${escapeHtml(item.href)}" class="send-btn" style="display:block; text-align:center; margin-bottom:0.75rem;">${escapeHtml(item.label)}: ${escapeHtml(item.value)}</a>`
+                        : `<input type="text" readonly value="${escapeHtml(`${item.label}: ${item.value}`)}">`
+                    )
+                    .join('')
+                : '<input type="text" readonly value="Contact details will appear here.">'}
+            </form>
           </div>
         </section>
       `;
@@ -697,6 +1300,19 @@ function renderThemeBody(themeId: FreefolioThemeId, data: FreefolioThemeData) {
             </div>
           </div>
         </section>
+        <section id="experience" class="py-20 bg-dark-card/30">
+          <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-bold text-center mb-12 gradient-text">Experience</h2>
+            <div class="max-w-4xl mx-auto space-y-8">
+              ${renderExperienceCards(data.experience, {
+                wrapper: 'bg-dark-card p-6 rounded-lg card-hover border border-dark-border',
+                title: 'text-xl font-semibold text-aurora-green',
+                meta: 'mt-2 text-sm text-gray-400',
+                description: 'mt-3 text-gray-300',
+              })}
+            </div>
+          </div>
+        </section>
         <section id="portfolio" class="py-20">
           <div class="container mx-auto px-6">
             <h2 class="text-4xl font-bold text-center mb-12 gradient-text">Portfolio</h2>
@@ -716,6 +1332,17 @@ function renderThemeBody(themeId: FreefolioThemeId, data: FreefolioThemeData) {
                   `
                 )
                 .join('')}
+            </div>
+          </div>
+        </section>
+        <section id="contact" class="py-20 bg-dark-card/30">
+          <div class="container mx-auto px-6 text-center">
+            <h2 class="text-4xl font-bold mb-12 gradient-text">Contact</h2>
+            <div class="flex flex-wrap justify-center gap-4">
+              ${renderSimpleContactList(
+                data.contactItems,
+                'px-4 py-3 rounded-full border border-aurora-green text-aurora-green hover:bg-aurora-green hover:text-dark-bg transition'
+              )}
             </div>
           </div>
         </section>
@@ -746,6 +1373,22 @@ function renderThemeBody(themeId: FreefolioThemeId, data: FreefolioThemeData) {
             <section class="projects-info" id="projects">
               <h1>Projects</h1>
               <div class="projects-cards">${renderBasicProjects(data.projects)}</div>
+            </section>
+            <hr>
+            <section class="projects-info" id="contact">
+              <h1>Contact</h1>
+              <div class="projects-cards">
+                ${data.contactItems
+                  .map(
+                    (item) => `
+                      <div class="project-card-info">
+                        <h2>${escapeHtml(item.label)}</h2>
+                        <ul><li>${item.href ? `<a href="${escapeHtml(item.href)}">${escapeHtml(item.value)}</a>` : escapeHtml(item.value)}</li></ul>
+                      </div>
+                    `
+                  )
+                  .join('')}
+              </div>
             </section>
             <hr>
           </main>
@@ -864,6 +1507,22 @@ function renderThemeBody(themeId: FreefolioThemeId, data: FreefolioThemeData) {
                 .join('')}
             </div>
           </section>
+          <section id="contact">
+            <h1>Contact Me</h1>
+            <div class="container">
+              ${data.contactItems
+                .map(
+                  (item) => `
+                    <div class="card">
+                      <h3>${escapeHtml(item.label)}</h3>
+                      <p>${escapeHtml(item.value)}</p>
+                      ${item.href ? `<a href="${escapeHtml(item.href)}">Open</a>` : ''}
+                    </div>
+                  `
+                )
+                .join('')}
+            </div>
+          </section>
         </main>
       `;
     case 'freefolio-clean':
@@ -905,6 +1564,18 @@ function renderThemeBody(themeId: FreefolioThemeId, data: FreefolioThemeData) {
                     <h3>${escapeHtml(project.title)}</h3>
                     <p>${escapeHtml(project.description)}</p>
                     <small>${joinTech(project)}</small>
+                  </div>
+                `
+              )
+              .join('')}
+          </section>
+          <section class="portfolio" id="contact">
+            ${data.contactItems
+              .map(
+                (item) => `
+                  <div class="portfolio-card">
+                    <h3>${escapeHtml(item.label)}</h3>
+                    <p>${item.href ? `<a href="${escapeHtml(item.href)}">${escapeHtml(item.value)}</a>` : escapeHtml(item.value)}</p>
                   </div>
                 `
               )
@@ -1074,6 +1745,21 @@ function renderThemeBody(themeId: FreefolioThemeId, data: FreefolioThemeData) {
                 .join('')}
             </div>
           </section>
+          <section id="contact">
+            <h2 class="text-gradient">Contact</h2>
+            <div class="cards">
+              ${data.contactItems
+                .map(
+                  (item) => `
+                    <article class="card">
+                      <h3>${escapeHtml(item.label)}</h3>
+                      <p>${item.href ? `<a href="${escapeHtml(item.href)}">${escapeHtml(item.value)}</a>` : escapeHtml(item.value)}</p>
+                    </article>
+                  `
+                )
+                .join('')}
+            </div>
+          </section>
         </main>
       `;
     case 'freefolio-easy':
@@ -1121,6 +1807,21 @@ function renderThemeBody(themeId: FreefolioThemeId, data: FreefolioThemeData) {
                     <article class="card">
                       <h3>${escapeHtml(project.title)}</h3>
                       <p>${escapeHtml(project.description)}</p>
+                    </article>
+                  `
+                )
+                .join('')}
+            </div>
+          </section>
+          <section class="sub-section" id="contact">
+            <h2>Contact</h2>
+            <div class="cards">
+              ${data.contactItems
+                .map(
+                  (item) => `
+                    <article class="card">
+                      <h3>${escapeHtml(item.label)}</h3>
+                      <p>${item.href ? `<a href="${escapeHtml(item.href)}">${escapeHtml(item.value)}</a>` : escapeHtml(item.value)}</p>
                     </article>
                   `
                 )
@@ -1185,6 +1886,17 @@ function renderThemeBody(themeId: FreefolioThemeId, data: FreefolioThemeData) {
             </div>
           </div>
         </section>
+        <section id="contact" class="py-20 bg-white/50">
+          <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-bold text-center text-gray-800 mb-12">Let's Grow Together</h2>
+            <div class="max-w-4xl mx-auto flex flex-wrap justify-center gap-4">
+              ${renderSimpleContactList(
+                data.contactItems,
+                'inline-flex items-center rounded-full border-2 border-leaf-green px-6 py-3 text-leaf-green hover:bg-leaf-green hover:text-white transition'
+              )}
+            </div>
+          </div>
+        </section>
       `;
     case 'freefolio-hacker':
       return `
@@ -1219,7 +1931,7 @@ function renderThemeBody(themeId: FreefolioThemeId, data: FreefolioThemeData) {
                     )
                     .join('')}
                 </section>
-                <section class="row mb-5" id="works">
+          <section class="row mb-5" id="works">
                   <div class="col-12"><h1 class="primary--text">/Projects</h1></div>
                   ${data.projects
                     .map(
@@ -1230,6 +1942,24 @@ function renderThemeBody(themeId: FreefolioThemeId, data: FreefolioThemeData) {
                             <div class="v-card__text">
                               <h2 class="primary--text">${escapeHtml(project.title)}</h2>
                               <p>${escapeHtml(project.description)}</p>
+                            </div>
+                          </div>
+                        </div>
+                      `
+                    )
+                    .join('')}
+                </section>
+                <section class="row mb-5" id="experience">
+                  <div class="col-12"><h1 class="primary--text">/Experience</h1></div>
+                  ${data.experience
+                    .map(
+                      (item) => `
+                        <div class="col-md-6 col-12">
+                          <div class="v-card theme--dark">
+                            <div class="v-card__text">
+                              <h2 class="primary--text">${escapeHtml(item.position)}</h2>
+                              <p>${escapeHtml(item.company)}${item.duration ? ` • ${escapeHtml(item.duration)}` : ''}</p>
+                              <small>${escapeHtml(item.description)}</small>
                             </div>
                           </div>
                         </div>
@@ -1299,6 +2029,21 @@ function renderThemeBody(themeId: FreefolioThemeId, data: FreefolioThemeData) {
                 .join('')}
             </div>
           </section>
+          <section class="services section bd-container" id="contact">
+            <h2 class="section-title">Contact</h2>
+            <div class="services__container bd-grid">
+              ${data.contactItems
+                .map(
+                  (item) => `
+                    <div class="services__data">
+                      <h3 class="services__title">${escapeHtml(item.label)}</h3>
+                      <p class="services__description">${item.href ? `<a href="${escapeHtml(item.href)}">${escapeHtml(item.value)}</a>` : escapeHtml(item.value)}</p>
+                    </div>
+                  `
+                )
+                .join('')}
+            </div>
+          </section>
         </main>
       `;
     case 'freefolio-ingolfur':
@@ -1355,6 +2100,20 @@ function renderThemeBody(themeId: FreefolioThemeId, data: FreefolioThemeData) {
                   <div class="column large-3 medium-6">
                     <h4>${escapeHtml(skill.name)}</h4>
                     <p>${escapeHtml(`${skill.level}% proficiency`)}</p>
+                  </div>
+                `
+              )
+              .join('')}
+          </div>
+        </section>
+        <section id="contact" class="s-about target-section">
+          <div class="row">
+            ${data.contactItems
+              .map(
+                (item) => `
+                  <div class="column large-4 medium-6">
+                    <h4>${escapeHtml(item.label)}</h4>
+                    <p>${item.href ? `<a href="${escapeHtml(item.href)}">${escapeHtml(item.value)}</a>` : escapeHtml(item.value)}</p>
                   </div>
                 `
               )
@@ -1444,6 +2203,17 @@ function renderThemeBody(themeId: FreefolioThemeId, data: FreefolioThemeData) {
               </div>
             </div>
           </section>
+          <section id="contact">
+            <h2 class="section-highlight">CONTACT</h2>
+            <div class="contact-container">
+              <div class="contact-card">
+                <h2>&gt; Contacts</h2>
+                <div class="contact-links">
+                  ${renderSimpleContactList(data.contactItems)}
+                </div>
+              </div>
+            </div>
+          </section>
         </main>
       `;
     case 'freefolio-plain':
@@ -1515,6 +2285,28 @@ function renderThemeBody(themeId: FreefolioThemeId, data: FreefolioThemeData) {
                     </div>
                   </div>
                 </section>
+                <section>
+                  <div class="container fill-height" id="contact" style="height: auto; min-height: 100vh">
+                    <div class="row justify-center">
+                      <div class="text-center col-md-10 col-12"><h1>#Contact</h1></div>
+                      ${data.contactItems
+                        .map(
+                          (item) => `
+                            <div class="text-center col-sm-6 col-md-4 col-12">
+                              <div class="v-card v-card--hover v-sheet theme--light" style="height: 100%">
+                                <div class="v-card__text">
+                                  <h2>${escapeHtml(item.label)}</h2>
+                                  <br />
+                                  <p>${item.href ? `<a href="${escapeHtml(item.href)}">${escapeHtml(item.value)}</a>` : escapeHtml(item.value)}</p>
+                                </div>
+                              </div>
+                            </div>
+                          `
+                        )
+                        .join('')}
+                    </div>
+                  </div>
+                </section>
               </main>
             </div>
           </div>
@@ -1562,6 +2354,21 @@ function renderThemeBody(themeId: FreefolioThemeId, data: FreefolioThemeData) {
                     <article class="card">
                       <h3>${escapeHtml(project.title)}</h3>
                       <p>${escapeHtml(project.description)}</p>
+                    </article>
+                  `
+                )
+                .join('')}
+            </div>
+          </section>
+          <section class="Hero" id="contact">
+            <h1>Contact</h1>
+            <div class="cards">
+              ${data.contactItems
+                .map(
+                  (item) => `
+                    <article class="card">
+                      <h3>${escapeHtml(item.label)}</h3>
+                      <p>${item.href ? `<a href="${escapeHtml(item.href)}">${escapeHtml(item.value)}</a>` : escapeHtml(item.value)}</p>
                     </article>
                   `
                 )

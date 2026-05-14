@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PortfolioService } from '../../services/portfolio.service';
-import { PortfolioData, PortfolioTheme } from '../../models/portfolio.model';
+import { PortfolioData } from '../../models/portfolio.model';
 import { ThemeModernMinimalComponent } from '../../themes/modern-minimal/theme.component';
 import { ThemeCreativeDesignerComponent } from '../../themes/creative-designer/theme.component';
 import { ThemeDeveloperDarkComponent } from '../../themes/developer-dark/theme.component';
@@ -9,10 +9,8 @@ import { ThemeCorporateProfessionalComponent } from '../../themes/corporate-prof
 import { ThemePersonalBrandingComponent } from '../../themes/personal-branding/theme.component';
 import { Theme5Component } from '../themes/theme5.component';
 import { Theme6Component } from '../themes/theme6.component';
-import { PlatformAdminService } from '../../services/platform-admin.service';
-import { FreefolioThemeComponent } from '../../themes/freefolio/theme.component';
 import { isFreefolioTheme } from '../../themes/freefolio/freefolio-theme.registry';
-import { toFreefolioThemeData } from '../../themes/freefolio/freefolio-theme.model';
+import { ThemeFreefolioAnimeComponent } from '../../themes/freefolio-anime/theme.component';
 
 @Component({
   selector: 'app-portfolio',
@@ -26,7 +24,7 @@ import { toFreefolioThemeData } from '../../themes/freefolio/freefolio-theme.mod
     ThemePersonalBrandingComponent,
     Theme5Component,
     Theme6Component,
-    FreefolioThemeComponent,
+    ThemeFreefolioAnimeComponent,
   ],
   template: `
     @if (isLoading()) {
@@ -45,8 +43,10 @@ import { toFreefolioThemeData } from '../../themes/freefolio/freefolio-theme.mod
         </div>
       </div>
     } @else if (portfolioData(); as portfolio) {
-      @if (isFreefolioTheme(portfolio.profile.selectedTheme)) {
-        <app-freefolio-theme [themeId]="portfolio.profile.selectedTheme" [data]="freefolioData(portfolio)"></app-freefolio-theme>
+      @if (portfolio.profile.selectedTheme === 'freefolio-anime') {
+        <app-freefolio-anime-theme [data]="portfolio" [profileSlug]="profileSlug()" [page]="page()"></app-freefolio-anime-theme>
+      } @else if (isFreefolioTheme(portfolio.profile.selectedTheme)) {
+        <app-modern-minimal-theme [data]="portfolio" [profileSlug]="profileSlug()" [page]="page()"></app-modern-minimal-theme>
       } @else {
         <div [ngSwitch]="portfolio.profile.selectedTheme">
           <app-modern-minimal-theme *ngSwitchCase="'modern-minimal'" [data]="portfolio" [profileSlug]="profileSlug()" [page]="page()"></app-modern-minimal-theme>
@@ -110,11 +110,5 @@ export class PortfolioComponent {
       this.isLoading.set(false);
     }
   }
-
-  private isPremiumTheme(theme: PortfolioTheme) {
-    return theme === 'premium-signature' || theme === 'theme-5-boys';
-  }
-
   protected isFreefolioTheme = isFreefolioTheme;
-  protected freefolioData = toFreefolioThemeData;
 }

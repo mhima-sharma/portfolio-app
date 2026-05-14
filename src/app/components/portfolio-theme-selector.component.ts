@@ -110,7 +110,7 @@ export class PortfolioThemeSelectorComponent {
   selectedThemeId = signal<PortfolioTheme>('modern-minimal');
 
   themes = signal<ThemePreview[]>([
-    ...FREEFOLIO_THEMES.map((theme) => ({
+    ...FREEFOLIO_THEMES.filter((theme) => theme.id === 'freefolio-anime').map((theme) => ({
       id: theme.id,
       name: theme.name,
       description: theme.summary,

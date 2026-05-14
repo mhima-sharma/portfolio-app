@@ -11,6 +11,7 @@ import {
   PortfolioTheme,
   PremiumGalleryImage,
 } from '../models/portfolio.model';
+import { BlogItem, ServiceItem, TestimonialItem } from '../models/dashboard.models';
 import {
   API_BASE_URL,
   CLOUDINARY_CLOUD_NAME,
@@ -19,6 +20,10 @@ import {
 } from '../config/api.config';
 import { firstValueFrom } from 'rxjs';
 import { isFreefolioTheme } from '../themes/freefolio/freefolio-theme.registry';
+import { AuthService } from './auth.service';
+import { ServiceService } from './service.service';
+import { BlogService } from './blog.service';
+import { TestimonialService } from './testimonial.service';
 
 const DEFAULT_CONTACT: ContactData = {
   email: 'dev.nest.ms@gmail.com',
@@ -49,6 +54,10 @@ const DEFAULT_PROFILE: ProfileData = {
 @Injectable({ providedIn: 'root' })
 export class PortfolioService {
   private http = inject(HttpClient);
+  private authService = inject(AuthService);
+  private serviceService = inject(ServiceService);
+  private blogService = inject(BlogService);
+  private testimonialService = inject(TestimonialService);
   private activeLoadRequestId = 0;
 
   private skillsData = signal<Skill[]>([]);
@@ -91,7 +100,8 @@ export class PortfolioService {
       this.http.get<{ success: boolean; message: string; data: any }>(endpoint)
     );
 
-    return this.mapPortfolioResponse(response?.data, normalizedSlug);
+    const portfolio = this.mapPortfolioResponse(response?.data, normalizedSlug);
+    return this.enrichPortfolioForAuthenticatedOwner(portfolio, normalizedSlug);
   }
 
   loadPortfolio(profileSlug?: string) {
@@ -526,6 +536,59 @@ export class PortfolioService {
     };
   }
 
+  private mapService(service: any): ServiceItem {
+    return {
+      id: Number(service?.id ?? 0),
+      admin_id: service?.admin_id,
+      profile_id: service?.profile_id ?? null,
+      title: service?.title ?? '',
+      short_description: service?.short_description ?? service?.description ?? '',
+      long_description: service?.long_description ?? service?.description ?? '',
+      image: service?.image ?? '',
+      icon: service?.icon ?? '',
+      logo: service?.logo ?? '',
+      price: service?.price ?? '',
+      is_active: Boolean(service?.is_active ?? true),
+      created_at: service?.created_at ?? '',
+      updated_at: service?.updated_at ?? '',
+    };
+  }
+
+  private mapBlog(blog: any): BlogItem {
+    return {
+      id: Number(blog?.id ?? 0),
+      admin_id: blog?.admin_id,
+      profile_id: blog?.profile_id ?? null,
+      title: blog?.title ?? '',
+      slug: blog?.slug ?? '',
+      short_description: blog?.short_description ?? blog?.description ?? '',
+      content: blog?.content ?? '',
+      thumbnail: blog?.thumbnail ?? blog?.image ?? '',
+      tags: Array.isArray(blog?.tags) ? blog.tags.join(', ') : blog?.tags ?? '',
+      is_published: Boolean(blog?.is_published ?? true),
+      created_at: blog?.created_at ?? '',
+      updated_at: blog?.updated_at ?? '',
+    };
+  }
+
+  private mapTestimonial(testimonial: any): TestimonialItem {
+    return {
+      id: Number(testimonial?.id ?? 0),
+      admin_id: testimonial?.admin_id,
+      profile_id: testimonial?.profile_id ?? null,
+      client_name: testimonial?.client_name ?? testimonial?.name ?? '',
+      client_designation: testimonial?.client_designation ?? testimonial?.designation ?? '',
+      company_name: testimonial?.company_name ?? testimonial?.company ?? '',
+      review: testimonial?.review ?? testimonial?.content ?? '',
+      rating: Number(testimonial?.rating ?? 5),
+      client_image: testimonial?.client_image ?? testimonial?.image ?? '',
+      company_logo: testimonial?.company_logo ?? testimonial?.logo ?? '',
+      is_active: Boolean(testimonial?.is_active ?? true),
+      created_at: testimonial?.created_at ?? '',
+      updated_at: testimonial?.updated_at ?? '',
+    };
+  }
+
   private sortExperience(items: Experience[]): Experience[] {
     return [...items].sort((a, b) => {
       const aIsCurrent = this.isCurrentExperience(a);
@@ -707,6 +770,15 @@ export class PortfolioService {
             data.experience.map((experience: any) => this.mapExperience(experience))
           )
         : [],
+      services: Array.isArray(data?.services)
+        ? data.services.map((service: any) => this.mapService(service))
+        : [],
+      blogs: Array.isArray(data?.blogs)
+        ? data.blogs.map((blog: any) => this.mapBlog(blog))
+        : [],
+      testimonials: Array.isArray(data?.testimonials)
+        ? data.testimonials.map((testimonial: any) => this.mapTestimonial(testimonial))
+        : [],
     };
   }
 
@@ -718,6 +790,46 @@ export class PortfolioService {
     this.skillsData.set(portfolio.skills);
     this.projectsData.set(portfolio.projects);
     this.experienceData.set(portfolio.experience);
+  }
+
+  private async enrichPortfolioForAuthenticatedOwner(
+    portfolio: PortfolioData,
+    requestedSlug: string
+  ): Promise<PortfolioData> {
+    const authSlug = this.normalizeSlug(this.authService.getCurrentSlug());
+    const portfolioSlug = this.normalizeSlug(portfolio.profile.slug || requestedSlug);
+    const isOwnerContext = Boolean(
+      this.authService.isAuthenticated() &&
+      authSlug &&
+      portfolioSlug &&
+      authSlug === portfolioSlug
+    );
+
+    const needsExtraContent =
+      !portfolio.services?.length &&
+      !portfolio.blogs?.length &&
+      !portfolio.testimonials?.length;
+
+    if (!isOwnerContext || !needsExtraContent) {
+      return portfolio;
+    }
+
+    try {
+      const [services, blogs, testimonials] = await Promise.all([
+        this.serviceService.getServices(),
+        this.blogService.getBlogs(),
+        this.testimonialService.getTestimonials(),
+      ]);
+
+      return {
+        ...portfolio,
+        services: services ?? [],
+        blogs: blogs ?? [],
+        testimonials: testimonials ?? [],
+      };
+    } catch {
+      return portfolio;
+    }
   }
 
   private normalizeTheme(theme?: string): PortfolioTheme {

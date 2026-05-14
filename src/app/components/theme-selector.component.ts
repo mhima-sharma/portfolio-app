@@ -110,11 +110,11 @@ export class ThemeSelectorComponent {
 
   themes = signal<ThemePreview[]>([
     {
-      id: 'freefolio-basic',
-      name: 'Freefolio',
-      description: 'Free and customizable theme',
-      previewImage: '/assets/theme-previews/freefolio.png',
-      colorPalette: ['#ffffff', '#000000', '#f3f4f6', '#6b7280']
+      id: 'freefolio-anime',
+      name: 'Freefolio Anime',
+      description: 'Comic-inspired Angular rebuild with clear sections and stable styling.',
+      previewImage: '/assets/freefolio/images/anime.png',
+      colorPalette: ['#ef4444', '#fde68a', '#ffffff', '#111827']
     },
     {
       id: 'modern-minimal',

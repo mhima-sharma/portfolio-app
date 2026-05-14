@@ -1,0 +1,329 @@
+:host {
+  display: block;
+}
+
+.anime-theme {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(255, 226, 226, 0.9), transparent 28%),
+    radial-gradient(circle at top right, rgba(254, 215, 170, 0.85), transparent 24%),
+    linear-gradient(180deg, #fff7ed 0%, #ffffff 42%, #fef2f2 100%);
+  color: #1f2937;
+  font-family: 'Kosugi Maru', sans-serif;
+}
+
+.anime-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  backdrop-filter: blur(18px);
+  background: rgba(255, 255, 255, 0.84);
+  border-bottom: 1px solid rgba(239, 68, 68, 0.14);
+}
+
+.anime-logo,
+.anime-logo:visited {
+  color: #111827;
+  text-decoration: none;
+  font-family: 'Bangers', cursive;
+  font-size: 2rem;
+  letter-spacing: 0.08em;
+}
+
+.anime-logo span {
+  color: #ef4444;
+}
+
+.anime-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.anime-nav a,
+.anime-nav a:visited {
+  color: #374151;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+.anime-main {
+  width: min(1180px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 2rem 0 4rem;
+}
+
+.hero-panel,
+.content-panel {
+  border-radius: 2rem;
+  border: 3px solid #111827;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 12px 12px 0 rgba(17, 24, 39, 0.96);
+}
+
+.hero-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+  gap: 2rem;
+  align-items: center;
+  padding: 2rem;
+}
+
+.hero-copy h1,
+.content-panel h2 {
+  font-family: 'Bangers', cursive;
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+
+.hero-copy h1 {
+  font-size: clamp(2.6rem, 7vw, 5rem);
+  line-height: 0.95;
+}
+
+.hero-role {
+  margin: 1rem 0 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.hero-role span {
+  color: #ef4444;
+}
+
+.hero-text,
+.panel-copy p,
+.card p {
+  line-height: 1.75;
+}
+
+.hero-actions,
+.link-row,
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.primary-btn,
+.primary-btn:visited,
+.secondary-btn,
+.secondary-btn:visited,
+.link-row a,
+.link-row a:visited,
+.card a,
+.card a:visited {
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.primary-btn,
+.secondary-btn {
+  padding: 0.9rem 1.25rem;
+  border-radius: 999px;
+  border: 2px solid #111827;
+}
+
+.primary-btn {
+  background: #ef4444;
+  color: #fff;
+}
+
+.secondary-btn {
+  background: #fff;
+  color: #111827;
+}
+
+.hero-art img,
+.panel-art img,
+.card-image {
+  display: block;
+  width: 100%;
+}
+
+.hero-art img,
+.panel-art img {
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.content-panel {
+  margin-top: 2rem;
+  padding: 1.75rem;
+}
+
+.two-column {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.85fr) minmax(0, 1.15fr);
+  gap: 1.75rem;
+  align-items: center;
+}
+
+.eyebrow {
+  display: inline-block;
+  margin-bottom: 0.75rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  border: 2px solid #111827;
+  background: #fde68a;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.fact-grid,
+.grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.fact-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 1.5rem;
+}
+
+.cards-grid {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  margin-top: 1.5rem;
+}
+
+.fact-card,
+.card {
+  border: 2px solid #111827;
+  border-radius: 1.5rem;
+  background: #fff;
+}
+
+.fact-card {
+  padding: 1rem;
+}
+
+.fact-card span,
+.card strong {
+  color: #6b7280;
+}
+
+.fact-card strong {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: 1.6rem;
+  color: #111827;
+}
+
+.card {
+  padding: 1.1rem;
+}
+
+.card h3 {
+  margin: 0.8rem 0 0.45rem;
+  font-size: 1.1rem;
+}
+
+.card-image {
+  height: 190px;
+  object-fit: cover;
+  border-radius: 1rem;
+  border: 2px solid #111827;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.85rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: #fee2e2;
+  color: #b91c1c;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.skill-card p,
+.rating {
+  margin-top: 0.85rem;
+}
+
+.skill-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.skill-track {
+  height: 0.85rem;
+  margin-top: 0.9rem;
+  border-radius: 999px;
+  background: #e5e7eb;
+  overflow: hidden;
+}
+
+.skill-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ef4444, #f97316);
+}
+
+.timeline {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.timeline-card {
+  position: relative;
+  padding-left: 1.4rem;
+}
+
+.timeline-card::before {
+  content: '';
+  position: absolute;
+  left: 0.2rem;
+  top: 1.35rem;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  background: #ef4444;
+  border: 2px solid #111827;
+}
+
+.rating {
+  color: #f59e0b;
+  letter-spacing: 0.16em;
+}
+
+@media (max-width: 920px) {
+  .hero-panel,
+  .two-column {
+    grid-template-columns: 1fr;
+  }
+
+  .anime-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  .anime-main {
+    width: min(100% - 1rem, 1180px);
+  }
+
+  .hero-panel,
+  .content-panel {
+    padding: 1.25rem;
+    box-shadow: 8px 8px 0 rgba(17, 24, 39, 0.95);
+  }
+
+  .fact-grid {
+    grid-template-columns: 1fr;
+  }
+}

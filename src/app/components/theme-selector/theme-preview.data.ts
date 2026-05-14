@@ -6,6 +6,7 @@ const RENDERABLE_PAGED_THEMES: PortfolioTheme[] = [
   'developer-dark',
   'corporate-professional',
   'personal-branding',
+  'freefolio-anime',
 ];
 
 export function normalizePreviewTheme(themeId: PortfolioTheme): PortfolioTheme {

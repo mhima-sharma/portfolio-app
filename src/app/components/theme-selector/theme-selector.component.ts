@@ -193,7 +193,7 @@ export class ThemeSelectorComponent {
       surface: 'linear-gradient(135deg, #eff6ff, #dbeafe)',
       previewClasses: ['h-4 w-28', 'h-20 w-full rounded-[1.5rem]', 'h-24 w-16 rounded-[1.25rem]', 'h-3 w-24'],
     },
-    ...FREEFOLIO_THEMES.map((theme) => ({
+    ...FREEFOLIO_THEMES.filter((theme) => theme.id === 'freefolio-anime').map((theme) => ({
       id: theme.id,
       name: theme.name,
       badge: theme.badge,

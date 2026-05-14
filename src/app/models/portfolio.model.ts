@@ -1,3 +1,5 @@
+import { BlogItem, ServiceItem, TestimonialItem } from './dashboard.models';
+
 export interface Skill {
   id: string | number;
   name: string;
@@ -115,4 +117,7 @@ export interface PortfolioData {
   projects: Project[];
   experience: Experience[];
   gallery?: PremiumGalleryImage[];
+  services?: ServiceItem[];
+  blogs?: BlogItem[];
+  testimonials?: TestimonialItem[];
 }

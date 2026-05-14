@@ -4,7 +4,6 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { map } from 'rxjs/operators';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { PortfolioTheme } from '../models/portfolio.model';
-import { FreefolioThemeId } from '../themes/freefolio/freefolio-theme.registry';
 import { ThemeModernMinimalComponent } from '../themes/modern-minimal/theme.component';
 import { ThemeCreativeDesignerComponent } from '../themes/creative-designer/theme.component';
 import { ThemeDeveloperDarkComponent } from '../themes/developer-dark/theme.component';
@@ -12,9 +11,8 @@ import { ThemeCorporateProfessionalComponent } from '../themes/corporate-profess
 import { ThemePersonalBrandingComponent } from '../themes/personal-branding/theme.component';
 import { Theme5Component } from './themes/theme5.component';
 import { Theme6Component } from './themes/theme6.component';
-import { FreefolioThemeComponent } from '../themes/freefolio/theme.component';
+import { ThemeFreefolioAnimeComponent } from '../themes/freefolio-anime/theme.component';
 import { isFreefolioTheme } from '../themes/freefolio/freefolio-theme.registry';
-import { toFreefolioThemeData } from '../themes/freefolio/freefolio-theme.model';
 import {
   buildThemePreviewData,
   isPagedPreviewTheme,
@@ -34,7 +32,7 @@ import {
     ThemePersonalBrandingComponent,
     Theme5Component,
     Theme6Component,
-    FreefolioThemeComponent,
+    ThemeFreefolioAnimeComponent,
   ],
   template: `
     <div class="min-h-screen bg-slate-100 text-slate-900">
@@ -55,7 +53,7 @@ import {
 
         @if (isPagedTheme()) {
           <div class="mx-auto flex max-w-7xl flex-wrap gap-2 px-4 pb-4 sm:px-6 lg:px-8">
-            @for (item of previewPages; track item.id) {
+            @for (item of previewPages(); track item.id) {
               <a
                 [routerLink]="['/theme-preview', rawThemeId()]"
                 [queryParams]="{ page: item.id }"
@@ -71,8 +69,12 @@ import {
 
       <main>
         <div class="pointer-events-none select-none">
-          @if (isFreefolioTheme(renderTheme())) {
-            <app-freefolio-theme [themeId]="freefolioThemeId()" [data]="freefolioData()"></app-freefolio-theme>
+          @if (renderTheme() === 'freefolio-anime') {
+            <app-freefolio-anime-theme [data]="previewData()" [profileSlug]="previewSlug()" [page]="previewPage()"></app-freefolio-anime-theme>
+          } @else if (isFreefolioTheme(renderTheme())) {
+            <div class="mx-auto max-w-3xl px-4 py-16 text-center text-slate-600">
+              This legacy Freefolio theme is temporarily hidden while it is being rebuilt in Angular.
+            </div>
           } @else {
             <div [ngSwitch]="renderTheme()">
               <app-modern-minimal-theme *ngSwitchCase="'modern-minimal'" [data]="previewData()" [profileSlug]="previewSlug()" [page]="previewPage()"></app-modern-minimal-theme>
@@ -94,11 +96,20 @@ import {
 export class ThemePreviewComponent {
   private route = inject(ActivatedRoute);
 
-  protected previewPages = [
+  private readonly defaultPreviewPages = [
     { id: 'home', label: 'Home' },
     { id: 'about', label: 'About' },
     { id: 'projects', label: 'Projects' },
     { id: 'skills', label: 'Skills' },
+    { id: 'contact', label: 'Contact' },
+  ];
+
+  private readonly animePreviewPages = [
+    { id: 'home', label: 'Home' },
+    { id: 'about', label: 'About' },
+    { id: 'skills', label: 'Skills' },
+    { id: 'projects', label: 'Projects' },
+    { id: 'experience', label: 'Experience' },
     { id: 'contact', label: 'Contact' },
   ];
 
@@ -117,10 +128,9 @@ export class ThemePreviewComponent {
   protected previewSlug = computed(() => this.previewData().profile.slug);
   protected previewTitle = computed(() => `${this.renderTheme()} preview`);
   protected isPagedTheme = computed(() => isPagedPreviewTheme(this.rawThemeId()));
-  protected previewPage = computed(() => (this.isPagedTheme() ? this.pageParam() : 'home'));
-  protected freefolioData = computed(() => toFreefolioThemeData(this.previewData()));
-  protected freefolioThemeId = computed<FreefolioThemeId>(() =>
-    isFreefolioTheme(this.renderTheme()) ? (this.renderTheme() as FreefolioThemeId) : 'freefolio-basic'
+  protected previewPages = computed(() =>
+    this.renderTheme() === 'freefolio-anime' ? this.animePreviewPages : this.defaultPreviewPages
   );
+  protected previewPage = computed(() => (this.isPagedTheme() ? this.pageParam() : 'home'));
   protected isFreefolioTheme = isFreefolioTheme;
 }

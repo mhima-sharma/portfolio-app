@@ -1,0 +1,243 @@
+<div class="anime-theme">
+  <header class="anime-header">
+    <a class="anime-logo" [routerLink]="['/', profileSlug(), 'home']">Personal<span> Portfolio</span></a>
+    <nav class="anime-nav">
+      @for (item of navItems; track item.page) {
+        <a [routerLink]="['/', profileSlug(), item.page]">{{ item.label }}</a>
+      }
+    </nav>
+  </header>
+
+  <main class="anime-main">
+    @if (currentPage() === 'home') {
+      <section class="hero-panel" id="home">
+        <div class="hero-copy">
+          <span class="eyebrow">Hello there</span>
+          <h1>{{ profileName() }}</h1>
+          <p class="hero-role">a passionate <span>{{ profileTitle() }}</span></p>
+          <p class="hero-text">{{ aboutText() || 'A strong visual portfolio with clear storytelling and clean content blocks.' }}</p>
+          <div class="hero-actions">
+            <a class="primary-btn" [routerLink]="['/', profileSlug(), 'projects']">See Projects</a>
+            <a class="secondary-btn" [routerLink]="['/', profileSlug(), 'contact']">Contact Me</a>
+          </div>
+        </div>
+        <div class="hero-art">
+          <img src="/assets/freefolio/anime/img/home.png" alt="Anime portfolio hero art" />
+        </div>
+      </section>
+
+      <section class="content-panel">
+        <span class="eyebrow">Quick Overview</span>
+        <h2>Portfolio Highlights</h2>
+        <div class="grid cards-grid">
+          <article class="card fact-card">
+            <span>Years</span>
+            <strong>{{ data().about.yearsExperience || 0 }}+</strong>
+          </article>
+          <article class="card fact-card">
+            <span>Projects</span>
+            <strong>{{ projects().length }}</strong>
+          </article>
+          <article class="card fact-card">
+            <span>Skills</span>
+            <strong>{{ skills().length }}</strong>
+          </article>
+          <article class="card fact-card">
+            <span>Services</span>
+            <strong>{{ services().length }}</strong>
+          </article>
+        </div>
+      </section>
+    } @else if (currentPage() === 'about') {
+      <section class="content-panel two-column" id="about">
+        <div class="panel-art">
+          <img src="/assets/freefolio/anime/img/about.png" alt="About illustration" />
+        </div>
+        <div class="panel-copy">
+          <span class="eyebrow">About Me</span>
+          <h2>{{ profileTitle() }}</h2>
+          <p>{{ data().about.description || data().about.bio || 'Profile summary will appear here.' }}</p>
+          <p>{{ data().about.bio }}</p>
+          <div class="fact-grid">
+            <article class="fact-card">
+              <span>Years</span>
+              <strong>{{ data().about.yearsExperience || 0 }}+</strong>
+            </article>
+            <article class="fact-card">
+              <span>Projects</span>
+              <strong>{{ projects().length }}</strong>
+            </article>
+            <article class="fact-card">
+              <span>Skills</span>
+              <strong>{{ skills().length }}</strong>
+            </article>
+            <article class="fact-card">
+              <span>Services</span>
+              <strong>{{ services().length }}</strong>
+            </article>
+          </div>
+        </div>
+      </section>
+    } @else if (currentPage() === 'skills') {
+      @if (skills().length) {
+        <section class="content-panel" id="skills">
+          <span class="eyebrow">Skill Set</span>
+          <h2>What I Work With</h2>
+          <div class="grid cards-grid">
+            @for (skill of skills(); track skill.id) {
+              <article class="card skill-card">
+                <div class="skill-row">
+                  <h3>{{ skill.name }}</h3>
+                  <span>{{ skill.level }}%</span>
+                </div>
+                <div class="skill-track">
+                  <div class="skill-fill" [style.width.%]="skill.level"></div>
+                </div>
+                <p>{{ skill.category }}</p>
+              </article>
+            }
+          </div>
+        </section>
+      }
+
+      @if (services().length) {
+        <section class="content-panel" id="services">
+          <span class="eyebrow">Services</span>
+          <h2>How I Can Help</h2>
+          <div class="grid cards-grid">
+            @for (service of services(); track service.id) {
+              <article class="card">
+                @if (service.image || service.logo) {
+                  <img class="card-image" [src]="service.image || service.logo" [alt]="service.title" />
+                }
+                <h3>{{ service.title }}</h3>
+                <p>{{ service.short_description }}</p>
+                @if (service.price) {
+                  <span class="badge">{{ service.price }}</span>
+                }
+              </article>
+            }
+          </div>
+        </section>
+      }
+    } @else if (currentPage() === 'projects') {
+      @if (projects().length) {
+        <section class="content-panel" id="projects">
+          <span class="eyebrow">Projects</span>
+          <h2>Featured Work</h2>
+          <div class="grid cards-grid">
+            @for (project of projects(); track project.id) {
+              <article class="card project-card">
+                @if (project.image) {
+                  <img class="card-image" [src]="project.image" [alt]="project.title" />
+                }
+                <h3>{{ project.title }}</h3>
+                <p>{{ project.description }}</p>
+                <div class="chip-row">
+                  @for (tech of project.technologies; track tech) {
+                    <span class="badge">{{ tech }}</span>
+                  }
+                </div>
+                <div class="link-row">
+                  @if (project.liveLink) {
+                    <a [href]="project.liveLink" target="_blank" rel="noopener noreferrer">Live</a>
+                  }
+                  @if (project.githubLink) {
+                    <a [href]="project.githubLink" target="_blank" rel="noopener noreferrer">Code</a>
+                  }
+                </div>
+              </article>
+            }
+          </div>
+        </section>
+      }
+
+      @if (blogs().length) {
+        <section class="content-panel" id="blogs">
+          <span class="eyebrow">Blogs</span>
+          <h2>Latest Writing</h2>
+          <div class="grid cards-grid">
+            @for (blog of blogs(); track blog.id) {
+              <article class="card">
+                @if (blog.thumbnail) {
+                  <img class="card-image" [src]="blog.thumbnail" [alt]="blog.title" />
+                }
+                <h3>{{ blog.title }}</h3>
+                <p>{{ blog.short_description }}</p>
+                @if (blog.tags) {
+                  <span class="badge">{{ blog.tags }}</span>
+                }
+              </article>
+            }
+          </div>
+        </section>
+      }
+
+      @if (gallery().length) {
+        <section class="content-panel" id="gallery">
+          <span class="eyebrow">Gallery</span>
+          <h2>Visual Portfolio</h2>
+          <div class="grid cards-grid">
+            @for (image of gallery(); track image.id) {
+              <article class="card">
+                <img class="card-image" [src]="image.imageUrl" [alt]="image.altText" />
+                <h3>{{ image.title }}</h3>
+                <p>{{ image.altText }}</p>
+              </article>
+            }
+          </div>
+        </section>
+      }
+    } @else if (currentPage() === 'experience') {
+      @if (experience().length) {
+        <section class="content-panel" id="experience">
+          <span class="eyebrow">Experience</span>
+          <h2>Professional Journey</h2>
+          <div class="timeline">
+            @for (item of experience(); track item.id) {
+              <article class="card timeline-card">
+                <span class="badge">{{ item.duration }}</span>
+                <h3>{{ item.position }}</h3>
+                <strong>{{ item.company }}</strong>
+                <p>{{ item.description }}</p>
+              </article>
+            }
+          </div>
+        </section>
+      }
+    } @else if (currentPage() === 'contact') {
+      @if (testimonials().length) {
+        <section class="content-panel" id="testimonials">
+          <span class="eyebrow">Testimonials</span>
+          <h2>What People Say</h2>
+          <div class="grid cards-grid">
+            @for (item of testimonials(); track item.id) {
+              <article class="card">
+                <div class="rating">{{ '★'.repeat(item.rating || 5) }}</div>
+                <p>{{ item.review }}</p>
+                <h3>{{ item.client_name }}</h3>
+                <strong>{{ item.client_designation }}{{ item.company_name ? ' • ' + item.company_name : '' }}</strong>
+              </article>
+            }
+          </div>
+        </section>
+      }
+
+      <section class="content-panel" id="contact">
+        <span class="eyebrow">Contact</span>
+        <h2>Let's Build Something Great</h2>
+        <div class="grid cards-grid">
+          @for (item of contactLinks(); track item.key) {
+            <article class="card">
+              <span class="badge">{{ item.label }}</span>
+              <h3>{{ item.value }}</h3>
+              @if (item.href) {
+                <a [href]="item.href" target="_blank" rel="noopener noreferrer">Open Link</a>
+              }
+            </article>
+          }
+        </div>
+      </section>
+    }
+  </main>
+</div>

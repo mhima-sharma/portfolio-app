@@ -7,9 +7,8 @@ import { ThemeCorporateProfessionalComponent } from '../themes/corporate-profess
 import { ThemePersonalBrandingComponent } from '../themes/personal-branding/theme.component';
 import { Theme5Component } from './themes/theme5.component';
 import { Theme6Component } from './themes/theme6.component';
-import { FreefolioThemeComponent } from '../themes/freefolio/theme.component';
+import { ThemeFreefolioAnimeComponent } from '../themes/freefolio-anime/theme.component';
 import { PortfolioData, PortfolioTheme } from '../models/portfolio.model';
-import { FreefolioThemeData } from '../themes/freefolio/freefolio-theme.model';
 import { FreefolioThemeId, FREEFOLIO_THEMES, getFreefolioThemeMeta, isFreefolioTheme } from '../themes/freefolio/freefolio-theme.registry';
 
 @Component({
@@ -24,7 +23,7 @@ import { FreefolioThemeId, FREEFOLIO_THEMES, getFreefolioThemeMeta, isFreefolioT
     ThemePersonalBrandingComponent,
     Theme5Component,
     Theme6Component,
-    FreefolioThemeComponent,
+    ThemeFreefolioAnimeComponent,
   ],
   template: `
     <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" (click)="closeModal()">
@@ -34,8 +33,10 @@ import { FreefolioThemeId, FREEFOLIO_THEMES, getFreefolioThemeMeta, isFreefolioT
           <button (click)="closeModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
         </div>
         <div class="overflow-auto max-h-[80vh]">
-          @if (isFreefolioTheme(themeId())) {
-            <app-freefolio-theme [themeId]="getFreefolioThemeId()" [data]="getFreefolioData()"></app-freefolio-theme>
+          @if (themeId() === 'freefolio-anime') {
+            <app-freefolio-anime-theme [data]="previewData" profileSlug="preview" page="home"></app-freefolio-anime-theme>
+          } @else if (isFreefolioTheme(themeId())) {
+            <div class="p-8 text-center text-slate-600">This legacy Freefolio theme is temporarily hidden while it is being rebuilt in Angular.</div>
           } @else {
             @switch (themeId()) {
               @case ('modern-minimal') {
@@ -133,6 +134,48 @@ export class ThemePreviewModalComponent {
         startDate: '2020-01-01',
         endDate: 'Present'
       }
+    ],
+    services: [
+      {
+        id: 1,
+        title: 'Portfolio Strategy',
+        short_description: 'I help professionals shape a sharp digital presence.',
+        long_description: 'Positioning, narrative, and portfolio planning for modern creators and developers.',
+        is_active: true,
+      }
+    ],
+    blogs: [
+      {
+        id: 1,
+        title: 'How I build portfolio systems',
+        short_description: 'A quick breakdown of reusable theming and content modeling.',
+        content: 'Reusable portfolio systems need strong data contracts, flexible sections, and thoughtful defaults.',
+        is_published: true,
+        tags: 'Angular, UI, Architecture',
+        created_at: '2026-01-10',
+      }
+    ],
+    testimonials: [
+      {
+        id: 1,
+        client_name: 'Aarav Sharma',
+        client_designation: 'Founder',
+        company_name: 'LaunchLayer',
+        review: 'Fast execution, clear communication, and a polished final result.',
+        rating: 5,
+        is_active: true,
+      }
+    ],
+    gallery: [
+      {
+        id: 1,
+        slug: 'preview',
+        imageUrl: '/assets/freefolio/images/anime.png',
+        title: 'Landing Page Preview',
+        altText: 'Portfolio landing page preview',
+        sortOrder: 1,
+        isFeatured: true,
+      }
     ]
   };
 
@@ -144,7 +187,7 @@ export class ThemePreviewModalComponent {
     'personal-branding': 'Personal Branding',
     'theme-5': 'Theme 5',
     'premium-signature': 'Premium Signature',
-    ...Object.fromEntries(FREEFOLIO_THEMES.map((theme) => [theme.id, theme.name])),
+    ...Object.fromEntries(FREEFOLIO_THEMES.filter((theme) => theme.id === 'freefolio-anime').map((theme) => [theme.id, theme.name])),
   } as Record<string, string>;
 
   getThemeName(themeId: string): string {
@@ -156,31 +199,6 @@ export class ThemePreviewModalComponent {
   }
 
   protected isFreefolioTheme = isFreefolioTheme;
-
-  protected getFreefolioThemeId(): FreefolioThemeId {
-    const theme = this.themeId();
-    return isFreefolioTheme(theme) ? theme : 'freefolio-basic';
-  }
-
-  getFreefolioData(): FreefolioThemeData {
-    return {
-      full_name: this.previewData.profile.name,
-      title: this.previewData.profile.title,
-      about: this.previewData.about.bio,
-      projects: this.previewData.projects.map(p => ({
-        title: p.title,
-        description: p.description,
-        image: p.image,
-        technologies: p.technologies,
-        liveLink: p.liveLink,
-        githubLink: p.githubLink
-      })),
-      skills: this.previewData.skills.map(s => ({
-        name: s.name,
-        level: s.level
-      }))
-    };
-  }
 
   selectTheme() {
     this.themeSelected.emit(this.themeId());
